@@ -417,7 +417,19 @@ function AddLost() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowConfirmationModal(true)} // Show confirmation modal
+                onClick={() =>{
+                    if (
+                      !newLostItem ||
+                      !newLostItemDesc ||
+                      !newCategory ||
+                      !newLocationLost ||
+                      !newDateLost
+                    ) {
+                      setStatus("Please fill in all fields.");
+                      return;
+                    }
+                    setShowConfirmationModal(true); // Show confirmation modal
+                  }} 
                 className="px-4 py-2 bg-green-500 text-white border border-green-600 rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
                 Submit

@@ -167,6 +167,7 @@ function AddFound() {
         setStatus("Please fill in all fields.");
         return;
       }
+      setShowConfirmationModal(true); // Show the confirmation modal
 
       const response = await fetch(`${API_URL}/found-items`, {
         method: "POST",
@@ -383,7 +384,19 @@ function AddFound() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowConfirmationModal(true)} // Show confirmation modal
+                onClick={() =>{
+                    if (
+                      !newFoundItem ||
+                      !newFoundItemDesc ||
+                      !newCategory ||
+                      !newLocationFound ||
+                      !newDateFound
+                    ) {
+                      setStatus("Please fill in all fields.");
+                      return;
+                    }
+                    setShowConfirmationModal(true); // Show confirmation modal
+                  }} 
                 className="px-4 py-2 bg-green-500 text-white border border-green-600 rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
                 Submit
@@ -410,8 +423,8 @@ function AddFound() {
               </button>
               <button
                 onClick={() => {
-                  setShowConfirmationModal(false);
                   onSubmitFoundItem();
+                  setShowConfirmationModal(false);
                 }}
                 className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
               >
