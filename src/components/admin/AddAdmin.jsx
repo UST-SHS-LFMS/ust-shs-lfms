@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./AdminSidebar";
-import { FunnelIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  FunnelIcon,
+  MagnifyingGlassIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
 
 const AddAdminForm = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +16,18 @@ const AddAdminForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  // Check if all fields are filled to enable the Submit button
+  useEffect(() => {
+    const { fullName, email, employeeNumber, role } = formData;
+    setIsFormValid(
+      fullName.trim() !== "" &&
+        email.trim() !== "" &&
+        employeeNumber.trim() !== "" &&
+        role.trim() !== ""
+    );
+  }, [formData]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -149,32 +165,50 @@ const AddAdminForm = () => {
           </div>
 
           {/* Buttons */}
-          <div className="col-span-2 flex justify-end gap-4 mt-6">
+          <div className="col-span-2 flex justify-between items-center mt-6">
             <button
               type="button"
-              onClick={handleClear}
-              className="px-4 py-2 bg-white text-amber-400 border-2 border-amber-400 rounded-4xl hover:bg-amber-100 font-bold"
+              onClick={() => window.history.back()} // Navigate back
+              className="px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
             >
-              Clear
+              Back
             </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-amber-400 text-white border border-amber-400 rounded-4xl hover:bg-amber-100 font-bold"
-              disabled={loading}
-            >
-              {loading ? "Adding..." : "Submit"}
-            </button>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={handleClear}
+                className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+              >
+                Clear
+              </button>
+              <button
+                type="submit"
+                className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
+                  !isFormValid || loading
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-green-600"
+                } transition-all duration-200`}
+                disabled={loading || !isFormValid}
+              >
+                {loading ? "Adding..." : "Submit"}
+              </button>
+            </div>
           </div>
         </form>
       </div>
 
       {/* Popup Message */}
+      {/* Popup Message */}
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative">
+            {/* Close button (x mark) */}
+            <button
+              onClick={() => setShowPopup(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+            >
               <svg
-                className="w-6 h-6 text-green-500"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -184,19 +218,22 @@ const AddAdminForm = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M5 13l4 4L19 7"
+                  d="M6 18L18 6M6 6l12 12"
                 ></path>
               </svg>
+            </button>
+
+            {/* Checkmark image and message */}
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img
+                src="https://i.imgur.com/eFvkfQz.png"
+                alt="Checkmark"
+                className="w-12 h-12"
+              />
               <h2 className="text-lg font-medium text-gray-800">
-                Admin added successfully
+                Admin added successfully!
               </h2>
             </div>
-            <button
-              onClick={() => setShowPopup(false)}
-              className="px-4 py-2 bg-amber-400 text-white rounded-lg hover:bg-amber-500"
-            >
-              Done
-            </button>
           </div>
         </div>
       )}

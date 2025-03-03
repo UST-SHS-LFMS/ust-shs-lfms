@@ -77,7 +77,7 @@ function ManageAdmins() {
         <div className="flex justify-end mb-4">
           <button
             onClick={() => navigate("/add-admin")}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600"
           >
             + Add Admin
           </button>
@@ -92,7 +92,6 @@ function ManageAdmins() {
                 <th className="px-6 py-3 text-left">Full Name</th>
                 <th className="px-6 py-3 text-left">Role</th>
                 <th className="px-6 py-3 text-left">Date Added</th>
-                <th className="px-6 py-3 text-left">Status</th>
                 <th className="px-6 py-3 text-left"></th>
               </tr>
             </thead>
@@ -103,17 +102,6 @@ function ManageAdmins() {
                   <td className="px-6 py-2 text-sm">{employee.fullName}</td>
                   <td className="px-6 py-2 text-sm">{employee.role}</td>
                   <td className="px-6 py-2 text-sm">{employee.dateAdded}</td>
-                  <td className="px-6 py-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        employee.status === "Active"
-                          ? "bg-green-300 text-green-600"
-                          : "bg-red-300 text-red-600"
-                      }`}
-                    >
-                      {employee.status}
-                    </span>
-                  </td>
                   <td className="px-6 py-2">
                     <button
                       onClick={() => handleEditClick(employee)}

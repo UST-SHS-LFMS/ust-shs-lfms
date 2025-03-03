@@ -23,10 +23,9 @@ const sidebarItems = [
 const StudentSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
   const [isSidebarDocked, setIsSidebarDocked] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Firebase logout
   const handleLogout = async () => {
     try {
       await signOut(auth); 
@@ -41,11 +40,9 @@ const StudentSidebar = () => {
   };
 
   return (
-    <div
-      className={`${
-        isSidebarDocked ? "w-56" : "w-20"
-      } bg-white text-gray-400 flex flex-col transition-all duration-300 shadow-2xl shadow-gray-400 p-4`}
-    >
+    <div className={`${
+      isSidebarDocked ? "w-56" : "w-20"
+    } bg-white text-gray-400 flex flex-col transition-all duration-300 shadow-2xl shadow-gray-400 p-4 relative z-10`}>
       <div className="flex items-center justify-between mb-6 font-bold text-amber-500">
         {isSidebarDocked && <span className="whitespace-nowrap ml-2">WELCOME!</span>}
         <button
@@ -74,12 +71,35 @@ const StudentSidebar = () => {
       </nav>
 
       <button
-        onClick={handleLogout}
+        onClick={() => setShowLogoutModal(true)}
         className="flex items-center gap-3 px-5 py-3 mt-6 rounded-md text-sm transition-all duration-200 hover:bg-gray-400 hover:text-black"
       >
         <ArrowLeftOnRectangleIcon className="w-5 h-5" />
         {isSidebarDocked && <span>Log Out</span>}
       </button>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <p className="mb-4 text-lg font-semibold text-black">Are you sure you want to log out?</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+              >
+                No
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
