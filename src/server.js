@@ -588,7 +588,6 @@ app.post("/api/add-admin", async (req, res) => {
       employeeNumber,
       role,
       createdAt: new Date().toISOString().split("T")[0],
-      status: "Active",
     };
 
     const docRef = await addDoc(userRef, newAdmin);

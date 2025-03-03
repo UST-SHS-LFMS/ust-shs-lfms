@@ -19,6 +19,17 @@ function AddFound() {
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
 
+  // Check if all required fields are filled
+  const isFormValid = () => {
+    return (
+      newFoundItem.trim() !== "" &&
+      newFoundItemDesc.trim() !== "" &&
+      newCategory.trim() !== "" &&
+      newLocationFound.trim() !== "" &&
+      newDateFound.trim() !== ""
+    );
+  };
+
   // Fetch data
   const getFoundItems = async () => {
     try {
@@ -167,7 +178,11 @@ function AddFound() {
         setStatus("Please fill in all fields.");
         return;
       }
-      setShowConfirmationModal(true); // Show the confirmation modal
+
+      if (!isFormValid()) {
+        setStatus("Please fill in all fields.");
+        return;
+      }
 
       const response = await fetch(`${API_URL}/found-items`, {
         method: "POST",
@@ -378,26 +393,19 @@ function AddFound() {
                   setNewLocationFound("");
                   setNewDateFound("");
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-4xl hover:bg-gray-100 not-visited:transition-colors duration-200"
+                className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >
                 Clear
               </button>
               <button
                 type="button"
-                onClick={() =>{
-                    if (
-                      !newFoundItem ||
-                      !newFoundItemDesc ||
-                      !newCategory ||
-                      !newLocationFound ||
-                      !newDateFound
-                    ) {
-                      setStatus("Please fill in all fields.");
-                      return;
-                    }
-                    setShowConfirmationModal(true); // Show confirmation modal
-                  }} 
-                className="px-4 py-2 bg-green-500 text-white border border-green-600 rounded-4xl hover:bg-green-600 transition-colors duration-200"
+                onClick={() => setShowConfirmationModal(true)} // Show confirmation modal
+                disabled={!isFormValid()} // Disable if form is not valid
+                className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
+                  isFormValid()
+                    ? "hover:bg-green-600"
+                    : "opacity-50 cursor-not-allowed"
+                } transition-colors duration-200`}
               >
                 Submit
               </button>
@@ -411,13 +419,13 @@ function AddFound() {
       {/* Confirmation Modal */}
       {showConfirmationModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
             <h2 className="text-xl font-bold mb-4">Are you sure?</h2>
             <p className="mb-4">Make sure all information is correct.</p>
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => setShowConfirmationModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
               >
                 No
               </button>
@@ -426,7 +434,7 @@ function AddFound() {
                   onSubmitFoundItem();
                   setShowConfirmationModal(false);
                 }}
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
                 Yes
               </button>

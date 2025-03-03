@@ -14,8 +14,8 @@ import { signOut } from "firebase/auth";
 const sidebarItems = [
   { icon: UserIcon, text: "Profile", path: "/admin-profile" },
   { icon: ListBulletIcon, text: "Items", path: "/items" },
-  { icon: QuestionMarkCircleIcon, text: "Help & Support", path: "/admin-help" },
   { icon: UsersIcon, text: "Manage Admins", path: "/manage-admins" },
+  { icon: QuestionMarkCircleIcon, text: "Help & Support", path: "/admin-help" },
 ];
 
 const AdminSidebar = () => {
@@ -79,18 +79,18 @@ const AdminSidebar = () => {
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
             <p className="mb-4 text-lg font-semibold text-black">Are you sure you want to log out?</p>
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
               >
                 No
               </button>
               <button
                 onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
                 Yes
               </button>
@@ -101,8 +101,6 @@ const AdminSidebar = () => {
     </div>
   );
 };
-
-//Git Test
 
 export default AdminSidebar;
 

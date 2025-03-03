@@ -61,16 +61,8 @@ const EditAdmin = ({
         {/* Modal Content */}
         <div className="space-y-3">
           <p>
-            <strong>Employee ID:</strong> {employee.employeeID}
+            <strong>Employee:</strong> {employee.employeeID}
           </p>
-          <p>
-            <strong>Name:</strong> {employee.employeeFirstName}{" "}
-            {employee.employeeLastName}
-          </p>
-          <p>
-            <strong>Date Added:</strong> {employee.dateAdded}
-          </p>
-
           {/* Role Dropdown */}
           <label className="block font-semibold">Role:</label>
           <select
