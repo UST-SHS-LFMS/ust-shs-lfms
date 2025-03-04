@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/admin/AdminSidebar";
+import { QrCodeIcon } from "@heroicons/react/24/outline";
 
 function AddFound() {
   const [foundItems, setFoundItems] = useState([]);
@@ -13,8 +14,11 @@ function AddFound() {
   const [newCategory, setNewCategory] = useState("");
   const [newLocationFound, setNewLocationFound] = useState("");
   const [newDateFound, setNewDateFound] = useState("");
+  const [foundByName, setFoundByName] = useState(""); // New state for Full Name
+  const [foundByID, setFoundByID] = useState(""); // New state for Student ID
   const [status, setStatus] = useState("");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
@@ -26,7 +30,9 @@ function AddFound() {
       newFoundItemDesc.trim() !== "" &&
       newCategory.trim() !== "" &&
       newLocationFound.trim() !== "" &&
-      newDateFound.trim() !== ""
+      newDateFound.trim() !== "" &&
+      foundByName.trim() !== "" && // Validate Full Name
+      foundByID.trim() !== "" // Validate Student ID
     );
   };
 
@@ -173,7 +179,9 @@ function AddFound() {
         !newFoundItemDesc ||
         !newCategory ||
         !newLocationFound ||
-        !newDateFound
+        !newDateFound ||
+        !foundByName || // Validate Full Name
+        !foundByID // Validate Student ID
       ) {
         setStatus("Please fill in all fields.");
         return;
@@ -194,13 +202,15 @@ function AddFound() {
           locationFound: newLocationFound,
           dateFound: newDateFound,
           department: "SHS",
+          foundByName: foundByName, // Include Full Name in the request
+          foundByID: foundByID, // Include Student ID in the request
         }),
       });
 
       if (response.ok) {
         getFoundItems();
         getMatches(); // Call getMatches() only after successful submission
-        setStatus("Found item added successfully!");
+        setShowSuccessPopup(true); // Show the success popup
 
         // Clear form fields
         setNewFoundItem("");
@@ -208,6 +218,8 @@ function AddFound() {
         setNewCategory("");
         setNewLocationFound("");
         setNewDateFound("");
+        setFoundByName(""); // Clear Full Name
+        setFoundByID(""); // Clear Student ID
       } else {
         setStatus("Error adding found item");
       }
@@ -372,6 +384,47 @@ function AddFound() {
                 required
               />
             </div>
+
+            {/* Full Name and Student ID Fields (Inline) */}
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Full Name
+                  <div className="inline text-red-600">*</div>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  value={foundByName}
+                  onChange={(e) => setFoundByName(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                  placeholder="Full Name"
+                  required
+                />
+              </div>
+
+              <div className="flex-1">
+                <label
+                  htmlFor="studentID"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Student ID
+                  <div className="inline text-red-600">*</div>
+                </label>
+                <input
+                  type="text"
+                  id="studentID"
+                  value={foundByID}
+                  onChange={(e) => setFoundByID(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                  placeholder="Student ID"
+                  required
+                />
+              </div>
+            </div>
           </div>
 
           {/* Buttons */}
@@ -384,6 +437,7 @@ function AddFound() {
               Back
             </button>
             <div className="flex gap-4">
+            <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
               <button
                 type="button"
                 onClick={() => {
@@ -392,6 +446,8 @@ function AddFound() {
                   setNewCategory("");
                   setNewLocationFound("");
                   setNewDateFound("");
+                  setFoundByName(""); // Clear Full Name
+                  setFoundByID(""); // Clear Student ID
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >
@@ -439,6 +495,30 @@ function AddFound() {
                 Yes
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img
+                src="https://i.imgur.com/eFvkfQz.png"
+                alt="Checkmark"
+                className="w-12 h-12"
+              />
+              <h2 className="text-lg font-medium text-gray-800">
+                Item added successfully!
+              </h2>
+            </div>
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+            >
+              Done
+            </button>
           </div>
         </div>
       )}

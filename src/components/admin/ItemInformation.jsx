@@ -1,7 +1,129 @@
-import React from "react";
+import { QrCodeIcon } from "@heroicons/react/24/outline";
+import React, { useState } from "react";
 
 const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
+  const [isClaimFormOpen, setClaimFormOpen] = useState(false);
+  const [isMatchClaimFormOpen, setMatchClaimFormOpen] = useState(false);
+  const [claimedByID, setClaimedByID] = useState("");
+  const [claimedByName, setClaimedByName] = useState("");
+
   if (!isOpen || !item) return null;
+
+  const handleClaimSubmit = async (e) => {
+    e.preventDefault();
+    await moveItem(); // Trigger the moveItem function
+    setClaimFormOpen(false); // Close the claim form
+  };
+
+  const handleMatchClaimSubmit = async (e) => {
+    e.preventDefault();
+    await moveMatchItem(item.matchID); // Pass match ID
+    setMatchClaimFormOpen(false);
+  };
+
+  const moveItem = async () => {
+    try {
+      const docId = item.id;
+
+      if (!docId) {
+        alert("No item ID found!");
+        return;
+      }
+
+      const response = await fetch(
+        `http://localhost:3001/api/moveItem/${docId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ claimedByID, claimedByName }), // Include form data in the request
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Item claimed successfully");
+        onClose(); // Close the modal after the move
+      } else {
+        alert("Failed to claim item");
+      }
+    } catch (error) {
+      console.error("Error claiming item:", error);
+      alert("An error occurred while claiming the item");
+    }
+  };
+
+  const moveMatchItem = async () => {
+    try {
+      const docId = item.id; // Ensure we're using item.id like moveItem
+  
+      if (!docId) {
+        alert("No item ID found!");
+        return;
+      }
+  
+      const response = await fetch(
+        `http://localhost:3001/api/moveMatchItem/${docId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ claimedByID, claimedByName }), // Include form data
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        alert("Matched item moved successfully!");
+        onClose(); // Close modal after success
+      } else {
+        alert("Failed to move item: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error moving item:", error);
+      alert("An error occurred while moving the item.");
+    }
+  };
+  
+
+  const cancelMatch = async () => {
+    try {
+      const docId = item.id;
+      console.log("Match ID:", docId);
+
+      if (!docId) {
+        alert("No item ID found!");
+        return;
+      }
+
+      const cancelResponse = await fetch(
+        `http://localhost:3001/api/cancelMatch/${docId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!cancelResponse.ok) {
+        throw new Error("Failed to cancel match");
+      }
+
+      const cancelData = await cancelResponse.json();
+
+      if (!cancelData.success) {
+        throw new Error("Failed to cancel match");
+      }
+
+      alert("Match cancelled successfully");
+      onClose(); // Close the modal
+    } catch (error) {
+      console.error("Error cancelling match:", error);
+      alert(`An error occurred: ${error.message}`);
+    }
+  };
 
   const renderFoundContent = () => (
     <>
@@ -56,8 +178,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   );
 
   const renderMatchContent = () => {
-    const { foundItem = {}, lostItem = {} } = item; // Extract with fallback to empty objects
-  
+    const { foundItem = {}, lostItem = {} } = item;
+
     return (
       <>
         <h3 className="text-md font-bold">Found Item</h3>
@@ -82,9 +204,9 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         <p>
           <strong>Status:</strong> {foundItem.status}
         </p>
-  
+
         <hr className="my-2" />
-  
+
         <h3 className="text-md font-bold">Lost Item</h3>
         <p>
           <strong>Category:</strong> {lostItem.category}
@@ -111,67 +233,6 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
     );
   };
 
-  const moveItem = async () => {
-    try {
-      // Make sure item.id exists (this is the Firestore document ID)
-      const docId = item.id;
-
-      if (!docId) {
-        alert("No item ID found!");
-        return;
-      }
-
-      const response = await fetch(`http://localhost:3001/api/moveItem/${docId}`, {
-        method: 'POST',
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert('Item archived successfully');
-        onClose(); // Close the modal after the move
-      } else {
-        alert('Failed to move item');
-      }
-    } catch (error) {
-      console.error('Error moving item:', error);
-      alert('An error occurred while moving the item');
-    }
-  };
-
-  const cancelMatch = async () => {
-    try {
-      const docId = item.id;
-      console.log("Match ID:", docId);  // Check the value of docId before making the request
-  
-      if (!docId) {
-        alert("No item ID found!");
-        return;
-      }
-  
-      const cancelResponse = await fetch(`http://localhost:3001/api/cancelMatch/${docId}`, {
-        method: 'DELETE',
-      });
-  
-      if (!cancelResponse.ok) {
-        throw new Error('Failed to cancel match');
-      }
-  
-      const cancelData = await cancelResponse.json();
-  
-      if (!cancelData.success) {
-        throw new Error('Failed to cancel match');
-      }
-  
-      alert('Match cancelled successfully');
-      onClose(); // Close the modal
-  
-    } catch (error) {
-      console.error('Error cancelling match:', error);
-      alert(`An error occurred: ${error.message}`);
-    }
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case "FOUND ITEMS":
@@ -192,7 +253,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       case "FOUND ITEMS":
         return (
           <button
-            onClick={moveItem}
+            onClick={() => setClaimFormOpen(true)} // Open the claim form
             className="px-8 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
           >
             Claim
@@ -200,12 +261,23 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         );
       case "MATCH ITEMS":
         return (
+          <div className="flex justify-end gap-2">
+          {/* Cancel Match Button */}
           <button
             onClick={cancelMatch}
             className="px-8 py-2 bg-gray-500 text-white rounded-3xl hover:bg-gray-600"
           >
             Cancel Match
           </button>
+
+          {/* Mark as Claimed Button */}
+          <button
+            onClick={() => setMatchClaimFormOpen(true)}
+            className="px-8 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
+          >
+            Mark as Claimed
+          </button>
+        </div>
         );
       case "LOST ITEMS":
       case "ARCHIVE":
@@ -216,53 +288,143 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-      <div className="bg-white rounded-lg p-6 shadow-lg w-1/2 relative">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-        >
-          ✕
-        </button>
+    <>
+      {/* Main Modal */}
+      <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+        <div className="bg-white rounded-lg p-6 shadow-lg w-1/2 relative">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
 
-        {/* Container for Left and Right Sections */}
-        <div className="flex space-x-0">
-          {/* Left Section: Item Details */}
-          <div className="w-1/2">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold">
-                {activeTab === "FOUND ITEMS"
-                  ? "Found Item Details"
-                  : activeTab === "LOST ITEMS"
-                  ? "Lost Item Details"
-                  : activeTab === "MATCH ITEMS"
-                  ? "Matching Item Details"
-                  : activeTab === "ARCHIVE"
-                  ? "Archived Item Details"
-                  : "bruh"
-                }
-              </h2>
+          {/* Container for Left and Right Sections */}
+          <div className="flex space-x-0">
+            {/* Left Section: Item Details */}
+            <div className="w-1/2">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold">
+                  {activeTab === "FOUND ITEMS"
+                    ? "Found Item Details"
+                    : activeTab === "LOST ITEMS"
+                      ? "Lost Item Details"
+                      : activeTab === "MATCH ITEMS"
+                        ? "Matching Item Details"
+                        : activeTab === "ARCHIVE"
+                          ? "Archived Item Details"
+                          : "bruh"}
+                </h2>
+              </div>
+              <div className="text-sm text-gray-700 space-y-2">
+                {renderContent()}
+              </div>
             </div>
-            <div className="text-sm text-gray-700 space-y-2">
-              {renderContent()}
+
+            {/* Right Section: Item Image */}
+            <div className="w-1/2 flex justify-center items-center">
+              <img
+                src="https://i.imgur.com/R6u77UJ.png"
+                alt="Item"
+                className="w-48 h-48 object-cover rounded-lg shadow-md"
+              />
             </div>
           </div>
 
-          {/* Right Section: Item Image */}
-          <div className="w-1/2 flex justify-center items-center">
-            <img
-              src="https://i.imgur.com/R6u77UJ.png"
-              alt="Item"
-              className="w-48 h-48 object-cover rounded-lg shadow-md"
-            />
+          {/* Conditional Button */}
+          <div className="mt-4 text-right">{renderButton()}</div>
+        </div>
+      </div>
+
+      {isMatchClaimFormOpen && (
+  <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+    <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
+      <button
+        onClick={() => setMatchClaimFormOpen(false)}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+      <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+      <form onSubmit={handleMatchClaimSubmit}>
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Student Number"
+            value={claimedByID}
+            onChange={(e) => setClaimedByID(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={claimedByName}
+            onChange={(e) => setClaimedByName(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+            required
+          />
+          <div className="flex justify-end items-center gap-2">
+            <QrCodeIcon className="w-7 h-7 " />
+            <button
+              type="submit"
+              className="px-5 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
+            >
+              Claim
+            </button>
           </div>
         </div>
-
-        {/* Conditional Button */}
-        <div className="mt-4 text-right">{renderButton()}</div>
-      </div>
+      </form>
     </div>
+  </div>
+)}
+
+      {/* Claim Form Popup */}
+      {isClaimFormOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
+            <button
+              onClick={() => setClaimFormOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+            <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+            <form onSubmit={handleClaimSubmit}>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Student Number"
+                  value={claimedByID}
+                  onChange={(e) => setClaimedByID(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={claimedByName}
+                  onChange={(e) => setClaimedByName(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                {/* Flex container for Claim button and QR Code icon */}
+                <div className="flex justify-end items-center gap-2">
+                  <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 flex items-center gap-2"
+                  >
+                    Claim
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

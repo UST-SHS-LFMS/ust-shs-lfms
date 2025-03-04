@@ -19,6 +19,7 @@ function AddLost() {
   const [notifyEmail, setNotifyEmail] = useState(true); //meowrge
   const [status, setStatus] = useState("");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
@@ -170,7 +171,7 @@ function AddLost() {
     }
   };
 
-  // Handle new lost item submission //meowrge
+  // Handle new lost item submission
   const onSubmitLostItem = async () => {
     try {
       const auth = getAuth(); // Initialize Firebase Auth
@@ -206,7 +207,15 @@ function AddLost() {
 
       if (response.ok) {
         getLostItems();
-        setStatus("Lost item added successfully!");
+        setShowSuccessPopup(true); // Show the success popup
+
+        // Clear form fields
+        setNewLostItem("");
+        setNewLostItemDesc("");
+        setNewCategory("");
+        setNewLocationLost("");
+        setNewDateLost("");
+        setNewNotifEmail("");
       } else {
         setStatus("Error adding lost item");
       }
@@ -401,7 +410,7 @@ function AddLost() {
           <div className="col-span-2 flex justify-between gap-4 mt-6">
             <button
               type="button"
-              onClick={() => window.history.back()}
+              onClick={() => navigate(-1)}
               className="px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
             >
               Back
@@ -463,6 +472,33 @@ function AddLost() {
                 Yes
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img
+                src="https://i.imgur.com/eFvkfQz.png"
+                alt="Checkmark"
+                className="w-12 h-12"
+              />
+              <h2 className="text-lg font-medium text-gray-800">
+                Lost item added successfully!
+              </h2>
+              <p className="text-s text-gray-500">
+              You'll get an update if we find a matching item.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
