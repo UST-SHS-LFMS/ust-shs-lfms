@@ -198,31 +198,9 @@ const AddAdminForm = () => {
       </div>
 
       {/* Popup Message */}
-      {/* Popup Message */}
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg relative">
-            {/* Close button (x mark) */}
-            <button
-              onClick={() => setShowPopup(false)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-
             {/* Checkmark image and message */}
             <div className="flex flex-col items-center gap-2 mb-4">
               <img
@@ -233,6 +211,16 @@ const AddAdminForm = () => {
               <h2 className="text-lg font-medium text-gray-800">
                 Admin added successfully!
               </h2>
+            </div>
+
+            {/* Done button */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowPopup(false)}
+                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>

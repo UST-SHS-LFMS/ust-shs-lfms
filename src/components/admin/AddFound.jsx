@@ -15,6 +15,7 @@ function AddFound() {
   const [newDateFound, setNewDateFound] = useState("");
   const [status, setStatus] = useState("");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
@@ -200,7 +201,7 @@ function AddFound() {
       if (response.ok) {
         getFoundItems();
         getMatches(); // Call getMatches() only after successful submission
-        setStatus("Found item added successfully!");
+        setShowSuccessPopup(true); // Show the success popup
 
         // Clear form fields
         setNewFoundItem("");
@@ -439,6 +440,30 @@ function AddFound() {
                 Yes
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img
+                src="https://i.imgur.com/eFvkfQz.png"
+                alt="Checkmark"
+                className="w-12 h-12"
+              />
+              <h2 className="text-lg font-medium text-gray-800">
+                Item added successfully!
+              </h2>
+            </div>
+            <button
+              onClick={() => setShowSuccessPopup(false)}
+              className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+            >
+              Done
+            </button>
           </div>
         </div>
       )}
