@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/admin/AdminSidebar";
+import { QrCodeIcon } from "@heroicons/react/24/outline";
 
 function AddFound() {
   const [foundItems, setFoundItems] = useState([]);
@@ -13,6 +14,8 @@ function AddFound() {
   const [newCategory, setNewCategory] = useState("");
   const [newLocationFound, setNewLocationFound] = useState("");
   const [newDateFound, setNewDateFound] = useState("");
+  const [fullName, setFullName] = useState(""); // New state for Full Name
+  const [studentID, setStudentID] = useState(""); // New state for Student ID
   const [status, setStatus] = useState("");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
@@ -27,7 +30,9 @@ function AddFound() {
       newFoundItemDesc.trim() !== "" &&
       newCategory.trim() !== "" &&
       newLocationFound.trim() !== "" &&
-      newDateFound.trim() !== ""
+      newDateFound.trim() !== "" &&
+      fullName.trim() !== "" && // Validate Full Name
+      studentID.trim() !== "" // Validate Student ID
     );
   };
 
@@ -174,7 +179,9 @@ function AddFound() {
         !newFoundItemDesc ||
         !newCategory ||
         !newLocationFound ||
-        !newDateFound
+        !newDateFound ||
+        !fullName || // Validate Full Name
+        !studentID // Validate Student ID
       ) {
         setStatus("Please fill in all fields.");
         return;
@@ -195,6 +202,8 @@ function AddFound() {
           locationFound: newLocationFound,
           dateFound: newDateFound,
           department: "SHS",
+          fullName: fullName, // Include Full Name in the request
+          studentID: studentID, // Include Student ID in the request
         }),
       });
 
@@ -209,6 +218,8 @@ function AddFound() {
         setNewCategory("");
         setNewLocationFound("");
         setNewDateFound("");
+        setFullName(""); // Clear Full Name
+        setStudentID(""); // Clear Student ID
       } else {
         setStatus("Error adding found item");
       }
@@ -373,6 +384,47 @@ function AddFound() {
                 required
               />
             </div>
+
+            {/* Full Name and Student ID Fields (Inline) */}
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Full Name
+                  <div className="inline text-red-600">*</div>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                  placeholder="Full Name"
+                  required
+                />
+              </div>
+
+              <div className="flex-1">
+                <label
+                  htmlFor="studentID"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Student ID
+                  <div className="inline text-red-600">*</div>
+                </label>
+                <input
+                  type="text"
+                  id="studentID"
+                  value={studentID}
+                  onChange={(e) => setStudentID(e.target.value)}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                  placeholder="Student ID"
+                  required
+                />
+              </div>
+            </div>
           </div>
 
           {/* Buttons */}
@@ -385,6 +437,7 @@ function AddFound() {
               Back
             </button>
             <div className="flex gap-4">
+            <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
               <button
                 type="button"
                 onClick={() => {
@@ -393,6 +446,8 @@ function AddFound() {
                   setNewCategory("");
                   setNewLocationFound("");
                   setNewDateFound("");
+                  setFullName(""); // Clear Full Name
+                  setStudentID(""); // Clear Student ID
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >

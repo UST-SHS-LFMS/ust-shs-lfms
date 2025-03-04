@@ -489,6 +489,9 @@ function AddLost() {
               <h2 className="text-lg font-medium text-gray-800">
                 Lost item added successfully!
               </h2>
+              <p className="text-s text-gray-500">
+              You'll get an update if we find a matching item.
+              </p>
             </div>
             <button
               onClick={() => setShowSuccessPopup(false)}

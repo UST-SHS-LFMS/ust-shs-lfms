@@ -1,3 +1,4 @@
+import { QrCodeIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
 const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
@@ -312,12 +313,16 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   className="w-full p-2 border rounded-lg"
                   required
                 />
-                <button
-                  type="submit"
-                  className="px-8 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
-                >
-                  Claim
-                </button>
+                {/* Flex container for Claim button and QR Code icon */}
+                <div className="flex justify-end items-center gap-2">
+                  <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 flex items-center gap-2"
+                  >
+                    Claim
+                  </button>
+                </div>
               </div>
             </form>
           </div>
