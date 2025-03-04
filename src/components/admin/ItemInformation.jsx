@@ -249,6 +249,14 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   };
 
   const renderButton = () => {
+    if (activeTab === "FOUND ITEMS" && item.status === "Matched") {
+      return (
+        <p className="text-black-600 font-medium">
+          Cancel this match in the <strong>Match Items</strong> tab to claim.
+        </p>
+      );
+    }
+
     switch (activeTab) {
       case "FOUND ITEMS":
         return (
