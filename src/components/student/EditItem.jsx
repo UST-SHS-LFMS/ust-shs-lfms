@@ -135,8 +135,6 @@ function EditItem({ item, onClose, onDelete }) {
           </svg>
         </button>
 
-        <h2 className="text-xl font-bold mb-4">Edit Item</h2>
-
         <div className="grid grid-cols-2 gap-4">
           {/* Left Column */}
           <div className="space-y-3">
