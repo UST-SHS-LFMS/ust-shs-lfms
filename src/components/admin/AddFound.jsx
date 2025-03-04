@@ -14,8 +14,8 @@ function AddFound() {
   const [newCategory, setNewCategory] = useState("");
   const [newLocationFound, setNewLocationFound] = useState("");
   const [newDateFound, setNewDateFound] = useState("");
-  const [fullName, setFullName] = useState(""); // New state for Full Name
-  const [studentID, setStudentID] = useState(""); // New state for Student ID
+  const [foundByName, setFoundByName] = useState(""); // New state for Full Name
+  const [foundByID, setFoundByID] = useState(""); // New state for Student ID
   const [status, setStatus] = useState("");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
@@ -31,8 +31,8 @@ function AddFound() {
       newCategory.trim() !== "" &&
       newLocationFound.trim() !== "" &&
       newDateFound.trim() !== "" &&
-      fullName.trim() !== "" && // Validate Full Name
-      studentID.trim() !== "" // Validate Student ID
+      foundByName.trim() !== "" && // Validate Full Name
+      foundByID.trim() !== "" // Validate Student ID
     );
   };
 
@@ -180,8 +180,8 @@ function AddFound() {
         !newCategory ||
         !newLocationFound ||
         !newDateFound ||
-        !fullName || // Validate Full Name
-        !studentID // Validate Student ID
+        !foundByName || // Validate Full Name
+        !foundByID // Validate Student ID
       ) {
         setStatus("Please fill in all fields.");
         return;
@@ -202,8 +202,8 @@ function AddFound() {
           locationFound: newLocationFound,
           dateFound: newDateFound,
           department: "SHS",
-          fullName: fullName, // Include Full Name in the request
-          studentID: studentID, // Include Student ID in the request
+          foundByName: foundByName, // Include Full Name in the request
+          foundByID: foundByID, // Include Student ID in the request
         }),
       });
 
@@ -218,8 +218,8 @@ function AddFound() {
         setNewCategory("");
         setNewLocationFound("");
         setNewDateFound("");
-        setFullName(""); // Clear Full Name
-        setStudentID(""); // Clear Student ID
+        setFoundByName(""); // Clear Full Name
+        setFoundByID(""); // Clear Student ID
       } else {
         setStatus("Error adding found item");
       }
@@ -398,8 +398,8 @@ function AddFound() {
                 <input
                   type="text"
                   id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  value={foundByName}
+                  onChange={(e) => setFoundByName(e.target.value)}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Full Name"
                   required
@@ -417,8 +417,8 @@ function AddFound() {
                 <input
                   type="text"
                   id="studentID"
-                  value={studentID}
-                  onChange={(e) => setStudentID(e.target.value)}
+                  value={foundByID}
+                  onChange={(e) => setFoundByID(e.target.value)}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Student ID"
                   required
@@ -446,8 +446,8 @@ function AddFound() {
                   setNewCategory("");
                   setNewLocationFound("");
                   setNewDateFound("");
-                  setFullName(""); // Clear Full Name
-                  setStudentID(""); // Clear Student ID
+                  setFoundByName(""); // Clear Full Name
+                  setFoundByID(""); // Clear Student ID
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >

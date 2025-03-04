@@ -364,6 +364,7 @@ app.post("/api/send-email", sendEmail);
 // API Endpoint to move an item to the archive
 app.post("/api/moveItem/:id", async (req, res) => {
   const docId = req.params.id;
+  const { claimedByID, claimedByName } = req.body; // Extract student details
 
   try {
     const sourceCollection = "found_items";
@@ -373,14 +374,21 @@ app.post("/api/moveItem/:id", async (req, res) => {
     const docSnapshot = await getDoc(docRef);
 
     if (!docSnapshot.exists()) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Document not found" });
+      return res.status(404).json({ success: false, error: "Document not found" });
     }
 
     const docData = docSnapshot.data();
+
+    // Add studentNumber and fullName to the new document
+    const updatedDocData = {
+      ...docData,
+        claimedByID,
+        claimedByName,
+      status: "Claimed", // Update status to indicate it has been claimed
+    };
+
     const targetDocRef = doc(db, targetCollection, docId);
-    await setDoc(targetDocRef, docData);
+    await setDoc(targetDocRef, updatedDocData);
     await deleteDoc(docRef);
 
     res.json({ success: true });
@@ -389,6 +397,76 @@ app.post("/api/moveItem/:id", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+app.post("/api/moveMatchItem/:id", async (req, res) => {
+  const docId = req.params.id; // Match document ID
+  const { claimedByID, claimedByName } = req.body;
+
+  try {
+    const matchRef = doc(db, "matches", docId);
+    const matchSnapshot = await getDoc(matchRef);
+
+    if (!matchSnapshot.exists()) {
+      return res.status(404).json({ success: false, error: "Match not found" });
+    }
+
+    const matchData = matchSnapshot.data();
+    console.log("Match Data:", matchData); // Debugging
+
+    // Make sure to correctly extract the document IDs
+    const lostDocID = matchData.lostDocId || matchData.lostID;
+    const foundDocID = matchData.foundDocId || matchData.foundID;
+
+    if (!lostDocID || !foundDocID) {
+      return res.status(400).json({ success: false, error: "Missing associated item IDs" });
+    }
+
+    // Define references
+    const lostItemRef = doc(db, "lost_items", lostDocID);
+    const foundItemRef = doc(db, "found_items", foundDocID);
+    const archiveCollection = "archives";
+
+    const lostItemSnapshot = await getDoc(lostItemRef);
+    const foundItemSnapshot = await getDoc(foundItemRef);
+
+    if (!lostItemSnapshot.exists() || !foundItemSnapshot.exists()) {
+      return res.status(404).json({ success: false, error: "One or both items not found" });
+    }
+
+    const lostItemData = lostItemSnapshot.data();
+    const foundItemData = foundItemSnapshot.data();
+
+    // Prepare updated data with claimer info
+    const updatedLostItem = {
+      ...lostItemData,
+      claimedByID,
+      claimedByName,
+      status: "Claimed",
+    };
+
+    const updatedFoundItem = {
+      ...foundItemData,
+      claimedByID,
+      claimedByName,
+      status: "Claimed",
+    };
+
+    // Move both items to archive
+    await setDoc(doc(db, archiveCollection, lostDocID), updatedLostItem);
+    await setDoc(doc(db, archiveCollection, foundDocID), updatedFoundItem);
+
+    // Delete from original collections
+    await deleteDoc(lostItemRef);
+    await deleteDoc(foundItemRef);
+    await deleteDoc(matchRef); // Remove match entry
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error moving match items:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 
 // API Endpoint to cancel a match
 app.delete("/api/cancelMatch/:matchId", async (req, res) => {

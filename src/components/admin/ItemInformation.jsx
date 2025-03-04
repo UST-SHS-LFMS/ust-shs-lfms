@@ -3,8 +3,9 @@ import React, { useState } from "react";
 
 const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   const [isClaimFormOpen, setClaimFormOpen] = useState(false);
-  const [studentNumber, setStudentNumber] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [isMatchClaimFormOpen, setMatchClaimFormOpen] = useState(false);
+  const [claimedByID, setClaimedByID] = useState("");
+  const [claimedByName, setClaimedByName] = useState("");
 
   if (!isOpen || !item) return null;
 
@@ -12,6 +13,12 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
     e.preventDefault();
     await moveItem(); // Trigger the moveItem function
     setClaimFormOpen(false); // Close the claim form
+  };
+
+  const handleMatchClaimSubmit = async (e) => {
+    e.preventDefault();
+    await moveMatchItem(item.matchID); // Pass match ID
+    setMatchClaimFormOpen(false);
   };
 
   const moveItem = async () => {
@@ -30,7 +37,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ studentNumber, fullName }), // Include form data in the request
+          body: JSON.stringify({ claimedByID, claimedByName }), // Include form data in the request
         }
       );
 
@@ -47,6 +54,41 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       alert("An error occurred while claiming the item");
     }
   };
+
+  const moveMatchItem = async () => {
+    try {
+      const docId = item.id; // Ensure we're using item.id like moveItem
+  
+      if (!docId) {
+        alert("No item ID found!");
+        return;
+      }
+  
+      const response = await fetch(
+        `http://localhost:3001/api/moveMatchItem/${docId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ claimedByID, claimedByName }), // Include form data
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        alert("Matched item moved successfully!");
+        onClose(); // Close modal after success
+      } else {
+        alert("Failed to move item: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error moving item:", error);
+      alert("An error occurred while moving the item.");
+    }
+  };
+  
 
   const cancelMatch = async () => {
     try {
@@ -219,12 +261,23 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         );
       case "MATCH ITEMS":
         return (
+          <div className="flex justify-end gap-2">
+          {/* Cancel Match Button */}
           <button
             onClick={cancelMatch}
             className="px-8 py-2 bg-gray-500 text-white rounded-3xl hover:bg-gray-600"
           >
             Cancel Match
           </button>
+
+          {/* Mark as Claimed Button */}
+          <button
+            onClick={() => setMatchClaimFormOpen(true)}
+            className="px-8 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
+          >
+            Mark as Claimed
+          </button>
+        </div>
         );
       case "LOST ITEMS":
       case "ARCHIVE":
@@ -284,6 +337,49 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         </div>
       </div>
 
+      {isMatchClaimFormOpen && (
+  <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+    <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
+      <button
+        onClick={() => setMatchClaimFormOpen(false)}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+      <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+      <form onSubmit={handleMatchClaimSubmit}>
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Student Number"
+            value={claimedByID}
+            onChange={(e) => setClaimedByID(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={claimedByName}
+            onChange={(e) => setClaimedByName(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+            required
+          />
+          <div className="flex justify-end items-center gap-2">
+            <QrCodeIcon className="w-7 h-7 " />
+            <button
+              type="submit"
+              className="px-5 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
+            >
+              Claim
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
       {/* Claim Form Popup */}
       {isClaimFormOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
@@ -300,16 +396,16 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                 <input
                   type="text"
                   placeholder="Student Number"
-                  value={studentNumber}
-                  onChange={(e) => setStudentNumber(e.target.value)}
+                  value={claimedByID}
+                  onChange={(e) => setClaimedByID(e.target.value)}
                   className="w-full p-2 border rounded-lg"
                   required
                 />
                 <input
                   type="text"
                   placeholder="Full Name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  value={claimedByName}
+                  onChange={(e) => setClaimedByName(e.target.value)}
                   className="w-full p-2 border rounded-lg"
                   required
                 />
