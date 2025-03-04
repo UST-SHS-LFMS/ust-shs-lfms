@@ -207,7 +207,7 @@ app.post("/api/lost-items", async (req, res) => {
       lostID: newLostID,
       ...req.body,
       status: "Pending",
-      dateLost: new Date().toISOString().split("T")[0],
+      dateLost: req.body.dateLost || new Date().toISOString().split("T")[0], 
     };
 
     const docRef = await addDoc(lostItemsCollectionRef, newItem);
@@ -236,7 +236,7 @@ app.post("/api/found-items", async (req, res) => {
       foundID: newFoundID,
       ...req.body,
       status: "Pending",
-      dateFound: new Date().toISOString().split("T")[0],
+      dateFound: req.body.dateFound || new Date().toISOString().split("T")[0], 
     };
 
     const docRef = await addDoc(foundItemsCollectionRef, newItem);

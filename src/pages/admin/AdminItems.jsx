@@ -43,7 +43,14 @@ function AdminItems() {
   const [loading, setLoading] = useState(true)
   const [currentItem, setCurrentItem] = useState(null)
   const [filters, setFilters] = useState(initialFilterState)
-  const [categories, setCategories] = useState(["Electronics", "Clothing", "Books", "Accessories", "Other"])
+  const [categories, setCategories] = useState(["Personal Belongings",
+                  "Electronics",
+                  "School Supplies & Stationery",
+                  "Tumblers & Food Containers",
+                  "Clothing & Apparell",
+                  "Money & Valuables",
+                  "Documents",
+                  "Other",])
   const [statuses, setStatuses] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [qrCodes, setQrCodes] = useState({})

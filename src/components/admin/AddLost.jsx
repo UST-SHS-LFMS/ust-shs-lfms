@@ -77,6 +77,11 @@ function AddLost() {
       return false;
     }
 
+    // Ensure categories match
+    if (lostItem.category !== foundItem.category) {
+       return false;
+     }
+
     const dateLost = new Date(lostItem.dateLost);
     const dateFound = new Date(foundItem.dateFound);
     if (dateLost > dateFound) {
