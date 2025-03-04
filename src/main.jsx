@@ -14,7 +14,6 @@ import StudentItems from "./pages/student/StudentItems.jsx";
 import StudentSearch from "./pages/student/StudentSearch.jsx";
 import StudentHelpSupport from "./pages/student/StudentHelpSupport.jsx";
 import StudentSetup from "./pages/student/StudentSetup.jsx";
-import AdminSetup from "./pages/admin/AdminSetup.jsx";
 import ReportLost from "./pages/student/ReportLost.jsx";
 import Home from "./Home";
 
@@ -31,7 +30,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/admin-profile" element={<Profile />} />
         <Route path="/add-found" element={<AddFound />} />
         <Route path="/add-lost" element={<AddLost />} />
-        <Route path="/admin-setup" element={<AdminSetup />} />
 
         {/* Student Routes */}
         <Route path="/student-profile" element={<StudentProfile />} />

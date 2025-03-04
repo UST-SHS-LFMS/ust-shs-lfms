@@ -592,11 +592,17 @@ app.get("/api/users/email/:email", async (req, res) => {
   }
 });
 
-// API to update user profile details
 app.put("/api/users/:uid", async (req, res) => {
   try {
     const { uid } = req.params;
-    const { gradeLevel, studentNumber, strand } = req.body;
+    const {
+      gradeLevel,
+      studentNumber,
+      strand,
+      affiliation,
+      employeeNumber,
+      role,
+    } = req.body;
 
     const userRef = doc(db, "users", uid);
     const userDoc = await getDoc(userRef);
@@ -605,12 +611,13 @@ app.put("/api/users/:uid", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    await updateDoc(userRef, {
-      gradeLevel,
-      studentNumber,
-      strand,
-      role: "student",
-    });
+    // Determine the role and update fields accordingly
+    const updateData =
+      role === "faculty"
+        ? { affiliation, employeeNumber, role }
+        : { gradeLevel, studentNumber, strand, role: "student" };
+
+    await updateDoc(userRef, updateData);
 
     res.status(200).json({ message: "User profile updated successfully" });
   } catch (error) {
