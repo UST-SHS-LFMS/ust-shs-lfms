@@ -45,7 +45,7 @@ function UserSetup() {
             role: formData.role, // role is "student"
           };
 
-      const response = await fetch(`http://localhost:3001/api/users/${uid}`, {
+          const response = await fetch(`http://localhost:3001/api/users/${email}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),

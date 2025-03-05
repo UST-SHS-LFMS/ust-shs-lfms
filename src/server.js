@@ -207,7 +207,7 @@ app.post("/api/lost-items", async (req, res) => {
       lostID: newLostID,
       ...req.body,
       status: "Pending",
-      dateLost: req.body.dateLost || new Date().toISOString().split("T")[0], 
+      dateLost: req.body.dateLost || new Date().toISOString().split("T")[0],
     };
 
     const docRef = await addDoc(lostItemsCollectionRef, newItem);
@@ -236,7 +236,7 @@ app.post("/api/found-items", async (req, res) => {
       foundID: newFoundID,
       ...req.body,
       status: "Pending",
-      dateFound: req.body.dateFound || new Date().toISOString().split("T")[0], 
+      dateFound: req.body.dateFound || new Date().toISOString().split("T")[0],
     };
 
     const docRef = await addDoc(foundItemsCollectionRef, newItem);
@@ -374,7 +374,9 @@ app.post("/api/moveItem/:id", async (req, res) => {
     const docSnapshot = await getDoc(docRef);
 
     if (!docSnapshot.exists()) {
-      return res.status(404).json({ success: false, error: "Document not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "Document not found" });
     }
 
     const docData = docSnapshot.data();
@@ -382,8 +384,8 @@ app.post("/api/moveItem/:id", async (req, res) => {
     // Add studentNumber and fullName to the new document
     const updatedDocData = {
       ...docData,
-        claimedByID,
-        claimedByName,
+      claimedByID,
+      claimedByName,
       status: "Claimed", // Update status to indicate it has been claimed
     };
 
@@ -418,7 +420,9 @@ app.post("/api/moveMatchItem/:id", async (req, res) => {
     const foundDocID = matchData.foundDocId || matchData.foundID;
 
     if (!lostDocID || !foundDocID) {
-      return res.status(400).json({ success: false, error: "Missing associated item IDs" });
+      return res
+        .status(400)
+        .json({ success: false, error: "Missing associated item IDs" });
     }
 
     // Define references
@@ -430,7 +434,9 @@ app.post("/api/moveMatchItem/:id", async (req, res) => {
     const foundItemSnapshot = await getDoc(foundItemRef);
 
     if (!lostItemSnapshot.exists() || !foundItemSnapshot.exists()) {
-      return res.status(404).json({ success: false, error: "One or both items not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "One or both items not found" });
     }
 
     const lostItemData = lostItemSnapshot.data();
@@ -466,7 +472,6 @@ app.post("/api/moveMatchItem/:id", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
 
 // API Endpoint to cancel a match
 app.delete("/api/cancelMatch/:matchId", async (req, res) => {
@@ -530,7 +535,7 @@ app.post("/api/users", async (req, res) => {
   try {
     const { uid, email, fullName, photoURL } = req.body;
 
-    const userRef = doc(db, "users", uid);
+    const userRef = doc(db, "users", email); // Use email as the document ID
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
@@ -592,9 +597,9 @@ app.get("/api/users/email/:email", async (req, res) => {
   }
 });
 
-app.put("/api/users/:uid", async (req, res) => {
+app.put("/api/users/:email", async (req, res) => {
   try {
-    const { uid } = req.params;
+    const { email } = req.params;
     const {
       gradeLevel,
       studentNumber,
@@ -604,7 +609,7 @@ app.put("/api/users/:uid", async (req, res) => {
       role,
     } = req.body;
 
-    const userRef = doc(db, "users", uid);
+    const userRef = doc(db, "users", email); // Use email as document ID
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
