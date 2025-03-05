@@ -661,7 +661,7 @@ app.get("/api/users/email/:email", async (req, res) => {
   }
 });
 
-// API Endpoint to add an admin user
+// API Endpoint to add admin
 app.post("/api/add-admin", async (req, res) => {
   try {
     const { fullName, email, employeeNumber, role } = req.body;
@@ -670,7 +670,7 @@ app.post("/api/add-admin", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const userRef = collection(db, "users");
+    const userRef = doc(db, "users", email); // Use email as document ID
 
     const newAdmin = {
       fullName,
@@ -680,8 +680,9 @@ app.post("/api/add-admin", async (req, res) => {
       createdAt: new Date().toISOString().split("T")[0],
     };
 
-    const docRef = await addDoc(userRef, newAdmin);
-    res.status(201).json({ id: docRef.id, ...newAdmin });
+    await setDoc(userRef, newAdmin); // Use setDoc instead of addDoc
+
+    res.status(201).json({ id: email, ...newAdmin });
   } catch (error) {
     console.error("Error adding admin:", error);
     res.status(500).json({ error: "Internal server error" });
