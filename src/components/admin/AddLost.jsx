@@ -73,10 +73,6 @@ function AddLost() {
       return false;
     }
 
-    if (lostItem.status !== "Pending" || foundItem.status !== "Pending") {
-      return false;
-    }
-
     // Ensure categories match
     if (lostItem.category !== foundItem.category) {
        return false;
