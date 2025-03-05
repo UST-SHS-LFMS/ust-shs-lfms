@@ -544,7 +544,7 @@ app.post("/api/users", async (req, res) => {
         email,
         fullName,
         photoURL,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toISOString().split("T")[0],
       });
     }
 
@@ -609,7 +609,7 @@ app.put("/api/users/:email", async (req, res) => {
       role,
     } = req.body;
 
-    const userRef = doc(db, "users", email); // Use email as document ID
+    const userRef = doc(db, "users", email);
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
@@ -646,7 +646,7 @@ app.get("/api/users/email/:email", async (req, res) => {
 
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
-    console.log("Fetched user data:", userData); // Debugging line
+    console.log("Fetched user data:", userData);
 
     if (!userData.role) {
       console.warn("⚠️ Warning: User document does not have a 'role' field.");
@@ -670,7 +670,7 @@ app.post("/api/add-admin", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const userRef = doc(db, "users", email); // Use email as document ID
+    const userRef = doc(db, "users", email);
 
     const newAdmin = {
       fullName,
@@ -680,7 +680,7 @@ app.post("/api/add-admin", async (req, res) => {
       createdAt: new Date().toISOString().split("T")[0],
     };
 
-    await setDoc(userRef, newAdmin); // Use setDoc instead of addDoc
+    await setDoc(userRef, newAdmin);
 
     res.status(201).json({ id: email, ...newAdmin });
   } catch (error) {

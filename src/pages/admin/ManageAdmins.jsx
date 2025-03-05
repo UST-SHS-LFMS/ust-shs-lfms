@@ -101,7 +101,7 @@ function ManageAdmins() {
                   <td className="px-6 py-2 text-sm">{employee.employeeNumber}</td>
                   <td className="px-6 py-2 text-sm">{employee.fullName}</td>
                   <td className="px-6 py-2 text-sm">{employee.role}</td>
-                  <td className="px-6 py-2 text-sm">{employee.dateAdded}</td>
+                  <td className="px-6 py-2 text-sm">{employee.createdAt}</td>
                   <td className="px-6 py-2">
                     <button
                       onClick={() => handleEditClick(employee)}
