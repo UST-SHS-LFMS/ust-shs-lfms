@@ -1,150 +1,439 @@
-import { useState, useEffect } from "react";
+import { QrCodeIcon } from "@heroicons/react/24/outline";
+import React, { useState } from "react";
 
-function ItemFilter({
-  isOpen,
-  onClose,
-  onApplyFilters,
-  onResetFilters,
-  initialFilters,
-  categories,
-  statuses,
-}) {
-  const [filters, setFilters] = useState(initialFilters);
-  const [isLoading, setIsLoading] = useState(false);
+const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
+  const [isClaimFormOpen, setClaimFormOpen] = useState(false);
+  const [isMatchClaimFormOpen, setMatchClaimFormOpen] = useState(false);
+  const [claimedByID, setClaimedByID] = useState("");
+  const [claimedByName, setClaimedByName] = useState("");
 
-  useEffect(() => {
-    setFilters(initialFilters, onApplyFilters);
-  }, [initialFilters, onApplyFilters]);
+  if (!isOpen || !item) return null;
 
-  if (!isOpen) return null;
-
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleClaimSubmit = async (e) => {
+    e.preventDefault();
+    await moveItem(); // Trigger the moveItem function
+    setClaimFormOpen(false); // Close the claim form
   };
 
-  const handleApply = async () => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500)); // fetch delay
-  
-    // Check if filters are empty
-    const isFilterEmpty =
-      !filters.date && !filters.orderBy && !filters.category && !filters.status;
-  
-    if (isFilterEmpty) {
-      onApplyFilters((prevItems) => sortItems(prevItems)); // Sort if no filters
-    } else {
-      onApplyFilters(filters);
+  const handleMatchClaimSubmit = async (e) => {
+    e.preventDefault();
+    await moveMatchItem(item.matchID); // Pass match ID
+    setMatchClaimFormOpen(false);
+  };
+
+  const moveItem = async () => {
+    try {
+      const docId = item.id;
+
+      if (!docId) {
+        alert("No item ID found!");
+        return;
+      }
+
+      const response = await fetch(
+        `http://localhost:3001/api/moveItem/${docId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ claimedByID, claimedByName }), // Include form data in the request
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Item claimed successfully");
+        onClose(); // Close the modal after the move
+      } else {
+        alert("Failed to claim item");
+      }
+    } catch (error) {
+      console.error("Error claiming item:", error);
+      alert("An error occurred while claiming the item");
     }
-  
-    setIsLoading(false);
-    onClose();
   };
 
-  const handleReset = () => {
-    setFilters({
-      date: "",
-      orderBy: "",
-      category: "",
-      status: "",
-    });
-    onResetFilters();
+  const moveMatchItem = async () => {
+    try {
+      const docId = item.id; // Ensure we're using item.id like moveItem
+  
+      if (!docId) {
+        alert("No item ID found!");
+        return;
+      }
+  
+      const response = await fetch(
+        `http://localhost:3001/api/moveMatchItem/${docId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ claimedByID, claimedByName }), // Include form data
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        alert("Matched item moved successfully!");
+        onClose(); // Close modal after success
+      } else {
+        alert("Failed to move item: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error moving item:", error);
+      alert("An error occurred while moving the item.");
+    }
+  };
+  
+
+  const cancelMatch = async () => {
+    try {
+      const docId = item.id;
+      console.log("Match ID:", docId);
+
+      if (!docId) {
+        alert("No item ID found!");
+        return;
+      }
+
+      const cancelResponse = await fetch(
+        `http://localhost:3001/api/cancelMatch/${docId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!cancelResponse.ok) {
+        throw new Error("Failed to cancel match");
+      }
+
+      const cancelData = await cancelResponse.json();
+
+      if (!cancelData.success) {
+        throw new Error("Failed to cancel match");
+      }
+
+      alert("Match cancelled successfully");
+      onClose(); // Close the modal
+    } catch (error) {
+      console.error("Error cancelling match:", error);
+      alert(`An error occurred: ${error.message}`);
+    }
+  };
+
+  const renderFoundContent = () => (
+    <>
+      <p>
+        <strong>Category:</strong> {item.category}
+      </p>
+      <p>
+        <strong>Date Found:</strong> {item.dateFound}
+      </p>
+      <p>
+        <strong>Found ID:</strong> {item.foundID}
+      </p>
+      <p>
+        <strong>Description:</strong> {item.found_item_desc}
+      </p>
+      <p>
+        <strong>Item Name:</strong> {item.found_item_name}
+      </p>
+      <p>
+        <strong>Location Found:</strong> {item.locationFound}
+      </p>
+      <p>
+        <strong>Status:</strong> {item.status}
+      </p>
+    </>
+  );
+
+  const renderLostContent = () => (
+    <>
+      <p>
+        <strong>Category:</strong> {item.category}
+      </p>
+      <p>
+        <strong>Date Lost:</strong> {item.dateLost}
+      </p>
+      <p>
+        <strong>Lost ID:</strong> {item.lostID}
+      </p>
+      <p>
+        <strong>Description:</strong> {item.lost_item_desc}
+      </p>
+      <p>
+        <strong>Item Name:</strong> {item.lost_item_name}
+      </p>
+      <p>
+        <strong>Location Lost:</strong> {item.locationLost}
+      </p>
+      <p>
+        <strong>Status:</strong> {item.status}
+      </p>
+    </>
+  );
+
+  const renderMatchContent = () => {
+    const { foundItem = {}, lostItem = {} } = item;
+
+    return (
+      <>
+        <h3 className="text-md font-bold">Found Item</h3>
+        <p>
+          <strong>Category:</strong> {foundItem.category}
+        </p>
+        <p>
+          <strong>Date Found:</strong> {foundItem.dateFound}
+        </p>
+        <p>
+          <strong>Found ID:</strong> {foundItem.foundID}
+        </p>
+        <p>
+          <strong>Description:</strong> {foundItem.found_item_desc}
+        </p>
+        <p>
+          <strong>Item Name:</strong> {foundItem.found_item_name}
+        </p>
+        <p>
+          <strong>Location Found:</strong> {foundItem.locationFound}
+        </p>
+        <p>
+          <strong>Status:</strong> {foundItem.status}
+        </p>
+
+        <hr className="my-2" />
+
+        <h3 className="text-md font-bold">Lost Item</h3>
+        <p>
+          <strong>Category:</strong> {lostItem.category}
+        </p>
+        <p>
+          <strong>Date Lost:</strong> {lostItem.dateLost}
+        </p>
+        <p>
+          <strong>Lost ID:</strong> {lostItem.lostID}
+        </p>
+        <p>
+          <strong>Description:</strong> {lostItem.lost_item_desc}
+        </p>
+        <p>
+          <strong>Item Name:</strong> {lostItem.lost_item_name}
+        </p>
+        <p>
+          <strong>Location Lost:</strong> {lostItem.locationLost}
+        </p>
+        <p>
+          <strong>Status:</strong> {lostItem.status}
+        </p>
+      </>
+    );
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "FOUND ITEMS":
+        return renderFoundContent();
+      case "LOST ITEMS":
+        return renderLostContent();
+      case "MATCH ITEMS":
+        return renderMatchContent();
+      case "ARCHIVE":
+        return renderFoundContent(); // Assuming archive displays found content
+      default:
+        return <p>No information available.</p>;
+    }
+  };
+
+  const renderButton = () => {
+    if (activeTab === "FOUND ITEMS" && item.status === "Matched") {
+      return (
+        <p className="text-black-600 font-medium">
+          Cancel this match in the <strong>Match Items</strong> tab to claim.
+        </p>
+      );
+    }
+
+    switch (activeTab) {
+      case "FOUND ITEMS":
+        return (
+          <button
+            onClick={() => setClaimFormOpen(true)} // Open the claim form
+            className="px-8 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
+          >
+            Claim
+          </button>
+        );
+      case "MATCH ITEMS":
+        return (
+          <div className="flex justify-end gap-2">
+          {/* Cancel Match Button */}
+          <button
+            onClick={cancelMatch}
+            className="px-8 py-2 bg-gray-500 text-white rounded-3xl hover:bg-gray-600"
+          >
+            Cancel Match
+          </button>
+
+          {/* Mark as Claimed Button */}
+          <button
+            onClick={() => setMatchClaimFormOpen(true)}
+            className="px-8 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
+          >
+            Mark as Claimed
+          </button>
+        </div>
+        );
+      case "LOST ITEMS":
+      case "ARCHIVE":
+        return null; // No button for these cases
+      default:
+        return null;
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 md:w-1/2 lg:w-1/3">
-        <div className="flex justify-end">
+    <>
+      {/* Main Modal */}
+      <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+        <div className="bg-white rounded-lg p-6 shadow-lg w-1/2 relative">
+          {/* Close Button */}
           <button
             onClick={onClose}
-            className="text-gray-600 hover:text-gray-800"
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
           >
-            &times;
+            ✕
           </button>
-        </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Date
-            </label>
-            <input
-              type="date"
-              className="w-full border border-gray-300 rounded-md p-2"
-              value={filters.date}
-              onChange={(e) => handleFilterChange("date", e.target.value)}
-            />
+          {/* Container for Left and Right Sections */}
+          <div className="flex space-x-0">
+            {/* Left Section: Item Details */}
+            <div className="w-1/2">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold">
+                  {activeTab === "FOUND ITEMS"
+                    ? "Found Item Details"
+                    : activeTab === "LOST ITEMS"
+                      ? "Lost Item Details"
+                      : activeTab === "MATCH ITEMS"
+                        ? "Matching Item Details"
+                        : activeTab === "ARCHIVE"
+                          ? "Archived Item Details"
+                          : "bruh"}
+                </h2>
+              </div>
+              <div className="text-sm text-gray-700 space-y-2">
+                {renderContent()}
+              </div>
+            </div>
+
+            {/* Right Section: Item Image */}
+            <div className="w-1/2 flex justify-center items-center">
+              <img
+                src="https://i.imgur.com/R6u77UJ.png"
+                alt="Item"
+                className="w-48 h-48 object-cover rounded-lg shadow-md"
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Order By
-            </label>
-            <select
-              className="w-full border border-gray-300 rounded-md p-2"
-              value={filters.orderBy}
-              onChange={(e) => handleFilterChange("orderBy", e.target.value)}
-            >
-              <option value="">Select order</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Category
-            </label>
-            <select
-              className="w-full border border-gray-300 rounded-md p-2"
-              value={filters.category}
-              onChange={(e) => handleFilterChange("category", e.target.value)}
-            >
-              <option value="">All categories</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              className="w-full border border-gray-300 rounded-md p-2"
-              value={filters.status}
-              onChange={(e) => handleFilterChange("status", e.target.value)}
-            >
-              <option value="">All statuses</option>
-              {statuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-3 mt-6">
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 border border-gray-300 rounded-4xl hover:bg-gray-100 transition"
-          >
-            Reset
-          </button>
-          <button
-            onClick={handleApply}
-            className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition"
-            disabled={isLoading}
-          >
-            {isLoading ? "Applying..." : "Apply"}
-          </button>
+          {/* Conditional Button */}
+          <div className="mt-4 text-right">{renderButton()}</div>
         </div>
       </div>
-    </div>
-  );
-}
 
-export default ItemFilter;
+      {isMatchClaimFormOpen && (
+  <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+    <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
+      <button
+        onClick={() => setMatchClaimFormOpen(false)}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+      <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+      <form onSubmit={handleMatchClaimSubmit}>
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Student Number"
+            value={claimedByID}
+            onChange={(e) => setClaimedByID(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={claimedByName}
+            onChange={(e) => setClaimedByName(e.target.value)}
+            className="w-full p-2 border rounded-lg"
+            required
+          />
+          <div className="flex justify-end items-center gap-2">
+            <QrCodeIcon className="w-7 h-7 " />
+            <button
+              type="submit"
+              className="px-5 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
+            >
+              Claim
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+      {/* Claim Form Popup */}
+      {isClaimFormOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
+            <button
+              onClick={() => setClaimFormOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+            <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+            <form onSubmit={handleClaimSubmit}>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Student Number"
+                  value={claimedByID}
+                  onChange={(e) => setClaimedByID(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={claimedByName}
+                  onChange={(e) => setClaimedByName(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                {/* Flex container for Claim button and QR Code icon */}
+                <div className="flex justify-end items-center gap-2">
+                  <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 flex items-center gap-2"
+                  >
+                    Claim
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default ItemInformation;

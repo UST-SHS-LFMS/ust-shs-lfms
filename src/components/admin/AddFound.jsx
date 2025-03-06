@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase"; // Import your Firebase storage instance
 
 function AddFound() {
   const [foundItems, setFoundItems] = useState([]);
@@ -19,9 +21,21 @@ function AddFound() {
   const [status, setStatus] = useState("");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
+  const [imageFile, setImageFile] = useState(null); // State to hold the image file
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
+
+  // Handle image file change
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 5 * 1024 * 1024) {
+      // Check if file size is <= 5MB
+      setImageFile(file);
+    } else {
+      setStatus("File size must be less than 5MB.");
+    }
+  };
 
   // Check if all required fields are filled
   const isFormValid = () => {
@@ -188,6 +202,11 @@ function AddFound() {
         return;
       }
 
+      // Upload image to Firebase Storage
+      const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
+      await uploadBytes(storageRef, imageFile);
+      const photoURL = await getDownloadURL(storageRef);
+
       const response = await fetch(`${API_URL}/found-items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -200,6 +219,7 @@ function AddFound() {
           department: "SHS",
           foundByName: foundByName, // Include Full Name in the request
           foundByID: foundByID, // Include Student ID in the request
+          photoURL: photoURL, // Include the photoURL in the request
         }),
       });
 
@@ -216,6 +236,7 @@ function AddFound() {
         setNewDateFound("");
         setFoundByName(""); // Clear Full Name
         setFoundByID(""); // Clear Student ID
+        setImageFile(null);
       } else {
         setStatus("Error adding found item");
       }
@@ -316,6 +337,27 @@ function AddFound() {
                   </option>
                 ))}
               </select>
+            </div>
+            {/* Picture Upload Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Upload Image (Max 5MB)
+                <span className="text-red-600">*</span>
+              </label>
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <label htmlFor="imageUpload" className="cursor-pointer">
+                <img
+                  src="https://i.imgur.com/v3LZMXQ.jpeg"
+                  alt="Upload"
+                  className="w-40 h-30 object-cover rounded-lg border border-gray-300"
+                />
+              </label>
             </div>
           </div>
 
@@ -433,7 +475,7 @@ function AddFound() {
               Back
             </button>
             <div className="flex gap-4">
-            <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
+              <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
               <button
                 type="button"
                 onClick={() => {

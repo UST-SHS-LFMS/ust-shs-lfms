@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import StudentSidebar from "../../components/student/StudentSidebar";
 import { getAuth } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase"; // Import your Firebase storage instance
 
 function AddLost() {
   const [lostItems, setLostItems] = useState([]);
@@ -20,9 +22,21 @@ function AddLost() {
   const [status, setStatus] = useState("");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
+  const [imageFile, setImageFile] = useState(null); // State to hold the image file
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
+
+  // Handle image file change
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 5 * 1024 * 1024) {
+      // Check if file size is <= 5MB
+      setImageFile(file);
+    } else {
+      setStatus("File size must be less than 5MB.");
+    }
+  };
 
   // Check if all required fields are filled
   const isFormValid = () => {
@@ -73,7 +87,8 @@ function AddLost() {
       return false;
     }
 
-    if (lostItem.status !== "Pending" || foundItem.status !== "Pending") {
+    // Ensure categories match
+    if (lostItem.category !== foundItem.category) {
       return false;
     }
 
@@ -189,6 +204,11 @@ function AddLost() {
         return;
       }
 
+      // Upload image to Firebase Storage
+      const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
+      await uploadBytes(storageRef, imageFile);
+      const photoURL = await getDownloadURL(storageRef);
+
       const response = await fetch(`${API_URL}/lost-items`, {
         method: "POST",
         headers: {
@@ -202,6 +222,7 @@ function AddLost() {
           dateLost: newDateLost,
           notifEmail: emailToNotify,
           department: "SHS",
+          photoURL: photoURL,
         }),
       });
 
@@ -216,6 +237,7 @@ function AddLost() {
         setNewLocationLost("");
         setNewDateLost("");
         setNewNotifEmail("");
+        setImageFile(null);
       } else {
         setStatus("Error adding lost item");
       }
@@ -322,6 +344,24 @@ function AddLost() {
                 ))}
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Notification
+              </label>
+
+              <div className="flex items-center mt-2">
+                <input
+                  type="checkbox"
+                  id="notifyEmail"
+                  checked={notifyEmail}
+                  onChange={() => setNotifyEmail(!notifyEmail)} // Fixed toggle function
+                  className="mr-2"
+                />
+                <label htmlFor="notifyEmail" className="text-sm text-gray-700">
+                  Notify my email ({userEmail})
+                </label>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col gap-4">
@@ -386,23 +426,26 @@ function AddLost() {
               />
             </div>
 
+            {/* Picture Upload Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Notification
+                Upload Image (Max 5MB)
+                <span className="text-red-600">*</span>
               </label>
-
-              <div className="flex items-center mt-2">
-                <input
-                  type="checkbox"
-                  id="notifyEmail"
-                  checked={notifyEmail}
-                  onChange={() => setNotifyEmail(!notifyEmail)} // Fixed toggle function
-                  className="mr-2"
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <label htmlFor="imageUpload" className="cursor-pointer">
+                <img
+                  src="https://i.imgur.com/v3LZMXQ.jpeg"
+                  alt="Upload"
+                  className="w-40 h-30 object-cover rounded-lg border border-gray-300"
                 />
-                <label htmlFor="notifyEmail" className="text-sm text-gray-700">
-                  Notify my email ({userEmail})
-                </label>
-              </div>
+              </label>
             </div>
           </div>
 
@@ -490,7 +533,7 @@ function AddLost() {
                 Lost item added successfully!
               </h2>
               <p className="text-s text-gray-500">
-              You'll get an update if we find a matching item.
+                You'll get an update if we find a matching item.
               </p>
             </div>
             <button

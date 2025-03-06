@@ -208,6 +208,7 @@ app.post("/api/lost-items", async (req, res) => {
       ...req.body,
       status: "Pending",
       dateLost: req.body.dateLost || new Date().toISOString().split("T")[0],
+      photoURL: req.body.photoURL || "",
     };
 
     const docRef = await addDoc(lostItemsCollectionRef, newItem);
@@ -237,6 +238,7 @@ app.post("/api/found-items", async (req, res) => {
       ...req.body,
       status: "Pending",
       dateFound: req.body.dateFound || new Date().toISOString().split("T")[0],
+      photoURL: req.body.photoURL || "", // Include the photoURL in the new item
     };
 
     const docRef = await addDoc(foundItemsCollectionRef, newItem);
@@ -263,19 +265,33 @@ app.post("/api/matches", async (req, res) => {
   try {
     const { lostDocId, foundDocId, lostID, foundID } = req.body;
 
+    // Check if a match already exists
+    const existingMatchQuery = query(
+      matchesCollectionRef,
+      where("lostDocId", "==", lostDocId),
+      where("foundDocId", "==", foundDocId)
+    );
+    const existingMatchSnap = await getDocs(existingMatchQuery);
+
+    if (!existingMatchSnap.empty) {
+      return res.status(400).json({ error: "Match already exists" });
+    }
+
+    //  Validate lost item
     const lostItemSnap = await getDoc(doc(db, "lost_items", lostDocId));
     if (!lostItemSnap.exists()) {
       return res.status(404).json({ error: "Lost item not found" });
     }
     const lostItemData = lostItemSnap.data();
 
-    // Fetch found item details
+    //  Validate found item
     const foundItemSnap = await getDoc(doc(db, "found_items", foundDocId));
     if (!foundItemSnap.exists()) {
       return res.status(404).json({ error: "Found item not found" });
     }
     const foundItemData = foundItemSnap.data();
 
+    // Create new match
     const match = await addDoc(matchesCollectionRef, {
       newMatchID,
       lostDocId,
@@ -287,6 +303,7 @@ app.post("/api/matches", async (req, res) => {
       matchTimestamp: new Date(),
     });
 
+    // Update statuses of lost and found items
     await setDoc(
       doc(lostItemsCollectionRef, lostDocId),
       { status: "Matched" },
@@ -298,6 +315,7 @@ app.post("/api/matches", async (req, res) => {
       { merge: true }
     );
 
+    // ✅ Step 6: Update match counter
     await setDoc(matchCounterRef, { value: currentCounter + 1 });
 
     res.status(201).json({
