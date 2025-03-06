@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import StudentSidebar from "../../components/student/StudentSidebar";
+import AdminSidebar from "../../components/admin/AdminSidebar";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../firebase"; // Import your Firebase storage instance
@@ -23,6 +23,9 @@ function AddLost() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
   const [imageFile, setImageFile] = useState(null); // State to hold the image file
+  const [previewUrl, setPreviewUrl] = useState(
+    "https://i.imgur.com/v3LZMXQ.jpeg"
+  );
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
@@ -31,8 +34,11 @@ function AddLost() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 5 * 1024 * 1024) {
-      // Check if file size is <= 5MB
       setImageFile(file);
+
+      // Generate a preview URL
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
     } else {
       setStatus("File size must be less than 5MB.");
     }
@@ -205,9 +211,12 @@ function AddLost() {
       }
 
       // Upload image to Firebase Storage
-      const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-      const photoURL = await getDownloadURL(storageRef);
+      let photoURL = null;
+      if (imageFile) {
+        const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
+        await uploadBytes(storageRef, imageFile);
+        photoURL = await getDownloadURL(storageRef);
+      }
 
       const response = await fetch(`${API_URL}/lost-items`, {
         method: "POST",
@@ -222,7 +231,7 @@ function AddLost() {
           dateLost: newDateLost,
           notifEmail: emailToNotify,
           department: "SHS",
-          photoURL: photoURL,
+          ...(photoURL && { photoURL }),
         }),
       });
 
@@ -261,7 +270,7 @@ function AddLost() {
   return (
     <div className="flex min-h-screen bg-[#FFF8F0]">
       {/* Sidebar */}
-      <StudentSidebar />
+      <AdminSidebar />
 
       {/* Main Content */}
       <div className="flex-1 p-6">
@@ -441,8 +450,8 @@ function AddLost() {
               />
               <label htmlFor="imageUpload" className="cursor-pointer">
                 <img
-                  src="https://i.imgur.com/v3LZMXQ.jpeg"
-                  alt="Upload"
+                  src={previewUrl}
+                  alt="Upload Preview"
                   className="w-40 h-30 object-cover rounded-lg border border-gray-300"
                 />
               </label>
@@ -537,10 +546,12 @@ function AddLost() {
               </p>
             </div>
             <button
-              onClick={() => setShowSuccessPopup(false)}
+              onClick={() =>
+                navigate("/items", { state: { activeTab: "LOST ITEMS" } })
+              }
               className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
             >
-              Close
+              Done
             </button>
           </div>
         </div>

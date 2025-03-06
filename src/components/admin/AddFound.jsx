@@ -22,6 +22,9 @@ function AddFound() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
   const [imageFile, setImageFile] = useState(null); // State to hold the image file
+  const [previewUrl, setPreviewUrl] = useState(
+    "https://i.imgur.com/v3LZMXQ.jpeg"
+  );
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
@@ -30,13 +33,15 @@ function AddFound() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 5 * 1024 * 1024) {
-      // Check if file size is <= 5MB
       setImageFile(file);
+
+      // Generate a preview URL
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
     } else {
       setStatus("File size must be less than 5MB.");
     }
   };
-
   // Check if all required fields are filled
   const isFormValid = () => {
     return (
@@ -184,28 +189,18 @@ function AddFound() {
   // Handle new found item submission
   const onSubmitFoundItem = async () => {
     try {
-      if (
-        !newFoundItem ||
-        !newFoundItemDesc ||
-        !newCategory ||
-        !newLocationFound ||
-        !newDateFound ||
-        !foundByName || // Validate Full Name
-        !foundByID // Validate Student ID
-      ) {
-        setStatus("Please fill in all fields.");
-        return;
-      }
-
       if (!isFormValid()) {
         setStatus("Please fill in all fields.");
         return;
       }
 
       // Upload image to Firebase Storage
-      const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-      const photoURL = await getDownloadURL(storageRef);
+      let photoURL = null;
+      if (imageFile) {
+        const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
+        await uploadBytes(storageRef, imageFile);
+        photoURL = await getDownloadURL(storageRef);
+      }
 
       const response = await fetch(`${API_URL}/found-items`, {
         method: "POST",
@@ -219,7 +214,7 @@ function AddFound() {
           department: "SHS",
           foundByName: foundByName, // Include Full Name in the request
           foundByID: foundByID, // Include Student ID in the request
-          photoURL: photoURL, // Include the photoURL in the request
+          ...(photoURL && { photoURL }),
         }),
       });
 
@@ -353,8 +348,8 @@ function AddFound() {
               />
               <label htmlFor="imageUpload" className="cursor-pointer">
                 <img
-                  src="https://i.imgur.com/v3LZMXQ.jpeg"
-                  alt="Upload"
+                  src={previewUrl}
+                  alt="Upload Preview"
                   className="w-40 h-30 object-cover rounded-lg border border-gray-300"
                 />
               </label>
@@ -552,7 +547,7 @@ function AddFound() {
               </h2>
             </div>
             <button
-              onClick={() => setShowSuccessPopup(false)}
+              onClick={() => navigate("/items")}
               className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
             >
               Done

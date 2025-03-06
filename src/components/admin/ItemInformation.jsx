@@ -58,12 +58,12 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   const moveMatchItem = async () => {
     try {
       const docId = item.id; // Ensure we're using item.id like moveItem
-  
+
       if (!docId) {
         alert("No item ID found!");
         return;
       }
-  
+
       const response = await fetch(
         `http://localhost:3001/api/moveMatchItem/${docId}`,
         {
@@ -74,9 +74,9 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           body: JSON.stringify({ claimedByID, claimedByName }), // Include form data
         }
       );
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         alert("Matched item moved successfully!");
         onClose(); // Close modal after success
@@ -88,7 +88,6 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       alert("An error occurred while moving the item.");
     }
   };
-  
 
   const cancelMatch = async () => {
     try {
@@ -239,7 +238,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return renderFoundContent();
       case "LOST ITEMS":
         return renderLostContent();
-      case "MATCH ITEMS":
+      case "POTENTIAL MATCHES":
         return renderMatchContent();
       case "ARCHIVE":
         return renderFoundContent(); // Assuming archive displays found content
@@ -262,31 +261,32 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return (
           <button
             onClick={() => setClaimFormOpen(true)} // Open the claim form
-            className="px-8 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
           >
             Claim
           </button>
         );
-      case "MATCH ITEMS":
+      case "POTENTIAL MATCHES":
         return (
-          <div className="flex justify-end gap-2">
-          {/* Cancel Match Button */}
-          <button
-            onClick={cancelMatch}
-            className="px-8 py-2 bg-gray-500 text-white rounded-3xl hover:bg-gray-600"
-          >
-            Cancel Match
-          </button>
+          <div className="flex justify-between">
+            {/* Cancel Match Button (Left) */}
+            <button
+              onClick={cancelMatch}
+              className="px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600"
+            >
+              Cancel Match
+            </button>
 
-          {/* Mark as Claimed Button */}
-          <button
-            onClick={() => setMatchClaimFormOpen(true)}
-            className="px-8 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
-          >
-            Mark as Claimed
-          </button>
-        </div>
+            {/* Mark as Claimed Button (Right) */}
+            <button
+              onClick={() => setMatchClaimFormOpen(true)}
+              className="px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
+            >
+              Claim
+            </button>
+          </div>
         );
+
       case "LOST ITEMS":
       case "ARCHIVE":
         return null; // No button for these cases
@@ -299,7 +299,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
     <>
       {/* Main Modal */}
       <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-        <div className="bg-white rounded-lg p-6 shadow-lg w-1/2 relative">
+        <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
           {/* Close Button */}
           <button
             onClick={onClose}
@@ -312,19 +312,6 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           <div className="flex space-x-0">
             {/* Left Section: Item Details */}
             <div className="w-1/2">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold">
-                  {activeTab === "FOUND ITEMS"
-                    ? "Found Item Details"
-                    : activeTab === "LOST ITEMS"
-                      ? "Lost Item Details"
-                      : activeTab === "MATCH ITEMS"
-                        ? "Matching Item Details"
-                        : activeTab === "ARCHIVE"
-                          ? "Archived Item Details"
-                          : "bruh"}
-                </h2>
-              </div>
               <div className="text-sm text-gray-700 space-y-2">
                 {renderContent()}
               </div>
@@ -333,7 +320,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
             {/* Right Section: Item Image */}
             <div className="w-1/2 flex justify-center items-center">
               <img
-                src="https://i.imgur.com/R6u77UJ.png"
+                src={item.photoURL || "https://i.imgur.com/R6u77UJ.png"}
                 alt="Item"
                 className="w-48 h-48 object-cover rounded-lg shadow-md"
               />
@@ -346,47 +333,47 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       </div>
 
       {isMatchClaimFormOpen && (
-  <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-    <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
-      <button
-        onClick={() => setMatchClaimFormOpen(false)}
-        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
-      <h2 className="text-lg font-bold mb-4">Claimed by</h2>
-      <form onSubmit={handleMatchClaimSubmit}>
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Student Number"
-            value={claimedByID}
-            onChange={(e) => setClaimedByID(e.target.value)}
-            className="w-full p-2 border rounded-lg"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={claimedByName}
-            onChange={(e) => setClaimedByName(e.target.value)}
-            className="w-full p-2 border rounded-lg"
-            required
-          />
-          <div className="flex justify-end items-center gap-2">
-            <QrCodeIcon className="w-7 h-7 " />
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
             <button
-              type="submit"
-              className="px-5 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
+              onClick={() => setMatchClaimFormOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
-              Claim
+              ✕
             </button>
+            <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+            <form onSubmit={handleMatchClaimSubmit}>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={claimedByName}
+                  onChange={(e) => setClaimedByName(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Student Number"
+                  value={claimedByID}
+                  onChange={(e) => setClaimedByID(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                  required
+                />
+                <div className="flex justify-end items-center gap-2">
+                  <QrCodeIcon className="w-7 h-7 " />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
+                  >
+                    Claim
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
       {/* Claim Form Popup */}
       {isClaimFormOpen && (
@@ -403,17 +390,17 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
               <div className="space-y-4">
                 <input
                   type="text"
-                  placeholder="Student Number"
-                  value={claimedByID}
-                  onChange={(e) => setClaimedByID(e.target.value)}
+                  placeholder="Full Name"
+                  value={claimedByName}
+                  onChange={(e) => setClaimedByName(e.target.value)}
                   className="w-full p-2 border rounded-lg"
                   required
                 />
                 <input
                   type="text"
-                  placeholder="Full Name"
-                  value={claimedByName}
-                  onChange={(e) => setClaimedByName(e.target.value)}
+                  placeholder="Student Number"
+                  value={claimedByID}
+                  onChange={(e) => setClaimedByID(e.target.value)}
                   className="w-full p-2 border rounded-lg"
                   required
                 />
@@ -422,7 +409,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 flex items-center gap-2"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 flex items-center gap-2"
                   >
                     Claim
                   </button>

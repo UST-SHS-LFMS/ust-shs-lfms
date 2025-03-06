@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./AdminSidebar";
 import {
   FunnelIcon,
@@ -17,6 +18,7 @@ const AddAdminForm = () => {
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
+  const navigate = useNavigate();
 
   // Check if all fields are filled to enable the Submit button
   useEffect(() => {
@@ -216,7 +218,7 @@ const AddAdminForm = () => {
             {/* Done button */}
             <div className="flex justify-center">
               <button
-                onClick={() => setShowPopup(false)}
+                onClick={() => navigate("/manage-admins")}
                 className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
               >
                 Done

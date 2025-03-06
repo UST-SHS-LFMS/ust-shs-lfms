@@ -61,7 +61,7 @@ const EditAdmin = ({
         {/* Modal Content */}
         <div className="space-y-3">
           <p>
-            <strong>Employee:</strong> {employee.employeeID}
+            <strong>Employee:</strong> {employee.fullName}
           </p>
           {/* Role Dropdown */}
           <label className="block font-semibold">Role:</label>

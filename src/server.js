@@ -537,7 +537,8 @@ app.get("/api/found-items/category", async (req, res) => {
 
     const q = query(
       foundItemsCollectionRef,
-      where("category", "==", category.trim())
+      where("category", "==", category.trim()),
+      where("department", "==", "SHS")
     );
     const querySnapshot = await getDocs(q);
 

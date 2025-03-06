@@ -12,7 +12,7 @@ function StudentSearch() {
     setLoading(true);
     console.log("Fetching data for category:", selectedCategory); // Debugging log
     fetch(
-      `http://localhost:3001/api/found-items/category?category=${selectedCategory}`
+      `http://localhost:3001/api/found-items/category?category=${encodeURIComponent(selectedCategory)}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -41,11 +41,19 @@ function StudentSearch() {
             className="w-full py-3 px-5 text-gray-800 bg-white border border-gray-300 rounded-full shadow-md focus:ring-2 focus:ring-amber-400 focus:outline-none cursor-pointer"
           >
             <option value="" disabled>
-              Select a category...
+              Select a Category
             </option>
+            <option value="Personal Belongings">Personal Belongings</option>
             <option value="Electronics">Electronics</option>
-            <option value="Furniture">Furniture</option>
-            <option value="Stationery">Stationery</option>
+            <option value="School Supplies & Stationery">
+              School Supplies & Stationery
+            </option>
+            <option value="Tumblers & Food Containers">
+              Tumblers & Food Containers
+            </option>
+            <option value="Clothing & Apparell">Clothing & Apparell</option>
+            <option value="Money & Valuables">Money & Valuables</option>
+            <option value="Documents">Documents</option>
             <option value="Other">Other</option>
           </select>
         </div>
@@ -56,7 +64,7 @@ function StudentSearch() {
         ) : categoryData ? (
           <div className="mt-6 text-gray-800 w-full max-w-md bg-white rounded-lg shadow-sm">
             <table className="table-auto w-full text-left border-collapse">
-              <thead>
+              <thead className="bg-gray-50 text-m text-gray-600">
                 <tr>
                   <th className="px-4 py-2">Category</th>
                   <th className="px-4 py-2">Count</th>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FunnelIcon,
   MagnifyingGlassIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
@@ -10,6 +9,7 @@ import EditAdmin from "../../components/admin/EditAdmin";
 
 function ManageAdmins() {
   const [employees, setEmployees] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const navigate = useNavigate();
@@ -51,6 +51,18 @@ function ManageAdmins() {
     setIsEditModalOpen(false); // Close the modal
   };
 
+  // Handle search query change
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Filter employees based on search query (case insensitive)
+  const filteredEmployees = employees.filter((employee) =>
+    employee.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    employee.employeeNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+
   return (
     <div className="flex min-h-screen bg-[#FFF8F0]">
       <AdminSidebar />
@@ -64,13 +76,13 @@ function ManageAdmins() {
               <input
                 type="search"
                 placeholder="Search"
-                className="pl-10 pr-4 py-2 w-64 rounded-lg bg-[#F3E6FF]"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="pl-10 pr-4 py-2 w-64 rounded-4xl bg-gray-200"
               />
+
               <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" />
             </div>
-            <button className="flex items-center">
-              <FunnelIcon className="w-5 h-5" />
-            </button>
           </div>
         </div>
 
@@ -96,9 +108,11 @@ function ManageAdmins() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {employees.map((employee) => (
+              {filteredEmployees.map((employee) => (
                 <tr key={employee.id}>
-                  <td className="px-6 py-2 text-sm">{employee.employeeNumber}</td>
+                  <td className="px-6 py-2 text-sm">
+                    {employee.employeeNumber}
+                  </td>
                   <td className="px-6 py-2 text-sm">{employee.fullName}</td>
                   <td className="px-6 py-2 text-sm">{employee.role}</td>
                   <td className="px-6 py-2 text-sm">{employee.createdAt}</td>

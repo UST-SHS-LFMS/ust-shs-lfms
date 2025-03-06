@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FunnelIcon, MagnifyingGlassIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import {
+  MagnifyingGlassIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
+import { FunnelIcon } from "@heroicons/react/24/solid";
 import StudentSidebar from "../../components/student/StudentSidebar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import EditItem from "../../components/student/EditItem";
@@ -58,46 +62,68 @@ function StudentItems() {
   };
 
   // Handle saving edits
-const handleSave = async (lostID, updatedData) => {
+  const handleSave = async (lostID, updatedData) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/items/${lostID}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
-  
+      const response = await fetch(
+        `http://localhost:3001/api/items/${lostID}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedData),
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to update item");
       }
-  
+
       // Update the UI
       setItems((prevItems) =>
-        prevItems.map((item) => (item.lostID === lostID ? { ...item, ...updatedData } : item))
+        prevItems.map((item) =>
+          item.lostID === lostID ? { ...item, ...updatedData } : item
+        )
       );
-      onClose(); // Close the modal after saving
+      handleClose(); // Close the modal after saving
     } catch (error) {
       console.error("Error updating item:", error);
     }
   };
-  
+
   // Handle deleting an item
   const handleDelete = async (lostID) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/items/${lostID}`, {
-        method: "DELETE",
-      });
-  
+      const response = await fetch(
+        `http://localhost:3001/api/items/${lostID}`,
+        {
+          method: "DELETE",
+        }
+      );
+
       if (!response.ok) {
         throw new Error("Failed to delete item");
       }
-  
+
       // Update the UI
-      setItems((prevItems) => prevItems.filter((item) => item.lostID !== lostID));
-      onClose(); // Close the modal after deleting
+      setItems((prevItems) =>
+        prevItems.filter((item) => item.lostID !== lostID)
+      );
+      handleClose(); // Close the modal after deleting
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
+
+  // Handle search query change
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Filter items based on search query across all columns
+  const filteredItems = items.filter((item) =>
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   return (
     <div className="flex min-h-screen bg-[#FFF8F0]">
@@ -108,19 +134,19 @@ const handleSave = async (lostID, updatedData) => {
           <h1 className="text-3xl font-bold text-[#FFA500]">MY LOST ITEMS</h1>
 
           <div className="flex items-center gap-4">
+            <button className="flex items-center">
+              <FunnelIcon className="w-5 h-5" />
+            </button>
             <div className="relative">
               <input
                 type="search"
                 placeholder="Search"
-                className="pl-10 pr-4 py-2 w-64 rounded-lg bg-[#F3E6FF]"
+                className="pl-10 pr-4 py-2 w-64 rounded-4xl bg-gray-200"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
               />
               <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" />
             </div>
-            <button className="flex items-center">
-              <FunnelIcon className="w-5 h-5" />
-            </button>
           </div>
         </div>
 
@@ -133,12 +159,16 @@ const handleSave = async (lostID, updatedData) => {
 
         {/* Loading state */}
         {loading ? (
-          <div className="flex justify-center items-center h-64 text-black text-lg">Loading...</div>
+          <div className="flex justify-center items-center h-64 text-black text-lg">
+            Loading...
+          </div>
         ) : (
           /* Table */
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            {items.length === 0 ? (
-              <div className="py-8 text-center text-gray-500">No items found</div>
+            {filteredItems.length === 0 ? (
+              <div className="py-8 text-center text-gray-500">
+                No items found
+              </div>
             ) : (
               <table className="w-full">
                 <thead className="bg-gray-50 text-sm text-gray-600">
@@ -152,10 +182,12 @@ const handleSave = async (lostID, updatedData) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {items.map((item) => (
+                  {filteredItems.map((item) => (
                     <tr key={item.lostID}>
                       <td className="px-6 py-2 text-sm">{item.lostID}</td>
-                      <td className="px-6 py-2 text-sm">{item.lost_item_name}</td>
+                      <td className="px-6 py-2 text-sm">
+                        {item.lost_item_name}
+                      </td>
                       <td className="px-6 py-2 text-sm">{item.category}</td>
                       <td className="px-6 py-2 text-sm">{item.dateLost}</td>
                       <td className="px-6 py-2">
@@ -164,8 +196,8 @@ const handleSave = async (lostID, updatedData) => {
                             item.status === "Found"
                               ? "bg-green-500 text-white"
                               : item.status === "Matched"
-                              ? "bg-orange-500 text-white"
-                              : "bg-red-500 text-white"
+                                ? "bg-orange-500 text-white"
+                                : "bg-red-500 text-white"
                           }`}
                         >
                           {item.status}
@@ -190,7 +222,12 @@ const handleSave = async (lostID, updatedData) => {
 
       {/* EditItem Modal */}
       {selectedItem && (
-        <EditItem item={selectedItem} onClose={handleClose} onSave={handleSave} onDelete={handleDelete} />
+        <EditItem
+          item={selectedItem}
+          onClose={handleClose}
+          onSave={handleSave}
+          onDelete={handleDelete}
+        />
       )}
     </div>
   );
