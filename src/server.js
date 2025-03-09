@@ -268,7 +268,7 @@ app.post("/api/matches", async (req, res) => {
   const currentCounter = matchCounterSnap.exists()
     ? matchCounterSnap.data().value
     : 0;
-  const newMatchID = `M${String(currentCounter + 1).padStart(4, "0")}`;
+  const newMatchID = `M${String(currentCounter + 1).padStart(4, "0")}`; // Generate the new document ID
 
   try {
     const { lostDocId, foundDocId, lostID, foundID } = req.body;
@@ -285,22 +285,23 @@ app.post("/api/matches", async (req, res) => {
       return res.status(400).json({ error: "Match already exists" });
     }
 
-    //  Validate lost item
+    // Validate lost item
     const lostItemSnap = await getDoc(doc(db, "lost_items", lostDocId));
     if (!lostItemSnap.exists()) {
       return res.status(404).json({ error: "Lost item not found" });
     }
     const lostItemData = lostItemSnap.data();
 
-    //  Validate found item
+    // Validate found item
     const foundItemSnap = await getDoc(doc(db, "found_items", foundDocId));
     if (!foundItemSnap.exists()) {
       return res.status(404).json({ error: "Found item not found" });
     }
     const foundItemData = foundItemSnap.data();
 
-    // Create new match
-    const match = await addDoc(matchesCollectionRef, {
+    // Create new match with newMatchID as the document ID
+    const matchRef = doc(matchesCollectionRef, newMatchID);
+    await setDoc(matchRef, {
       newMatchID,
       lostDocId,
       foundDocId,
@@ -323,11 +324,11 @@ app.post("/api/matches", async (req, res) => {
       { merge: true }
     );
 
-    // ✅ Step 6: Update match counter
+    // Update match counter
     await setDoc(matchCounterRef, { value: currentCounter + 1 });
 
     res.status(201).json({
-      id: match.id,
+      id: newMatchID,
       lostItem: lostItemData,
       foundItem: foundItemData,
       lostDocId,
