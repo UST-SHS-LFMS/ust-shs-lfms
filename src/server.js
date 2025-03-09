@@ -201,24 +201,28 @@ app.post("/api/lost-items", async (req, res) => {
     const currentCounter = lostCounterSnap.exists()
       ? lostCounterSnap.data().value
       : 0;
-    const newLostID = `L${String(currentCounter + 1).padStart(4, "0")}`;
+    const newLostID = `L${String(currentCounter + 1).padStart(4, "0")}`; // Generate the new document ID
 
     const newItem = {
-      lostID: newLostID,
+      lostID: newLostID, // Ensure lostID matches the document ID
       ...req.body,
       status: "Pending",
       dateLost: req.body.dateLost || new Date().toISOString().split("T")[0],
       photoURL: req.body.photoURL || "",
     };
 
-    const docRef = await addDoc(lostItemsCollectionRef, newItem);
+    // Use setDoc with a custom document ID (newLostID)
+    const docRef = doc(lostItemsCollectionRef, newLostID);
+    await setDoc(docRef, newItem);
+
+    // Update the counter
     await setDoc(
       lostCounterRef,
       { value: currentCounter + 1 },
       { merge: true }
     );
 
-    res.status(201).json({ id: docRef.id, ...newItem });
+    res.status(201).json({ id: newLostID, ...newItem });
   } catch (err) {
     res.status(500).json({ error: "Error adding lost item" });
   }
@@ -231,24 +235,28 @@ app.post("/api/found-items", async (req, res) => {
     const currentCounter = foundCounterSnap.exists()
       ? foundCounterSnap.data().value
       : 0;
-    const newFoundID = `F${String(currentCounter + 1).padStart(4, "0")}`;
+    const newFoundID = `F${String(currentCounter + 1).padStart(4, "0")}`; // Generate the new document ID
 
     const newItem = {
-      foundID: newFoundID,
+      foundID: newFoundID, // Ensure foundID matches the document ID
       ...req.body,
       status: "Pending",
       dateFound: req.body.dateFound || new Date().toISOString().split("T")[0],
       photoURL: req.body.photoURL || "", // Include the photoURL in the new item
     };
 
-    const docRef = await addDoc(foundItemsCollectionRef, newItem);
+    // Use setDoc with a custom document ID (newFoundID)
+    const docRef = doc(foundItemsCollectionRef, newFoundID);
+    await setDoc(docRef, newItem);
+
+    // Update the counter
     await setDoc(
       foundCounterRef,
       { value: currentCounter + 1 },
       { merge: true }
     );
 
-    res.status(201).json({ id: docRef.id, ...newItem });
+    res.status(201).json({ id: newFoundID, ...newItem });
   } catch (err) {
     res.status(500).json({ error: "Error adding found item" });
   }
