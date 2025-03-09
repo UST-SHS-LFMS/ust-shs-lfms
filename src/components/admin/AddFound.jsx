@@ -93,6 +93,11 @@ function AddFound() {
       return false;
     }
 
+      // Ensure both items belong to SHS department
+  if (lostItem.department !== "SHS" || foundItem.department !== "SHS") {
+    return false;
+  }
+  
     // Ensure categories match
     if (lostItem.category !== foundItem.category) {
       return false;
