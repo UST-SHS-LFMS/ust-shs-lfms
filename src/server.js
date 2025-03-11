@@ -6,6 +6,8 @@ import admin from "firebase-admin";
 import { readFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import PDFDocument from "pdfkit";
+import PDFDocumentWithTables from "pdfkit-table";
 
 // Import Firebase Firestore functions for database operations
 import { initializeApp } from "firebase/app";
@@ -883,6 +885,131 @@ app.delete("/api/items/:lostID", async (req, res) => {
       error.message || error
     );
     return res.status(500).json({ error: "Error deleting item in Firestore" });
+  }
+});
+
+// API to Generate and Download PDF Report
+app.get("/api/generate-pdf", async (req, res) => {
+  try {
+    // Create a new PDF document with table support
+    const doc = new PDFDocumentWithTables({ margin: 30 });
+
+    // Set headers for PDF download
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="LostAndFound_Report.pdf"'
+    );
+    res.setHeader("Content-Type", "application/pdf");
+
+    // Stream the PDF directly to the response
+    doc.pipe(res);
+
+    // 🏫 Report Header
+    doc.fontSize(18).text("UST-SHS Lost and Found Report", {
+      align: "center",
+      underline: true,
+    });
+    doc.moveDown(1.5);
+
+    // 📝 Fetch and Format Lost Items (Only SHS)
+    const lostItemsSnapshot = await getDocs(
+      query(lostItemsCollectionRef, where("department", "==", "SHS"))
+    );
+
+    if (!lostItemsSnapshot.empty) {
+      doc.fontSize(14).text("LOST ITEMS", { underline: true });
+      doc.moveDown(0.5);
+
+      const lostItems = lostItemsSnapshot.docs.map((docData) => {
+        const data = docData.data();
+        return [
+          data.lostID,
+          data.lost_item_name,
+          data.lost_item_desc,
+          data.dateLost,
+          data.locationLost,
+          data.notifEmail || "N/A",
+          data.status,
+        ];
+      });
+
+      // ✅ Use `table` method correctly
+      await doc.table(
+        {
+          title: "Lost Items",
+          headers: [
+            "Lost ID",
+            "Item",
+            "Description",
+            "Date",
+            "Location",
+            "Lost By",
+            "Status",
+          ],
+          rows: lostItems,
+        },
+        {
+          width: 500,
+        }
+      );
+
+      doc.moveDown(1);
+    }
+
+    // 📝 Fetch and Format Found Items (Only SHS)
+    const foundItemsSnapshot = await getDocs(
+      query(foundItemsCollectionRef, where("department", "==", "SHS"))
+    );
+
+    if (!foundItemsSnapshot.empty) {
+      doc.fontSize(14).text("FOUND ITEMS", { underline: true });
+      doc.moveDown(0.5);
+
+      const foundItems = foundItemsSnapshot.docs.map((docData) => {
+        const data = docData.data();
+        return [
+          data.foundID,
+          data.found_item_name,
+          data.found_item_desc,
+          data.dateFound,
+          data.locationFound,
+          `${data.foundByName} (ID: ${data.foundByID})`,
+          data.status,
+        ];
+      });
+
+      // ✅ Use `table` method correctly
+      await doc.table(
+        {
+          title: "Found Items",
+          headers: [
+            "Found ID",
+            "Item",
+            "Description",
+            "Date",
+            "Location",
+            "Found By",
+            "Status",
+          ],
+          rows: foundItems,
+        },
+        {
+          width: 500,
+        }
+      );
+
+      doc.moveDown(1);
+    }
+
+    // Finalize the PDF
+    doc.end();
+  } catch (error) {
+    console.error("❌ Error generating PDF:", error);
+
+    // Send an error response only if headers haven't been sent yet
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 });
 

@@ -4,7 +4,7 @@ import {
   MagnifyingGlassIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
-import { FunnelIcon } from "@heroicons/react/24/solid";
+import { FunnelIcon, ArrowDownOnSquareIcon } from "@heroicons/react/24/solid";
 import ItemInformation from "../../components/admin/ItemInformation";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import ItemFilter from "../../components/admin/ItemFilter";
@@ -45,7 +45,9 @@ function AdminItems() {
   const [isItemInformationOpen, setIsItemInformationOpen] = useState(false);
   const [isItemFilterOpen, setIsItemFilterOpen] = useState(false);
   const location = useLocation();
-const [activeTab, setActiveTab] = useState(location.state?.activeTab || "FOUND ITEMS");
+  const [activeTab, setActiveTab] = useState(
+    location.state?.activeTab || "FOUND ITEMS"
+  );
   const [foundItems, setFoundItems] = useState([]);
   const [lostItems, setLostItems] = useState([]);
   const [matchItems, setMatchItems] = useState([]);
@@ -120,6 +122,37 @@ const [activeTab, setActiveTab] = useState(location.state?.activeTab || "FOUND I
       console.error("Error generating QR code:", error);
     }
   }, []);
+
+  const handleDownloadPDF = async () => {
+    try {
+      // Fetch the PDF
+      const response = await fetch("http://localhost:3001/api/generate-pdf", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to download PDF: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "LostAndFoundReport.pdf";
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("❌ Error downloading PDF:", error);
+
+      alert("Failed to download PDF. Please try again later.");
+    }
+  };
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -585,8 +618,15 @@ const [activeTab, setActiveTab] = useState(location.state?.activeTab || "FOUND I
       <AdminSidebar />
       <div className="flex-1 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-[#FFA500]">
+          <h1 className="text-3xl font-bold text-amber-500">
             LOST & FOUND ITEMS
+            <button
+              onClick={handleDownloadPDF}
+              className="p-2 text-amber-500 hover:text-amber-600"
+              title="Download Report"
+            >
+              <ArrowDownOnSquareIcon className="w-6 h-6" />
+            </button>
           </h1>
           <div className="flex items-center gap-4">
             <button
