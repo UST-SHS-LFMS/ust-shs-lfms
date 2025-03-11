@@ -26,6 +26,7 @@ function AddLost() {
   const [previewUrl, setPreviewUrl] = useState(
     "https://i.imgur.com/v3LZMXQ.jpeg"
   );
+  const [isAdding, setIsAdding] = useState(false); // State for loading popup
 
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
@@ -210,6 +211,8 @@ function AddLost() {
         return;
       }
 
+      setIsAdding(true); // Show the "Adding..." popup
+
       // Upload image to Firebase Storage
       let photoURL = null;
       if (imageFile) {
@@ -237,6 +240,7 @@ function AddLost() {
 
       if (response.ok) {
         getLostItems();
+        setIsAdding(false);
         setShowSuccessPopup(true); // Show the success popup
 
         // Clear form fields
@@ -248,9 +252,11 @@ function AddLost() {
         setNewNotifEmail("");
         setImageFile(null);
       } else {
+        setIsAdding(false);
         setStatus("Error adding lost item");
       }
     } catch (err) {
+      setIsAdding(false);
       setStatus("Error adding lost item");
       console.error(err);
     }
@@ -528,6 +534,21 @@ function AddLost() {
         </div>
       )}
 
+      {/* Adding... Popup */}
+      {isAdding && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+              <h2 className="text-lg font-medium text-gray-800">Adding...</h2>
+              <p className="text-s text-gray-500">
+                Please wait while we add your item.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
@@ -539,7 +560,7 @@ function AddLost() {
                 className="w-12 h-12"
               />
               <h2 className="text-lg font-medium text-gray-800">
-                Lost item added successfully!
+                Item added successfully!
               </h2>
               <p className="text-s text-gray-500">
                 You'll get an update if we find a matching item.
