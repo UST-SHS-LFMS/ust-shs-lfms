@@ -104,16 +104,11 @@ function AdminItems() {
     }
   }, []);
 
+  //window.location.origin automatically switches between localhost and deployed domain for later
   const generateQRCode = useCallback(async (item) => {
     try {
-      const qrData = JSON.stringify({
-        id: item.id || item.matchId,
-        type: "match",
-        foundItem: item.foundItemName || item.foundID,
-        lostItem: item.lostItemName || item.lostID,
-        matchTimestamp: item.matchTimestamp,
-      });
-      const qrCodeDataURL = await QRCode.toDataURL(qrData);
+      const itemUrl = `${window.location.origin}/admin/items/${item.id || item.matchId}`;
+      const qrCodeDataURL = await QRCode.toDataURL(itemUrl);
       setQrCodes((prevQrCodes) => ({
         ...prevQrCodes,
         [item.id || item.matchId]: qrCodeDataURL,
@@ -122,6 +117,8 @@ function AdminItems() {
       console.error("Error generating QR code:", error);
     }
   }, []);
+  
+  
 
   const handleDownloadPDF = async () => {
     try {
@@ -401,11 +398,9 @@ function AdminItems() {
               <td className="px-6 py-2 text-sm">{item.dateFound}</td>
               <td className="px-6 py-2 text-sm">
                 {qrCodes[item.id] && (
-                  <img
-                    src={qrCodes[item.id] || "/placeholder.svg"}
-                    alt="QR Code"
-                    className="w-8 h-8"
-                  />
+                  <a href={`http://localhost:5173/admin/items/${item.id}`} target="_blank" rel="noopener noreferrer">
+                  <img src={qrCodes[item.id]} alt="QR Code" className="w-8 h-8" />
+                </a>
                 )}
               </td>
               <td>

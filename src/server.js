@@ -1013,6 +1013,43 @@ app.get("/api/generate-pdf", async (req, res) => {
   }
 });
 
+// API to fetch user profile from Firestore using either student or employee number
+app.get("/api/users/id/:idNumber", async (req, res) => {
+  try {
+    const { idNumber } = req.params;
+    console.log("Looking up ID number:", idNumber);
+ 
+    const usersRef = collection(db, "users");
+    
+    // First try to find by studentNumber
+    let q = query(usersRef, where("studentNumber", "==", idNumber));
+    let querySnapshot = await getDocs(q);
+    
+    // If not found, try by employeeNumber
+    if (querySnapshot.empty) {
+      q = query(usersRef, where("employeeNumber", "==", idNumber));
+      querySnapshot = await getDocs(q);
+    }
+    
+    // If still not found, return not found
+    if (querySnapshot.empty) {
+      console.log("No user found with ID number:", idNumber);
+      return res.json({ exists: false });
+    }
+    
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
+    console.log("Fetched user data:", userData);
+    
+    res.json({ exists: true, data: userData });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

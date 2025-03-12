@@ -1,48 +1,42 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import AdminSidebar from "../../components/admin/AdminSidebar";
-import { QrCodeIcon } from "@heroicons/react/24/outline";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../../firebase"; // Import your Firebase storage instance
+"use client"
+
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import AdminSidebar from "../../components/admin/AdminSidebar"
+import { QrCodeIcon } from "@heroicons/react/24/outline"
+import { Html5QrcodeScanner } from "html5-qrcode"
 
 function AddFound() {
-  const [foundItems, setFoundItems] = useState([]);
-  const [lostItems, setLostItems] = useState([]);
-  const [matches, setMatches] = useState([]);
-  const [matchedPairs, setMatchedPairs] = useState(new Set()); // Track matched pairs to avoid duplicate checks
+  const [foundItems, setFoundItems] = useState([])
+  const [lostItems, setLostItems] = useState([])
+  const [matches, setMatches] = useState([])
+  const [matchedPairs, setMatchedPairs] = useState(new Set()) // Track matched pairs to avoid duplicate checks
 
-  const [newFoundItem, setNewFoundItem] = useState("");
-  const [newFoundItemDesc, setNewFoundItemDesc] = useState("");
-  const [newCategory, setNewCategory] = useState("");
-  const [newLocationFound, setNewLocationFound] = useState("");
-  const [newDateFound, setNewDateFound] = useState("");
-  const [foundByName, setFoundByName] = useState(""); // New state for Full Name
-  const [foundByID, setFoundByID] = useState(""); // New state for Student ID
-  const [status, setStatus] = useState("");
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
-  const [imageFile, setImageFile] = useState(null); // State to hold the image file
-  const [previewUrl, setPreviewUrl] = useState(
-    "https://i.imgur.com/v3LZMXQ.jpeg"
-  );
-  const [isAdding, setIsAdding] = useState(false); // State for loading popup
+  const [newFoundItem, setNewFoundItem] = useState("")
+  const [newFoundItemDesc, setNewFoundItemDesc] = useState("")
+  const [newCategory, setNewCategory] = useState("")
+  const [newLocationFound, setNewLocationFound] = useState("")
+  const [newDateFound, setNewDateFound] = useState("")
+  const [foundByName, setFoundByName] = useState("") // New state for Full Name
+  const [foundByID, setFoundByID] = useState("") // New state for Student ID
+  const [status, setStatus] = useState("")
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false) // State for modal visibility
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false) // State for success popup visibility
+  const [showScanner, setShowScanner] = useState(false) // State for QR scanner visibility
+  const [scanner, setScanner] = useState(null) // State to store scanner instance
 
-  const navigate = useNavigate();
-  const API_URL = "http://localhost:3001/api";
+  const navigate = useNavigate()
+  const API_URL = "http://localhost:3001/api"
 
-  // Handle image file change
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.size <= 5 * 1024 * 1024) {
-      setImageFile(file);
-
-      // Generate a preview URL
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
-    } else {
-      setStatus("File size must be less than 5MB.");
+  // Cleanup scanner on component unmount
+  useEffect(() => {
+    return () => {
+      if (scanner) {
+        scanner.clear()
+      }
     }
-  };
+  }, [scanner])
+
   // Check if all required fields are filled
   const isFormValid = () => {
     return (
@@ -53,82 +47,149 @@ function AddFound() {
       newDateFound.trim() !== "" &&
       foundByName.trim() !== "" && // Validate Full Name
       foundByID.trim() !== "" // Validate Student ID
-    );
-  };
+    )
+  }
 
   // Fetch data
   const getFoundItems = async () => {
     try {
-      const response = await fetch(`${API_URL}/found-items`);
-      const data = await response.json();
-      setFoundItems(data);
+      const response = await fetch(`${API_URL}/found-items`)
+      const data = await response.json()
+      setFoundItems(data)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   const getLostItems = async () => {
     try {
-      const response = await fetch(`${API_URL}/lost-items`);
-      const data = await response.json();
-      setLostItems(data);
+      const response = await fetch(`${API_URL}/lost-items`)
+      const data = await response.json()
+      setLostItems(data)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   const getMatches = async () => {
     try {
-      const response = await fetch(`${API_URL}/matches`);
-      const data = await response.json();
-      setMatches(data);
+      const response = await fetch(`${API_URL}/matches`)
+      const data = await response.json()
+      setMatches(data)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
+
+  // QR Code Scanner Function
+  const startScanner = () => {
+    setShowScanner(true)
+
+    requestAnimationFrame(() => {
+      if (scanner) {
+        scanner.clear()
+      }
+
+      const newScanner = new Html5QrcodeScanner("qr-reader", {
+        fps: 10,
+        qrbox: { width: 300, height: 300 },
+      })
+
+      setScanner(newScanner)
+
+      newScanner.render(
+        async (decodedText) => {
+          const idNumber = decodedText.replace(/\D/g, "").substring(0, 10)
+          console.log("Original decoded text:", decodedText)
+          console.log("Extracted ID (first 10 digits):", idNumber)
+
+          setFoundByID(idNumber) // Auto-fill ID 
+          setShowScanner(false)
+
+          try {
+            const response = await fetch(`${API_URL}/users/id/${idNumber}`)
+
+            if (!response.ok) {
+              throw new Error(`Server responded with status: ${response.status}`)
+            }
+
+            const responseData = await response.json()
+            console.log("User data:", responseData)
+
+            // Check if the response has the 'exists' property
+            if (responseData.hasOwnProperty("exists")) {
+              if (responseData.exists && responseData.data) {
+                setFoundByName(responseData.data.fullName || "")
+
+                if (!responseData.data.fullName) {
+                  console.warn("User found but no fullName field detected")
+                  alert("User found, but please enter the name manually.")
+                }
+              } else {
+                alert("User not found!")
+              }
+            } else {
+              // Direct data format (no exists/data wrapper)
+              if (responseData && responseData.fullName) {
+                setFoundByName(responseData.fullName)
+              } else {
+                console.warn("User found but no fullName field detected")
+                alert("User found, but please enter the name manually.")
+              }
+            }
+          } catch (error) {
+            console.error("Error fetching user data:", error)
+            alert(`Failed to fetch user information: ${error.message}`)
+          }
+
+          // Clear the scanner after successful scan
+          newScanner.clear()
+          setScanner(null)
+        },
+        (errorMessage) => {
+          console.log("QR Scan error:", errorMessage)
+        },
+      )
+    })
+  }
 
   // Efficient keyword-based matching function
   const matchItems = (lostItem, foundItem) => {
     if (!lostItem.lost_item_desc || !foundItem.found_item_desc) {
-      console.error("Missing item description:", lostItem, foundItem);
-      return false;
+      console.error("Missing item description:", lostItem, foundItem)
+      return false
     }
 
-    // Ensure both items belong to SHS department
-    if (lostItem.department !== "SHS" || foundItem.department !== "SHS") {
-      return false;
+    if (lostItem.status !== "Pending" || foundItem.status === "Pending") {
+      return false
     }
 
     // Ensure categories match
     if (lostItem.category !== foundItem.category) {
-      return false;
+      return false
     }
 
     // Convert descriptions into keyword sets
-    const lostKeywords = new Set(
-      lostItem.lost_item_desc.toLowerCase().split(/\s+/)
-    );
-    const foundKeywords = new Set(
-      foundItem.found_item_desc.toLowerCase().split(/\s+/)
-    );
+    const lostKeywords = new Set(lostItem.lost_item_desc.toLowerCase().split(/\s+/))
+    const foundKeywords = new Set(foundItem.found_item_desc.toLowerCase().split(/\s+/))
 
     // Check if there's any overlap
-    return [...lostKeywords].some((keyword) => foundKeywords.has(keyword));
-  };
+    return [...lostKeywords].some((keyword) => foundKeywords.has(keyword))
+  }
 
   // Automatically match found items with lost items
   useEffect(() => {
     lostItems.forEach((lostItem) => {
       foundItems.forEach((foundItem) => {
-        const matchKey = `${lostItem.id}-${foundItem.id}`;
+        const matchKey = `${lostItem.id}-${foundItem.id}`
 
         if (!matchedPairs.has(matchKey) && matchItems(lostItem, foundItem)) {
-          createMatch(lostItem, foundItem);
-          setMatchedPairs((prev) => new Set(prev).add(matchKey)); // Prevent duplicate matches
+          createMatch(lostItem, foundItem)
+          setMatchedPairs((prev) => new Set(prev).add(matchKey)) // Prevent duplicate matches
         }
-      });
-    });
-  }, [lostItems, foundItems]); // Ensures matches only update when lists change
+      })
+    })
+  }, [lostItems, foundItems]) // Ensures matches only update when lists change
 
   // Create a match entry in the database
   const createMatch = async (lostItem, foundItem) => {
@@ -144,22 +205,22 @@ function AddFound() {
           lostID: lostItem.lostID,
           foundID: foundItem.foundID,
         }),
-      });
+      })
 
       if (response.ok) {
-        console.log("Match Created");
+        console.log("Match Created")
 
-        const lostItemEmail = lostItem.notifEmail;
+        const lostItemEmail = lostItem.notifEmail
 
         // Prepare the email content
-        const subject = "Match Found for Your Lost Item";
+        const subject = "Match Found for Your Lost Item"
         const message = `
           <h1>Match Found!</h1>
           <p>Your lost item ("${lostItem.lost_item_name}") has been matched with a found item.</p>
           <p>Location: ${lostItem.locationLost} and ${foundItem.locationFound}</p>
           <p>Date Matched: ${new Date().toISOString()}</p>
           <p>Thank you for using our service!</p>
-        `;
+        `
 
         // Send email by making a request to the backend's /send-email endpoint
         const emailResponse = await fetch(`${API_URL}/send-email`, {
@@ -172,42 +233,45 @@ function AddFound() {
             subject: subject,
             message: message,
           }),
-        });
+        })
 
         if (emailResponse.ok) {
-          console.log("Email sent successfully!");
+          console.log("Email sent successfully!")
         } else {
-          console.error("Failed to send email");
+          console.error("Failed to send email")
         }
 
         // Optional: Update frontend or fetch new items
-        getMatches();
-        getLostItems();
-        getFoundItems();
+        getMatches()
+        getLostItems()
+        getFoundItems()
       } else {
-        console.error("Match Not Found");
+        console.error("Match Not Found")
       }
     } catch (err) {
-      console.error("Error creating match:", err);
+      console.error("Error creating match:", err)
     }
-  };
+  }
 
   // Handle new found item submission
   const onSubmitFoundItem = async () => {
     try {
-      if (!isFormValid()) {
-        setStatus("Please fill in all fields.");
-        return;
+      if (
+        !newFoundItem ||
+        !newFoundItemDesc ||
+        !newCategory ||
+        !newLocationFound ||
+        !newDateFound ||
+        !foundByName || // Validate Full Name
+        !foundByID // Validate Student ID
+      ) {
+        setStatus("Please fill in all fields.")
+        return
       }
 
-      setIsAdding(true); // Show the "Adding..." popup
-
-      // Upload image to Firebase Storage
-      let photoURL = null;
-      if (imageFile) {
-        const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
-        await uploadBytes(storageRef, imageFile);
-        photoURL = await getDownloadURL(storageRef);
+      if (!isFormValid()) {
+        setStatus("Please fill in all fields.")
+        return
       }
 
       const response = await fetch(`${API_URL}/found-items`, {
@@ -222,41 +286,36 @@ function AddFound() {
           department: "SHS",
           foundByName: foundByName, // Include Full Name in the request
           foundByID: foundByID, // Include Student ID in the request
-          ...(photoURL && { photoURL }),
         }),
-      });
+      })
 
       if (response.ok) {
-        getFoundItems();
-        setIsAdding(false);
-        getMatches(); // Call getMatches() only after successful submission
-        setShowSuccessPopup(true); // Show the success popup
+        getFoundItems()
+        getMatches() // Call getMatches() only after successful submission
+        setShowSuccessPopup(true) // Show the success popup
 
         // Clear form fields
-        setNewFoundItem("");
-        setNewFoundItemDesc("");
-        setNewCategory("");
-        setNewLocationFound("");
-        setNewDateFound("");
-        setFoundByName(""); // Clear Full Name
-        setFoundByID(""); // Clear Student ID
-        setImageFile(null);
+        setNewFoundItem("")
+        setNewFoundItemDesc("")
+        setNewCategory("")
+        setNewLocationFound("")
+        setNewDateFound("")
+        setFoundByName("") // Clear Full Name
+        setFoundByID("") // Clear Student ID
       } else {
-        setIsAdding(false);
-        setStatus("Error adding found item");
+        setStatus("Error adding found item")
       }
     } catch (err) {
-      setIsAdding(false);
-      setStatus("Error adding found item");
-      console.error(err);
+      setStatus("Error adding found item")
+      console.error(err)
     }
-  };
+  }
 
   // Fetch data on component mount
   useEffect(() => {
-    getLostItems();
-    getFoundItems();
-  }, []); // **getMatches() is NOT called here**
+    getLostItems()
+    getFoundItems()
+  }, []) // **getMatches() is NOT called here**
 
   return (
     <div className="flex min-h-screen bg-[#FFF8F0]">
@@ -273,10 +332,7 @@ function AddFound() {
         <form className="grid grid-cols-2 gap-8 p-10">
           <div className="flex flex-col gap-4">
             <div>
-              <label
-                htmlFor="newFoundItem"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="newFoundItem" className="block text-sm font-medium text-gray-700">
                 Item Name
                 <div className="inline text-red-600">*</div>
               </label>
@@ -292,10 +348,7 @@ function AddFound() {
             </div>
 
             <div>
-              <label
-                htmlFor="newFoundItemDesc"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="newFoundItemDesc" className="block text-sm font-medium text-gray-700">
                 Item Description
                 <div className="inline text-red-600">*</div>
               </label>
@@ -311,10 +364,7 @@ function AddFound() {
             </div>
 
             <div>
-              <label
-                htmlFor="newCategory"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="newCategory" className="block text-sm font-medium text-gray-700">
                 Category
                 <div className="inline text-red-600">*</div>
               </label>
@@ -344,35 +394,11 @@ function AddFound() {
                 ))}
               </select>
             </div>
-            {/* Picture Upload Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Upload Image (Max 5MB)
-                <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="file"
-                id="imageUpload"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <label htmlFor="imageUpload" className="cursor-pointer">
-                <img
-                  src={previewUrl}
-                  alt="Upload Preview"
-                  className="w-40 h-30 object-cover rounded-lg border border-gray-300"
-                />
-              </label>
-            </div>
           </div>
 
           <div className="flex flex-col gap-4">
             <div>
-              <label
-                htmlFor="newLocationFound"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="newLocationFound" className="block text-sm font-medium text-gray-700">
                 Location Found
                 <div className="inline text-red-600">*</div>
               </label>
@@ -411,10 +437,7 @@ function AddFound() {
             </div>
 
             <div>
-              <label
-                htmlFor="newDateFound"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="newDateFound" className="block text-sm font-medium text-gray-700">
                 Date Found
                 <div className="inline text-red-600">*</div>
               </label>
@@ -432,10 +455,7 @@ function AddFound() {
             {/* Full Name and Student ID Fields (Inline) */}
             <div className="flex gap-4">
               <div className="flex-1">
-                <label
-                  htmlFor="fullName"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
                   Full Name
                   <div className="inline text-red-600">*</div>
                 </label>
@@ -451,10 +471,7 @@ function AddFound() {
               </div>
 
               <div className="flex-1">
-                <label
-                  htmlFor="studentID"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="studentID" className="block text-sm font-medium text-gray-700">
                   Student ID
                   <div className="inline text-red-600">*</div>
                 </label>
@@ -480,18 +497,22 @@ function AddFound() {
             >
               Back
             </button>
-            <div className="flex gap-4">
-              <QrCodeIcon className="w-7 h-7 " /> {/* QR Code icon */}
+            {/* Flex container for Claim button and QR Code icon */}
+            <div className="flex justify-end items-center gap-2">
+              {/* Clickable QR Code Icon */}
+              <button onClick={startScanner} type="button" className="p-1 rounded-full hover:bg-gray-200 transition">
+                <QrCodeIcon className="w-7 h-7" />
+              </button>
               <button
                 type="button"
                 onClick={() => {
-                  setNewFoundItem("");
-                  setNewFoundItemDesc("");
-                  setNewCategory("");
-                  setNewLocationFound("");
-                  setNewDateFound("");
-                  setFoundByName(""); // Clear Full Name
-                  setFoundByID(""); // Clear Student ID
+                  setNewFoundItem("")
+                  setNewFoundItemDesc("")
+                  setNewCategory("")
+                  setNewLocationFound("")
+                  setNewDateFound("")
+                  setFoundByName("") // Clear Full Name
+                  setFoundByID("") // Clear Student ID
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >
@@ -502,9 +523,7 @@ function AddFound() {
                 onClick={() => setShowConfirmationModal(true)} // Show confirmation modal
                 disabled={!isFormValid()} // Disable if form is not valid
                 className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
-                  isFormValid()
-                    ? "hover:bg-green-600"
-                    : "opacity-50 cursor-not-allowed"
+                  isFormValid() ? "hover:bg-green-600" : "opacity-50 cursor-not-allowed"
                 } transition-colors duration-200`}
               >
                 Submit
@@ -531,8 +550,8 @@ function AddFound() {
               </button>
               <button
                 onClick={() => {
-                  onSubmitFoundItem();
-                  setShowConfirmationModal(false);
+                  onSubmitFoundItem()
+                  setShowConfirmationModal(false)
                 }}
                 className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
@@ -543,37 +562,16 @@ function AddFound() {
         </div>
       )}
 
-      {/* Adding... Popup */}
-      {isAdding && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
-            <div className="flex flex-col items-center gap-2 mb-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-              <h2 className="text-lg font-medium text-gray-800">Adding...</h2>
-              <p className="text-s text-gray-500">
-                Please wait while we add the item.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
           <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
             <div className="flex flex-col items-center gap-2 mb-4">
-              <img
-                src="https://i.imgur.com/eFvkfQz.png"
-                alt="Checkmark"
-                className="w-12 h-12"
-              />
-              <h2 className="text-lg font-medium text-gray-800">
-                Item added successfully!
-              </h2>
+              <img src="https://i.imgur.com/eFvkfQz.png" alt="Checkmark" className="w-12 h-12" />
+              <h2 className="text-lg font-medium text-gray-800">Item added successfully!</h2>
             </div>
             <button
-              onClick={() => navigate("/items")}
+              onClick={() => setShowSuccessPopup(false)}
               className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
             >
               Done
@@ -581,8 +579,33 @@ function AddFound() {
           </div>
         </div>
       )}
+
+      {/* QR Scanner Modal */}
+      {showScanner && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/75 z-[60]">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Scan QR Code</h3>
+              <button
+                onClick={() => {
+                  setShowScanner(false)
+                  if (scanner) {
+                    scanner.clear()
+                    setScanner(null)
+                  }
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <div id="qr-reader" className="w-[350px] mx-auto"></div>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  )
 }
 
-export default AddFound;
+export default AddFound
+
