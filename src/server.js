@@ -390,6 +390,29 @@ const sendEmail = async (req, res) => {
 // API route to send email
 app.post("/api/send-email", sendEmail);
 
+const moveOldItemToArchive = async (itemID, type) => {
+  try {
+    const sourceCollection = type === "lost" ? "lost_items" : "found_items";
+    const docRef = doc(db, sourceCollection, itemID);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      console.log(`Item ${itemID} not found.`);
+      return;
+    }
+
+    const itemData = docSnap.data();
+    const archiveRef = doc(db, "archives", itemID);
+    
+    await setDoc(archiveRef, { ...itemData, status: "Archived" });
+    await deleteDoc(docRef);
+
+    console.log(`Item ${itemID} archived.`);
+  } catch (error) {
+    console.error("Error moving item to archive:", error);
+  }
+};
+
 // API Endpoint to move an item to the archive
 app.post("/api/moveItem/:id", async (req, res) => {
   const docId = req.params.id;
@@ -536,6 +559,46 @@ app.delete("/api/cancelMatch/:matchId", async (req, res) => {
     res.status(500).json({ error: "Failed to cancel match" });
   }
 });
+
+const checkAndMoveOldItems = async () => {
+  try {
+    const now = new Date();
+    now.setMonth(now.getMonth() - 6); // 6 months ago
+
+    // Fetch lost items older than 6 months
+    const lostQuery = query(lostItemsCollectionRef, where("dateLost", "<", now.toISOString().split("T")[0]));
+    const lostItems = await getDocs(lostQuery);
+
+    lostItems.forEach(async (docSnap) => {
+      const item = docSnap.data();
+      console.log(`Archiving Lost Item: ${item.lostID}`);
+      await moveOldItemToArchive(item.lostID, "lost");
+    });
+
+    // Fetch found items older than 6 months
+    const foundQuery = query(foundItemsCollectionRef, where("dateFound", "<", now.toISOString().split("T")[0]));
+    const foundItems = await getDocs(foundQuery);
+
+    foundItems.forEach(async (docSnap) => {
+      const item = docSnap.data();
+      console.log(`Archiving Found Item: ${item.foundID}`);
+      await moveOldItemToArchive(item.foundID, "found");
+    });
+
+  } catch (error) {
+    console.error("Error checking and moving old items:", error);
+  }
+};
+
+// Run the function immediately on startup
+console.log("Running initial archive check...");
+checkAndMoveOldItems();
+
+// Schedule it to run every 24 hours
+setInterval(() => {
+  console.log("Running scheduled archive check...");
+  checkAndMoveOldItems();
+}, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
 
 // API Endpoint to search found items by category
 app.get("/api/found-items/category", async (req, res) => {
