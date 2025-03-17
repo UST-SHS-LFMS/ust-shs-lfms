@@ -5,12 +5,11 @@ import {
   QuestionMarkCircleIcon,
   ArrowLeftOnRectangleIcon,
   FlagIcon,
-  Bars3Icon,
   ListBulletIcon,
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { auth } from "../../firebase"; 
-import { signOut } from "firebase/auth"; 
+import { auth } from "../../firebase";
+import { signOut } from "firebase/auth";
 
 const sidebarItems = [
   { icon: UserIcon, text: "Profile", path: "/student-profile" },
@@ -23,34 +22,21 @@ const sidebarItems = [
 const StudentSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isSidebarDocked, setIsSidebarDocked] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); 
-      navigate("/"); 
+      await signOut(auth);
+      navigate("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarDocked(!isSidebarDocked);
-  };
-
   return (
-    <div className={`${
-      isSidebarDocked ? "w-56" : "w-20"
-    } bg-white text-gray-400 flex flex-col transition-all duration-300 shadow-2xl shadow-gray-400 p-4 relative z-10`}>
-      <div className="flex items-center justify-between mb-6 font-bold text-amber-500">
-        {isSidebarDocked && <span className="whitespace-nowrap ml-2">WELCOME!</span>}
-        <button
-          onClick={toggleSidebar}
-          className="text-amber-500 p-1 rounded-md flex justify-center items-center"
-        >
-          <Bars3Icon className="w-6 h-6" />
-        </button>
+    <div className="w-56 bg-white text-gray-400 flex flex-col shadow-2xl shadow-gray-400 p-4 relative z-10">
+      <div className="flex items-center mb-6 font-bold text-amber-500">
+        <span className="whitespace-nowrap ml-2">WELCOME!</span>
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -65,7 +51,7 @@ const StudentSidebar = () => {
             }`}
           >
             <item.icon className="w-5 h-5" />
-            {isSidebarDocked && <span>{item.text}</span>}
+            <span>{item.text}</span>
           </Link>
         ))}
       </nav>
@@ -75,7 +61,7 @@ const StudentSidebar = () => {
         className="flex items-center gap-3 px-5 py-3 mt-6 rounded-md text-sm transition-all duration-200 hover:bg-gray-400 hover:text-black"
       >
         <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-        {isSidebarDocked && <span>Log Out</span>}
+        <span>Log Out</span>
       </button>
 
       {/* Logout Confirmation Modal */}
