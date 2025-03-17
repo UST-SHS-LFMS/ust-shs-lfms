@@ -53,7 +53,7 @@ function AddFound() {
   // Fetch data
   const getFoundItems = async () => {
     try {
-      const response = await fetch(`${API_URL}/found-items`)
+      const response = await fetch(`${API_URL}/api/found-items`)
       const data = await response.json()
       setFoundItems(data)
     } catch (err) {
@@ -63,7 +63,7 @@ function AddFound() {
 
   const getLostItems = async () => {
     try {
-      const response = await fetch(`${API_URL}/lost-items`)
+      const response = await fetch(`${API_URL}/api/lost-items`)
       const data = await response.json()
       setLostItems(data)
     } catch (err) {
@@ -73,7 +73,7 @@ function AddFound() {
 
   const getMatches = async () => {
     try {
-      const response = await fetch(`${API_URL}/matches`)
+      const response = await fetch(`${API_URL}/api/matches`)
       const data = await response.json()
       setMatches(data)
     } catch (err) {
@@ -107,7 +107,7 @@ function AddFound() {
           setShowScanner(false)
 
           try {
-            const response = await fetch(`${API_URL}/users/id/${idNumber}`)
+            const response = await fetch(`${API_URL}/api/users/id/${idNumber}`)
 
             if (!response.ok) {
               throw new Error(`Server responded with status: ${response.status}`)
@@ -194,7 +194,7 @@ function AddFound() {
   // Create a match entry in the database
   const createMatch = async (lostItem, foundItem) => {
     try {
-      const response = await fetch(`${API_URL}/matches`, {
+      const response = await fetch(`${API_URL}/api/matches`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -223,7 +223,7 @@ function AddFound() {
         `
 
         // Send email by making a request to the backend's /send-email endpoint
-        const emailResponse = await fetch(`${API_URL}/send-email`, {
+        const emailResponse = await fetch(`${API_URL}/api/send-email`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -274,7 +274,7 @@ function AddFound() {
         return
       }
 
-      const response = await fetch(`${API_URL}/found-items`, {
+      const response = await fetch(`${API_URL}/api/found-items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

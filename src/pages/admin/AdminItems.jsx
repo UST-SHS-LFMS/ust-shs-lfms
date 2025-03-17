@@ -399,7 +399,7 @@ function AdminItems() {
               <td className="px-6 py-2 text-sm">{item.dateFound}</td>
               <td className="px-6 py-2 text-sm">
                 {qrCodes[item.id] && (
-                  <a href={`${API_URL}//admin/items/${item.id}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`${API_URL}/api/admin/items/${item.id}`} target="_blank" rel="noopener noreferrer">
                   <img src={qrCodes[item.id]} alt="QR Code" className="w-8 h-8" />
                 </a>
                 )}
