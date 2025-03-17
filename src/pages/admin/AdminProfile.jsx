@@ -13,7 +13,7 @@ function AdminProfile() {
       if (user) {
         try {
           const response = await fetch(
-            `${API_URL}/${user.email}`
+            `${API_URL}/api/users/email/${user.email}`
           );
           const result = await response.json(); // Rename to `result` to avoid confusion
           console.log("API Response:", result); // Log the full response
