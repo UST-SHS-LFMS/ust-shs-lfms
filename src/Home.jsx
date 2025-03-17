@@ -1,6 +1,8 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com"; // Render Backend URL
+
 const Home = () => {
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
@@ -11,9 +13,8 @@ const Home = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      const response = await fetch(
-        `http://localhost:3001/api/users/email/${user.email}`
-      );
+      // Check if the user already exists in the database
+      const response = await fetch(`${API_URL}/api/users/email/${user.email}`);
       const responseData = await response.json();
 
       if (response.ok && responseData.exists) {
@@ -21,16 +22,14 @@ const Home = () => {
 
         if (userRole === "student" || userRole === "faculty") {
           navigate("/student-profile");
-        } else if (
-          responseData.data.role === "Super Admin" ||
-          responseData.data.role === "Support Staff"
-        ) {
+        } else if (userRole === "Super Admin" || userRole === "Support Staff") {
           navigate("/admin-profile");
         } else {
-          console.error("Unknown role:", responseData.data.role);
+          console.error("Unknown role:", userRole);
         }
       } else {
-        await fetch("http://localhost:3001/api/users", {
+        // Register new user in the database
+        const registerResponse = await fetch(`${API_URL}/api/users`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -40,6 +39,10 @@ const Home = () => {
             photoURL: user.photoURL,
           }),
         });
+
+        if (!registerResponse.ok) {
+          throw new Error("Failed to register new user.");
+        }
 
         navigate("/student-setup", {
           state: {
