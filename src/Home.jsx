@@ -1,12 +1,33 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com"; 
+const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
 const Home = () => {
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
+
+  // State to manage the current background image
+  const [currentBg, setCurrentBg] = useState(0);
+
+  const bgImages = [
+    "https://i.imgur.com/pGxIF2u.jpeg",
+    "https://i.imgur.com/dM9AeSX.jpeg",
+    "https://i.imgur.com/YFUhbXL.jpeg",
+    "https://i.imgur.com/mKc1lxF.jpeg",
+    "https://i.imgur.com/ELy2bR1.jpeg",
+  ];
+
+  // Function to cycle through background images
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % bgImages.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const signInWithGoogle = async () => {
     try {
@@ -60,12 +81,18 @@ const Home = () => {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center relative px-6 py-12"
-      style={{ backgroundImage: "url(https://i.imgur.com/ELy2bR1.jpeg)" }}
+      className="min-h-screen flex items-center justify-center bg-cover bg-center transition-all duration-1000 ease-in-out"
+      style={{ backgroundImage: `url(${bgImages[currentBg]})` }}
     >
-      <div className="absolute inset-0 bg-black/50"></div>
+      <div className="max-w-md w-full text-center bg-white rounded-2xl shadow-2xl shadow-gray-900 p-8 border border-gray-100 relative">
+        {/* Logo */}
+        <img
+          src="https://i.imgur.com/mZTPNjN.png"
+          alt="UST-SHS Logo"
+          className="w-24 h-24 mx-auto mb-6"
+        />
 
-      <div className="relative z-10 bg-white/90 shadow-xl rounded-2xl p-8 max-w-md w-full text-center">
+        {/* Welcome Text */}
         <h1 className="text-4xl font-extrabold text-amber-500 mb-2">
           WELCOME!
         </h1>
@@ -77,6 +104,7 @@ const Home = () => {
           Workspace Account.
         </p>
 
+        {/* Google Sign-In Button */}
         <button
           onClick={signInWithGoogle}
           className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
