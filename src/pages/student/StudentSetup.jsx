@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 function UserSetup() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { uid, email } = location.state || {};
+  const { email } = location.state || {};
   const API_URL =
     "https://ust-shs-lost-and-found-management-system.onrender.com";
 
@@ -47,13 +47,13 @@ function UserSetup() {
     if (isFaculty) {
       if (!formData.affiliation)
         newErrors.affiliation = "Affiliation is required";
-      if (!formData.employeeNumber)
-        newErrors.employeeNumber = "Employee Number is required";
+      if (!/^\d{10}$/.test(formData.employeeNumber))
+        newErrors.employeeNumber = "Employee Number must be exactly 10 digits";
     } else {
       if (!formData.gradeLevel)
         newErrors.gradeLevel = "Grade Level is required";
-      if (!formData.studentNumber)
-        newErrors.studentNumber = "Student Number is required";
+      if (!/^\d{10}$/.test(formData.studentNumber))
+        newErrors.studentNumber = "Student Number must be exactly 10 digits";
       if (!formData.strand) newErrors.strand = "Strand is required";
     }
     setErrors(newErrors);
@@ -113,7 +113,7 @@ function UserSetup() {
             <>
               <div>
                 <label className="block text-gray-700 font-semibold">
-                  Affiliation
+                  Affiliation <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="affiliation"
@@ -133,7 +133,7 @@ function UserSetup() {
                 )}
 
                 <label className="block text-gray-700 font-semibold mt-4">
-                  Employee Number
+                  Employee Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -155,7 +155,7 @@ function UserSetup() {
             <>
               <div>
                 <label className="block text-gray-700 font-semibold">
-                  Grade Level
+                  Grade Level <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="gradeLevel"
@@ -172,7 +172,7 @@ function UserSetup() {
                 )}
 
                 <label className="block text-gray-700 font-semibold mt-4">
-                  Student Number
+                  Student Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -189,7 +189,7 @@ function UserSetup() {
 
               <div>
                 <label className="block text-gray-700 font-semibold">
-                  Strand
+                  Strand <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="strand"
