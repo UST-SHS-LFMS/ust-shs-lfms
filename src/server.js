@@ -395,7 +395,7 @@ const moveOldItemToArchive = async (itemID, type) => {
 
     const itemData = docSnap.data();
     const archiveRef = doc(db, "archives", itemID);
-    
+
     await setDoc(archiveRef, { ...itemData, status: "Archived" });
     await deleteDoc(docRef);
 
@@ -558,7 +558,10 @@ const checkAndMoveOldItems = async () => {
     now.setMonth(now.getMonth() - 6); // 6 months ago
 
     // Fetch lost items older than 6 months
-    const lostQuery = query(lostItemsCollectionRef, where("dateLost", "<", now.toISOString().split("T")[0]));
+    const lostQuery = query(
+      lostItemsCollectionRef,
+      where("dateLost", "<", now.toISOString().split("T")[0])
+    );
     const lostItems = await getDocs(lostQuery);
 
     lostItems.forEach(async (docSnap) => {
@@ -568,7 +571,10 @@ const checkAndMoveOldItems = async () => {
     });
 
     // Fetch found items older than 6 months
-    const foundQuery = query(foundItemsCollectionRef, where("dateFound", "<", now.toISOString().split("T")[0]));
+    const foundQuery = query(
+      foundItemsCollectionRef,
+      where("dateFound", "<", now.toISOString().split("T")[0])
+    );
     const foundItems = await getDocs(foundQuery);
 
     foundItems.forEach(async (docSnap) => {
@@ -576,7 +582,6 @@ const checkAndMoveOldItems = async () => {
       console.log(`Archiving Found Item: ${item.foundID}`);
       await moveOldItemToArchive(item.foundID, "found");
     });
-
   } catch (error) {
     console.error("Error checking and moving old items:", error);
   }
@@ -587,10 +592,13 @@ console.log("Running initial archive check...");
 checkAndMoveOldItems();
 
 // Schedule it to run every 24 hours
-setInterval(() => {
-  console.log("Running scheduled archive check...");
-  checkAndMoveOldItems();
-}, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+setInterval(
+  () => {
+    console.log("Running scheduled archive check...");
+    checkAndMoveOldItems();
+  },
+  24 * 60 * 60 * 1000
+); // 24 hours in milliseconds
 
 // API Endpoint to search found items by category
 app.get("/api/found-items/category", async (req, res) => {
@@ -1073,29 +1081,29 @@ app.get("/api/users/id/:idNumber", async (req, res) => {
   try {
     const { idNumber } = req.params;
     console.log("Looking up ID number:", idNumber);
- 
+
     const usersRef = collection(db, "users");
-    
+
     // First try to find by studentNumber
     let q = query(usersRef, where("studentNumber", "==", idNumber));
     let querySnapshot = await getDocs(q);
-    
+
     // If not found, try by employeeNumber
     if (querySnapshot.empty) {
       q = query(usersRef, where("employeeNumber", "==", idNumber));
       querySnapshot = await getDocs(q);
     }
-    
+
     // If still not found, return not found
     if (querySnapshot.empty) {
       console.log("No user found with ID number:", idNumber);
       return res.json({ exists: false });
     }
-    
+
     const userDoc = querySnapshot.docs[0];
     const userData = userDoc.data();
     console.log("Fetched user data:", userData);
-    
+
     res.json({ exists: true, data: userData });
   } catch (error) {
     console.error("Error fetching user profile:", error);
