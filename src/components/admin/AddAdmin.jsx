@@ -51,7 +51,7 @@ const AddAdminForm = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("${API_URL}/api/add-admin", {
+      const response = await fetch(`${API_URL}/api/add-admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
