@@ -59,7 +59,7 @@ function AddLost() {
   // Fetch lost and found items
   const getLostItems = async () => {
     try {
-      const response = await fetch(`${API_URL}/lost-items`);
+      const response = await fetch(`${API_URL}/api/lost-items`);
       const data = await response.json();
       setLostItems(data);
     } catch (err) {
@@ -69,7 +69,7 @@ function AddLost() {
 
   const getFoundItems = async () => {
     try {
-      const response = await fetch(`${API_URL}/found-items`);
+      const response = await fetch(`${API_URL}/api/found-items`);
       const data = await response.json();
       setFoundItems(data);
     } catch (err) {
@@ -79,7 +79,7 @@ function AddLost() {
 
   const getMatches = async () => {
     try {
-      const response = await fetch(`${API_URL}/matches`);
+      const response = await fetch(`${API_URL}/api/matches`);
       const data = await response.json();
       setMatches(data);
     } catch (err) {
@@ -134,7 +134,7 @@ function AddLost() {
   // Create a match entry in the database
   const createMatch = async (lostItem, foundItem) => {
     try {
-      const response = await fetch(`${API_URL}/matches`, {
+      const response = await fetch(`${API_URL}/api/matches`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +163,7 @@ function AddLost() {
         `;
 
         // Send email by making a request to the backend's /send-email endpoint
-        const emailResponse = await fetch(`${API_URL}/send-email`, {
+        const emailResponse = await fetch(`${API_URL}/api/send-email`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -221,7 +221,7 @@ function AddLost() {
         photoURL = await getDownloadURL(storageRef);
       }
 
-      const response = await fetch(`${API_URL}/lost-items`, {
+      const response = await fetch(`${API_URL}/api/lost-items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
