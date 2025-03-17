@@ -18,6 +18,7 @@ function UserSetup() {
   });
 
   const [isFaculty, setIsFaculty] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     // Check if the email contains ".shs@gmail.com" to determine if the user is faculty
@@ -41,7 +42,27 @@ function UserSetup() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateForm = () => {
+    let newErrors = {};
+    if (isFaculty) {
+      if (!formData.affiliation)
+        newErrors.affiliation = "Affiliation is required";
+      if (!formData.employeeNumber)
+        newErrors.employeeNumber = "Employee Number is required";
+    } else {
+      if (!formData.gradeLevel)
+        newErrors.gradeLevel = "Grade Level is required";
+      if (!formData.studentNumber)
+        newErrors.studentNumber = "Student Number is required";
+      if (!formData.strand) newErrors.strand = "Strand is required";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validateForm()) return;
+
     try {
       // Prepare the data to be sent based on the user's role
       const requestBody = isFaculty
@@ -107,6 +128,9 @@ function UserSetup() {
                   <option value="GAS">GAS</option>
                   <option value="TVL">TVL</option>
                 </select>
+                {errors.affiliation && (
+                  <p className="text-red-500 text-sm">{errors.affiliation}</p>
+                )}
 
                 <label className="block text-gray-700 font-semibold mt-4">
                   Employee Number
@@ -119,6 +143,11 @@ function UserSetup() {
                   className="w-full mt-1 p-3 border border-gray-300 rounded-lg"
                   placeholder="Enter Employee Number"
                 />
+                {errors.employeeNumber && (
+                  <p className="text-red-500 text-sm">
+                    {errors.employeeNumber}
+                  </p>
+                )}
               </div>
             </>
           ) : (
@@ -138,6 +167,9 @@ function UserSetup() {
                   <option value="11">Grade 11</option>
                   <option value="12">Grade 12</option>
                 </select>
+                {errors.gradeLevel && (
+                  <p className="text-red-500 text-sm">{errors.gradeLevel}</p>
+                )}
 
                 <label className="block text-gray-700 font-semibold mt-4">
                   Student Number
@@ -150,6 +182,9 @@ function UserSetup() {
                   className="w-full mt-1 p-3 border border-gray-300 rounded-lg"
                   placeholder="Enter Student Number"
                 />
+                {errors.studentNumber && (
+                  <p className="text-red-500 text-sm">{errors.studentNumber}</p>
+                )}
               </div>
 
               <div>
@@ -169,6 +204,9 @@ function UserSetup() {
                   <option value="GAS">GAS</option>
                   <option value="TVL">TVL</option>
                 </select>
+                {errors.strand && (
+                  <p className="text-red-500 text-sm">{errors.strand}</p>
+                )}
               </div>
             </>
           )}
