@@ -5,7 +5,8 @@ function UserSetup() {
   const navigate = useNavigate();
   const location = useLocation();
   const { uid, email } = location.state || {};
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   const [formData, setFormData] = useState({
     gradeLevel: "",
@@ -27,7 +28,17 @@ function UserSetup() {
   }, [email]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // studentNumber and employeeNumber
+    if (
+      (name === "studentNumber" || name === "employeeNumber") &&
+      !/^\d{0,10}$/.test(value)
+    ) {
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSave = async () => {
@@ -46,7 +57,7 @@ function UserSetup() {
             role: formData.role, // role is "student"
           };
 
-          const response = await fetch(`${API_URL}/api/users/${email}`, {
+      const response = await fetch(`${API_URL}/api/users/${email}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -142,7 +153,9 @@ function UserSetup() {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-semibold">Strand</label>
+                <label className="block text-gray-700 font-semibold">
+                  Strand
+                </label>
                 <select
                   name="strand"
                   value={formData.strand}
