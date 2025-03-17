@@ -34,35 +34,63 @@ const StudentSidebar = () => {
   };
 
   return (
-    <div className="w-56 bg-white text-gray-400 flex flex-col shadow-2xl shadow-gray-400 p-4 relative z-10">
-      <div className="flex items-center mb-6 font-bold text-amber-500">
-        <span className="whitespace-nowrap ml-2">WELCOME!</span>
+    <>
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:w-56 bg-white text-gray-400 flex-col shadow-2xl shadow-gray-400 p-4 relative z-10">
+        <div className="flex items-center mb-6 font-bold text-amber-500">
+          <span className="whitespace-nowrap ml-2">WELCOME!</span>
+        </div>
+
+        <nav className="flex-1 space-y-2">
+          {sidebarItems.map((item, index) => (
+            <Link
+              key={index}
+              to={item.path}
+              className={`flex items-center gap-3 px-5 py-3 rounded-md text-sm transition-all duration-200 ${
+                location.pathname === item.path
+                  ? "bg-amber-100 text-stone-900 border-l-4 border-amber-600"
+                  : "hover:bg-amber-400/40 hover:text-black"
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span>{item.text}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <button
+          onClick={() => setShowLogoutModal(true)}
+          className="flex items-center gap-3 px-5 py-3 mt-6 rounded-md text-sm transition-all duration-200 hover:bg-gray-400 hover:text-black"
+        >
+          <ArrowLeftOnRectangleIcon className="w-5 h-5" />
+          <span>Log Out</span>
+        </button>
       </div>
 
-      <nav className="flex-1 space-y-2">
-        {sidebarItems.map((item, index) => (
-          <Link
-            key={index}
-            to={item.path}
-            className={`flex items-center gap-3 px-5 py-3 rounded-md text-sm transition-all duration-200 ${
-              location.pathname === item.path
-                ? "bg-amber-100 text-stone-900 border-l-4 border-amber-600"
-                : "hover:bg-amber-400/40 hover:text-black"
-            }`}
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white text-gray-400 shadow-2xl shadow-gray-400 z-10">
+        <nav className="flex justify-around items-center p-2">
+          {sidebarItems.map((item, index) => (
+            <Link
+              key={index}
+              to={item.path}
+              className={`flex flex-col items-center p-2 rounded-md text-sm transition-all duration-200 ${
+                location.pathname === item.path
+                  ? "bg-amber-100 text-stone-900"
+                  : "hover:bg-amber-400/40 hover:text-black"
+              }`}
+            >
+              <item.icon className="w-6 h-6" />
+            </Link>
+          ))}
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="flex flex-col items-center p-2 rounded-md text-sm transition-all duration-200 hover:bg-gray-400 hover:text-black"
           >
-            <item.icon className="w-5 h-5" />
-            <span>{item.text}</span>
-          </Link>
-        ))}
-      </nav>
-
-      <button
-        onClick={() => setShowLogoutModal(true)}
-        className="flex items-center gap-3 px-5 py-3 mt-6 rounded-md text-sm transition-all duration-200 hover:bg-gray-400 hover:text-black"
-      >
-        <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-        <span>Log Out</span>
-      </button>
+            <ArrowLeftOnRectangleIcon className="w-6 h-6" />
+          </button>
+        </nav>
+      </div>
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
@@ -86,7 +114,7 @@ const StudentSidebar = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
