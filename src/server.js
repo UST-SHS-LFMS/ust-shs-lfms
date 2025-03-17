@@ -37,15 +37,7 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Firebase Admin SDK
-const serviceAccount = JSON.parse(
-  await readFile(
-    path.join(
-      __dirname,
-      "./lost-n-found-unified-database-firebase-adminsdk-fbsvc-259849aaea.json"
-    ),
-    "utf8"
-  )
-);
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
