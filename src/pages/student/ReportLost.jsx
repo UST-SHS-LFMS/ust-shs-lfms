@@ -29,7 +29,7 @@ function AddLost() {
   const [isAdding, setIsAdding] = useState(false); // State for loading popup
 
   const navigate = useNavigate();
-  const API_URL = "http://localhost:3001/api";
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   // Handle image file change
   const handleImageChange = (e) => {
@@ -152,7 +152,7 @@ function AddLost() {
 
         const lostItemEmail = lostItem.notifEmail;
 
-        // Prepare the email content
+        // Prepare the email contents
         const subject = "Match Found for Your Lost Item";
         const message = `
           <h1>Match Found!</h1>

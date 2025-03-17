@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+
 function EditItem({ item, onClose, onDelete }) {
   const [formData, setFormData] = useState({
     category: "",
@@ -38,6 +39,8 @@ function EditItem({ item, onClose, onDelete }) {
     "15th Floor",
   ];
 
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  
   // Populate form with selected item details
   useEffect(() => {
     if (item) {
@@ -64,7 +67,7 @@ function EditItem({ item, onClose, onDelete }) {
       console.log("📤 Payload:", formData);
 
       const response = await fetch(
-        `http://localhost:3001/api/items/${item.lostID}`,
+        `${API_URL}/api/items/${item.lostID}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -91,7 +94,7 @@ function EditItem({ item, onClose, onDelete }) {
       console.log("🗑️ Sending delete request for lostID:", item.lostID);
 
       const response = await fetch(
-        `http://localhost:3001/api/items/${item.lostID}`,
+        `${API_URL}/api/items/${item.lostID}`,
         {
           method: "DELETE",
         }

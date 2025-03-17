@@ -6,13 +6,14 @@ function AdminProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
           const response = await fetch(
-            `http://localhost:3001/api/users/email/${user.email}`
+            `${API_URL}/${user.email}`
           );
           const result = await response.json(); // Rename to `result` to avoid confusion
           console.log("API Response:", result); // Log the full response

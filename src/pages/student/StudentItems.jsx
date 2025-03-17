@@ -16,6 +16,7 @@ function StudentItems() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState(null); // State for modal
   const navigate = useNavigate();
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   useEffect(() => {
     const auth = getAuth();
@@ -27,7 +28,7 @@ function StudentItems() {
         const fetchItems = async () => {
           try {
             const response = await fetch(
-              `http://localhost:3001/api/items?email=${userEmail}`
+              `${API_URL}/api/items?email=${userEmail}`
             );
             if (!response.ok) {
               throw new Error("Failed to fetch items");
@@ -65,7 +66,7 @@ function StudentItems() {
   const handleSave = async (lostID, updatedData) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/items/${lostID}`,
+        `${API_URL}/api/items/${lostID}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -93,7 +94,7 @@ function StudentItems() {
   const handleDelete = async (lostID) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/items/${lostID}`,
+        `${API_URL}/api/items/${lostID}`,
         {
           method: "DELETE",
         }

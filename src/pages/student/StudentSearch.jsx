@@ -5,6 +5,7 @@ function StudentSearch() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categoryData, setCategoryData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   useEffect(() => {
     if (!selectedCategory) return;
@@ -12,7 +13,7 @@ function StudentSearch() {
     setLoading(true);
     console.log("Fetching data for category:", selectedCategory); // Debugging log
     fetch(
-      `http://localhost:3001/api/found-items/category?category=${encodeURIComponent(selectedCategory)}`
+      `${API_URL}/api/found-items/category?category=${encodeURIComponent(selectedCategory)}`
     )
       .then((res) => res.json())
       .then((data) => {

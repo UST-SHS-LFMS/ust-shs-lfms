@@ -69,6 +69,7 @@ function AdminItems() {
   const [statuses, setStatuses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [qrCodes, setQrCodes] = useState({});
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   const getActiveEndpoint = useCallback(() => {
     switch (activeTab) {
@@ -123,7 +124,7 @@ function AdminItems() {
   const handleDownloadPDF = async () => {
     try {
       // Fetch the PDF
-      const response = await fetch("http://localhost:3001/api/generate-pdf", {
+      const response = await fetch(`${API_URL}/api/generate-pdf`, {
         method: "GET",
       });
 
@@ -162,7 +163,7 @@ function AdminItems() {
 
     try {
       const response = await axios.get(
-        `http://localhost:3001/api/${endpoint}`,
+        `${API_URL}/api/${endpoint}`,
         {
           params: {
             dateField,
@@ -271,7 +272,7 @@ function AdminItems() {
   useEffect(() => {
     const fetchStatuses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/statuses");
+        const response = await axios.get(`${API_URL}/api/statuses`);
         setStatuses(response.data);
       } catch (error) {
         console.error("Error fetching statuses:", error);
@@ -398,7 +399,7 @@ function AdminItems() {
               <td className="px-6 py-2 text-sm">{item.dateFound}</td>
               <td className="px-6 py-2 text-sm">
                 {qrCodes[item.id] && (
-                  <a href={`http://localhost:5173/admin/items/${item.id}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`${API_URL}//admin/items/${item.id}`} target="_blank" rel="noopener noreferrer">
                   <img src={qrCodes[item.id]} alt="QR Code" className="w-8 h-8" />
                 </a>
                 )}

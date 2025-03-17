@@ -26,8 +26,8 @@ function AddFound() {
   const [scanner, setScanner] = useState(null) // State to store scanner instance
 
   const navigate = useNavigate()
-  const API_URL = "http://localhost:3001/api"
-
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  
   // Cleanup scanner on component unmount
   useEffect(() => {
     return () => {

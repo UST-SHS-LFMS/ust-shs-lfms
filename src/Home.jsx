@@ -1,7 +1,7 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com"; // Render Backend URL
+const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com"; 
 
 const Home = () => {
   const auth = getAuth();

@@ -11,6 +11,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   const [showScanner, setShowScanner] = useState("")
   const [scanner, setScanner] = useState(null)
 
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  
   useEffect(() => {
     // Cleanup function for the scanner
     return () => {
@@ -43,7 +45,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return
       }
 
-      const response = await fetch(`http://localhost:3001/api/moveItem/${docId}`, {
+      const response = await fetch(`${API_URL}/api/moveItem/${docId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +76,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return
       }
 
-      const response = await fetch(`http://localhost:3001/api/moveMatchItem/${docId}`, {
+      const response = await fetch(`${API_URL}/api/moveMatchItem/${docId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,7 +108,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return
       }
 
-      const cancelResponse = await fetch(`http://localhost:3001/api/cancelMatch/${docId}`, {
+      const cancelResponse = await fetch(`${API_URL}/api/cancelMatch/${docId}`, {
         method: "DELETE",
       })
 
@@ -320,7 +322,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           setShowScanner(false)
 
           try {
-            const response = await fetch(`http://localhost:3001/api/users/id/${idNumber}`)
+            const response = await fetch(`${API_URL}/api/users/id/${idNumber}`)
 
             if (!response.ok) {
               throw new Error(`Server responded with status: ${response.status}`)

@@ -13,12 +13,13 @@ function ManageAdmins() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const navigate = useNavigate();
-
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  
   // Fetch admins from API
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/admins");
+        const response = await fetch(`${API_URL}/api/admins`);
         const data = await response.json();
         setEmployees(data);
       } catch (error) {

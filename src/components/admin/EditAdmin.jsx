@@ -11,12 +11,13 @@ const EditAdmin = ({
   if (!isOpen || !employee) return null;
 
   const [role, setRole] = useState(employee.role);
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   // Handle updating the admin's role
   const handleSave = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:3001/api/admins/${employee.id}`,
+        `${API_URL}/api/admins/${employee.id}`,
         { role }
       );
       if (response.status === 200) {
@@ -34,7 +35,7 @@ const EditAdmin = ({
   const handleDelete = async () => {
     try {
       const response = await axios.delete(
-        `http://localhost:3001/api/admins/${employee.id}`
+        `${API_URL}/api/admins/${employee.id}`
       );
       if (response.status === 200) {
         alert("Admin deleted successfully");

@@ -5,6 +5,7 @@ function UserSetup() {
   const navigate = useNavigate();
   const location = useLocation();
   const { uid, email } = location.state || {};
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   const [formData, setFormData] = useState({
     gradeLevel: "",
@@ -45,7 +46,7 @@ function UserSetup() {
             role: formData.role, // role is "student"
           };
 
-          const response = await fetch(`http://localhost:3001/api/users/${email}`, {
+          const response = await fetch(`${API_URL}/api/users/${email}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),

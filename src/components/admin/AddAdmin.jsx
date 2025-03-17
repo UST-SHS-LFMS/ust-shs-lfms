@@ -7,6 +7,8 @@ import {
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
 
+const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+
 const AddAdminForm = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -49,7 +51,7 @@ const AddAdminForm = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/add-admin", {
+      const response = await fetch("${API_URL}/api/add-admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

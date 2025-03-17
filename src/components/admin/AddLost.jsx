@@ -29,8 +29,8 @@ function AddLost() {
   const [isAdding, setIsAdding] = useState(false); // State for loading popup
 
   const navigate = useNavigate();
-  const API_URL = "http://localhost:3001/api";
-
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  
   // Handle image file change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -565,7 +565,7 @@ function AddLost() {
                 className="w-12 h-12"
               />
               <h2 className="text-lg font-medium text-gray-800">
-                Lost item added successfully!
+                Item added successfully!
               </h2>
               <p className="text-s text-gray-500">
                 You'll get an update if we find a matching item.
