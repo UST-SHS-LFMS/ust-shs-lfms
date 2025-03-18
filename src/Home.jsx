@@ -84,22 +84,22 @@ const Home = () => {
       className="min-h-screen flex items-center justify-center bg-cover bg-center transition-all duration-1000 ease-in-out"
       style={{ backgroundImage: `url(${bgImages[currentBg]})` }}
     >
-      <div className="max-w-md w-full text-center bg-white rounded-2xl shadow-2xl shadow-gray-900 p-8 border border-gray-100 relative">
+      <div className="max-w-md w-full mx-4 sm:mx-6 md:mx-8 text-center bg-white rounded-2xl shadow-2xl shadow-gray-900 p-6 sm:p-8 border border-gray-100 relative">
         {/* Logo */}
         <img
           src="https://i.imgur.com/mZTPNjN.png"
           alt="UST-SHS Logo"
-          className="w-24 h-24 mx-auto mb-6"
+          className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6"
         />
 
         {/* Welcome Text */}
-        <h1 className="text-4xl font-extrabold text-amber-500 mb-2">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-amber-500 mb-2">
           WELCOME!
         </h1>
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">
           UST-SHS LOST AND FOUND
         </h2>
-        <p className="text-gray-600 text-sm mb-6">
+        <p className="text-gray-600 text-xs sm:text-sm mb-6">
           To access the UST-SHS Lost and Found, please use your UST Google
           Workspace Account.
         </p>
@@ -107,14 +107,14 @@ const Home = () => {
         {/* Google Sign-In Button */}
         <button
           onClick={signInWithGoogle}
-          className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
+          className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white py-2 sm:py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
         >
           <img
             src="https://i.imgur.com/5YjiD4v.png"
             alt="Google Logo"
-            className="w-5 h-5"
+            className="w-4 h-4 sm:w-5 sm:h-5"
           />
-          Sign in with Google
+          <span className="text-sm sm:text-base">Sign in with Google</span>
         </button>
       </div>
     </div>

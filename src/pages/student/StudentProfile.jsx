@@ -15,12 +15,12 @@ function StudentProfile() {
           const response = await fetch(
             `${API_URL}/api/users/email/${user.email}`
           );
-          const result = await response.json(); // Rename to `result` to avoid confusion
-          console.log("API Response:", result); // Log the full response
+          const result = await response.json();
+          console.log("API Response:", result);
 
           if (response.ok) {
-            setProfile(result.data); // Set the profile data from the `data` key
-            console.log("Profile set:", result.data); // Log the profile data
+            setProfile(result.data);
+            console.log("Profile set:", result.data);
           } else {
             console.error("Error fetching profile:", result.error);
           }
@@ -28,12 +28,12 @@ function StudentProfile() {
           console.error("Failed to fetch profile:", error);
         }
       } else {
-        console.log("No user logged in"); // Log if no user is logged in
+        console.log("No user logged in");
       }
       setLoading(false);
     });
 
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, [auth]);
 
   if (loading) {
@@ -54,7 +54,7 @@ function StudentProfile() {
 
   return (
     <div className="flex min-h-screen bg-amber-50/50">
-      {/* Sidebar */}
+      {/* Sidebar - Hidden on mobile */}
       <StudentSidebar />
 
       {/* Main Content */}
@@ -73,29 +73,37 @@ function StudentProfile() {
           />
         </div>
 
+        {/* Profile Content */}
         <div className="mt-6 md:mt-8">
           <h1 className="text-3xl md:text-5xl font-bold text-orange-400">
             PROFILE
           </h1>
           <div className="mt-6 md:mt-8 space-y-4 md:space-y-6">
+            {/* Full Name */}
             <div>
               <h2 className="text-2xl md:text-3xl font-bold">
                 {profile.fullName || "N/A"}
               </h2>
             </div>
+
+            {/* Email */}
             <div>
               <h3 className="text-lg md:text-xl font-semibold">Email</h3>
               <p className="text-gray-600 text-sm md:text-base break-words">
                 {profile.email || "N/A"}
               </p>
             </div>
+
+            {/* Student Number */}
             <div>
               <h3 className="text-lg md:text-xl font-semibold">Student No.</h3>
               <p className="text-gray-600 text-sm md:text-base">
                 {profile.studentNumber || "N/A"}
               </p>
             </div>
-            <div className="flex space-x-25">
+
+            {/* Grade Level and Strand */}
+            <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0">
               <div>
                 <h3 className="text-lg md:text-xl font-semibold">Grade Level</h3>
                 <p className="text-gray-600 text-sm md:text-base">
