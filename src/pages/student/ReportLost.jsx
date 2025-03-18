@@ -6,38 +6,31 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../firebase"; // Import your Firebase storage instance
 
 function AddLost() {
-  const [lostItems, setLostItems] = useState([]);
-  const [foundItems, setFoundItems] = useState([]);
-  const [matches, setMatches] = useState([]);
-  const [matchedPairs, setMatchedPairs] = useState(new Set()); // Track matched pairs
-
   const [newLostItem, setNewLostItem] = useState("");
   const [newLostItemDesc, setNewLostItemDesc] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newLocationLost, setNewLocationLost] = useState("");
   const [newDateLost, setNewDateLost] = useState("");
-  const [newNotifEmail, setNewNotifEmail] = useState("");
-  const [userEmail, setUserEmail] = useState(""); //meowrge
-  const [notifyEmail, setNotifyEmail] = useState(true); //meowrge
+  const [userEmail, setUserEmail] = useState("");
+  const [notifyEmail, setNotifyEmail] = useState(true);
   const [status, setStatus] = useState("");
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for modal visibility
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
-  const [imageFile, setImageFile] = useState(null); // State to hold the image file
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(
     "https://i.imgur.com/v3LZMXQ.jpeg"
   );
-  const [isAdding, setIsAdding] = useState(false); // State for loading popup
+  const [isAdding, setIsAdding] = useState(false);
 
   const navigate = useNavigate();
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   // Handle image file change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 5 * 1024 * 1024) {
       setImageFile(file);
-
-      // Generate a preview URL
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
     } else {
@@ -56,148 +49,11 @@ function AddLost() {
     );
   };
 
-  // Fetch lost and found items
-  const getLostItems = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/lost-items`);
-      const data = await response.json();
-      setLostItems(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const getFoundItems = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/found-items`);
-      const data = await response.json();
-      setFoundItems(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const getMatches = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/matches`);
-      const data = await response.json();
-      setMatches(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Efficient keyword-based matching function
-  const matchItems = (lostItem, foundItem) => {
-    if (!lostItem.lost_item_desc || !foundItem.found_item_desc) {
-      console.error("Missing item description:", lostItem, foundItem);
-      return false;
-    }
-
-    // Ensure categories match
-    if (lostItem.category !== foundItem.category) {
-      return false;
-    }
-
-    const dateLost = new Date(lostItem.dateLost);
-    const dateFound = new Date(foundItem.dateFound);
-    if (dateLost > dateFound) {
-      return false;
-    }
-
-    // Convert descriptions into keyword sets
-    const lostKeywords = new Set(
-      lostItem.lost_item_desc.toLowerCase().split(/\s+/)
-    );
-    const foundKeywords = new Set(
-      foundItem.found_item_desc.toLowerCase().split(/\s+/)
-    );
-
-    // Check for overlap
-    return [...lostKeywords].some((keyword) => foundKeywords.has(keyword));
-  };
-
-  // Automatically match lost items with found items
-  useEffect(() => {
-    lostItems.forEach((lostItem) => {
-      foundItems.forEach((foundItem) => {
-        const matchKey = `${lostItem.id}-${foundItem.id}`;
-
-        if (!matchedPairs.has(matchKey) && matchItems(lostItem, foundItem)) {
-          createMatch(lostItem, foundItem);
-          setMatchedPairs((prev) => new Set(prev).add(matchKey)); // Prevent duplicate matches
-        }
-      });
-    });
-  }, [lostItems, foundItems]); // Ensures matches only update when lists change
-
-  // Create a match entry in the database
-  const createMatch = async (lostItem, foundItem) => {
-    try {
-      const response = await fetch(`${API_URL}/api/matches`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lostDocId: lostItem.id,
-          foundDocId: foundItem.id,
-          lostID: lostItem.lostID,
-          foundID: foundItem.foundID,
-        }),
-      });
-
-      if (response.ok) {
-        console.log("Match Created");
-
-        const lostItemEmail = lostItem.notifEmail;
-
-        // Prepare the email contents
-        const subject = "Match Found for Your Lost Item";
-        const message = `
-          <h1>Match Found!</h1>
-          <p>Your lost item ("${lostItem.lost_item_name}") has been matched with a found item.</p>
-          <p>Location: ${lostItem.locationLost} and ${foundItem.locationFound}</p>
-          <p>Date Matched: ${new Date().toISOString()}</p>
-          <p>Thank you for using our service!</p>
-        `;
-
-        // Send email by making a request to the backend's /send-email endpoint
-        const emailResponse = await fetch(`${API_URL}/api/send-email`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            to: lostItemEmail,
-            subject: subject,
-            message: message,
-          }),
-        });
-
-        if (emailResponse.ok) {
-          console.log("Email sent successfully!");
-        } else {
-          console.error("Failed to send email");
-        }
-
-        // Optional: Update frontend or fetch new items
-        getMatches();
-        getLostItems();
-        getFoundItems();
-      } else {
-        console.error("Match Not Found");
-      }
-    } catch (err) {
-      console.error("Error creating match:", err);
-    }
-  };
-
   // Handle new lost item submission
   const onSubmitLostItem = async () => {
     try {
-      const auth = getAuth(); // Initialize Firebase Auth
-      const user = auth.currentUser; // Get the currently logged-in user
+      const auth = getAuth();
+      const user = auth.currentUser;
 
       if (!user) {
         setStatus("You must be logged in to add a lost item.");
@@ -211,7 +67,7 @@ function AddLost() {
         return;
       }
 
-      setIsAdding(true); // Show the "Adding..." popup
+      setIsAdding(true);
 
       // Upload image to Firebase Storage
       let photoURL = null;
@@ -239,9 +95,8 @@ function AddLost() {
       });
 
       if (response.ok) {
-        getLostItems();
         setIsAdding(false);
-        setShowSuccessPopup(true); // Show the success popup
+        setShowSuccessPopup(true);
 
         // Clear form fields
         setNewLostItem("");
@@ -249,7 +104,6 @@ function AddLost() {
         setNewCategory("");
         setNewLocationLost("");
         setNewDateLost("");
-        setNewNotifEmail("");
         setImageFile(null);
       } else {
         setIsAdding(false);
@@ -262,10 +116,8 @@ function AddLost() {
     }
   };
 
-  // Fetch data on component mount
+  // Fetch user email on component mount
   useEffect(() => {
-    getLostItems();
-    getFoundItems();
     const auth = getAuth();
     const user = auth.currentUser;
     if (user) {
@@ -275,25 +127,28 @@ function AddLost() {
 
   return (
     <div className="flex min-h-screen bg-[#FFF8F0]">
-      {/* Sidebar */}
+      {/* Sidebar - Hidden on mobile */}
       <StudentSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-4 md:p-6">
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-[#FFA500]">ADD LOST ITEM</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#FFA500]">
+            ADD LOST ITEM
+          </h1>
         </div>
 
         {/* Add Lost Item Form */}
-        <form className="grid grid-cols-2 gap-8 p-10">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 p-4 md:p-10">
+          {/* Left Column */}
           <div className="flex flex-col gap-4">
             <div>
               <label
                 htmlFor="newLostItem"
                 className="block text-sm font-medium text-gray-700"
               >
-                Item Name
-                <div className="inline text-red-600">*</div>
+                Item Name <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -311,8 +166,7 @@ function AddLost() {
                 htmlFor="newLostItemDesc"
                 className="block text-sm font-medium text-gray-700"
               >
-                Item Description
-                <div className="inline text-red-600">*</div>
+                Item Description <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -330,8 +184,7 @@ function AddLost() {
                 htmlFor="newCategory"
                 className="block text-sm font-medium text-gray-700"
               >
-                Category
-                <div className="inline text-red-600">*</div>
+                Category <span className="text-red-600">*</span>
               </label>
               <select
                 id="newCategory"
@@ -359,17 +212,17 @@ function AddLost() {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Notification
               </label>
-
               <div className="flex items-center mt-2">
                 <input
                   type="checkbox"
                   id="notifyEmail"
                   checked={notifyEmail}
-                  onChange={() => setNotifyEmail(!notifyEmail)} // Fixed toggle function
+                  onChange={() => setNotifyEmail(!notifyEmail)}
                   className="mr-2"
                 />
                 <label htmlFor="notifyEmail" className="text-sm text-gray-700">
@@ -379,14 +232,14 @@ function AddLost() {
             </div>
           </div>
 
+          {/* Right Column */}
           <div className="flex flex-col gap-4">
             <div>
               <label
                 htmlFor="newLocationLost"
                 className="block text-sm font-medium text-gray-700"
               >
-                Location Lost
-                <div className="inline text-red-600">*</div>
+                Location Lost <span className="text-red-600">*</span>
               </label>
               <select
                 id="newLocationLost"
@@ -427,8 +280,7 @@ function AddLost() {
                 htmlFor="newDateLost"
                 className="block text-sm font-medium text-gray-700"
               >
-                Date Lost
-                <div className="inline text-red-600">*</div>
+                Date Lost <span className="text-red-600">*</span>
               </label>
               <input
                 type="date"
@@ -441,11 +293,9 @@ function AddLost() {
               />
             </div>
 
-            {/* Picture Upload Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Upload Image (Max 5MB)
-                <span className="text-red-600">*</span>
+                Upload Image (Max 5MB) <span className="text-red-600">*</span>
               </label>
               <input
                 type="file"
@@ -465,45 +315,36 @@ function AddLost() {
           </div>
 
           {/* Buttons */}
-          <div className="col-span-2 flex justify-between gap-4 mt-6">
+          <div className="col-span-1 md:col-span-2 flex justify-end gap-4 mt-6">
             <button
               type="button"
-              onClick={() => navigate(-1)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
+              onClick={() => {
+                setNewLostItem("");
+                setNewLostItemDesc("");
+                setNewCategory("");
+                setNewLocationLost("");
+                setNewDateLost("");
+              }}
+              className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
             >
-              Back
+              Clear
             </button>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setNewLostItem("");
-                  setNewLostItemDesc("");
-                  setNewCategory("");
-                  setNewLocationLost("");
-                  setNewDateLost("");
-                  setNewNotifEmail("");
-                }}
-                className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
-              >
-                Clear
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowConfirmationModal(true)} // Show confirmation modal
-                disabled={!isFormValid()} // Disable if form is not valid
-                className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
-                  isFormValid()
-                    ? "hover:bg-green-600"
-                    : "opacity-50 cursor-not-allowed"
-                } transition-colors duration-200`}
-              >
-                Submit
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowConfirmationModal(true)}
+              disabled={!isFormValid()}
+              className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
+                isFormValid()
+                  ? "hover:bg-green-600"
+                  : "opacity-50 cursor-not-allowed"
+              } transition-colors duration-200`}
+            >
+              Submit
+            </button>
           </div>
         </form>
 
+        {/* Status Message */}
         <p className="text-red-600 mt-4">{status}</p>
       </div>
 

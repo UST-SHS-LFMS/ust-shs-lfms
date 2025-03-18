@@ -128,28 +128,37 @@ function StudentItems() {
 
   return (
     <div className="flex min-h-screen bg-[#FFF8F0]">
+      {/* Sidebar - Hidden on mobile */}
       <StudentSidebar />
 
-      <div className="flex-1 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-[#FFA500]">MY LOST ITEMS</h1>
+      {/* Main Content */}
+      <div className="flex-1 p-4 md:p-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+  {/* Heading and Search/Filter in one line for mobile */}
+  <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
+    <h1 className="text-xl md:text-3xl font-bold text-[#FFA500] whitespace-nowrap mr-4">
+      MY LOST ITEMS
+    </h1>
 
-          <div className="flex items-center gap-4">
-            <button className="flex items-center">
-              <FunnelIcon className="w-5 h-5" />
-            </button>
-            <div className="relative">
-              <input
-                type="search"
-                placeholder="Search"
-                className="pl-10 pr-4 py-2 w-64 rounded-4xl bg-gray-200"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-              <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" />
-            </div>
-          </div>
-        </div>
+    {/* Search and Filter */}
+    <div className="flex items-center gap-2">
+      <button className="flex items-center">
+        <FunnelIcon className="w-5 h-5" />
+      </button>
+      <div className="relative">
+        <input
+          type="search"
+          placeholder="Search"
+          className="pl-8 pr-4 py-1.5 w-32 md:w-48 rounded-4xl bg-gray-200 text-sm"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+        <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 top-2 text-gray-500" />
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Error state */}
         {error && (
@@ -171,51 +180,59 @@ function StudentItems() {
                 No items found
               </div>
             ) : (
-              <table className="w-full">
-                <thead className="bg-gray-50 text-sm text-gray-600">
-                  <tr>
-                    <th className="px-6 py-3 text-left">Lost ID</th>
-                    <th className="px-6 py-3 text-left">Item Name</th>
-                    <th className="px-6 py-3 text-left">Category</th>
-                    <th className="px-6 py-3 text-left">Date Lost</th>
-                    <th className="px-6 py-3 text-left">Status</th>
-                    <th className="px-6 py-3 text-left"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {filteredItems.map((item) => (
-                    <tr key={item.lostID}>
-                      <td className="px-6 py-2 text-sm">{item.lostID}</td>
-                      <td className="px-6 py-2 text-sm">
-                        {item.lost_item_name}
-                      </td>
-                      <td className="px-6 py-2 text-sm">{item.category}</td>
-                      <td className="px-6 py-2 text-sm">{item.dateLost}</td>
-                      <td className="px-6 py-2">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            item.status === "Found"
-                              ? "bg-green-500 text-white"
-                              : item.status === "Matched"
-                                ? "bg-orange-500 text-white"
-                                : "bg-red-500 text-white"
-                          }`}
-                        >
-                          {item.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-2">
-                        <button
-                          className="text-gray-400 hover:text-gray-600"
-                          onClick={() => handleEditClick(item)}
-                        >
-                          <PencilSquareIcon className="w-5 h-5" />
-                        </button>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 text-sm text-gray-600">
+                    <tr>
+                      <th className="px-4 md:px-6 py-3 text-left">Lost ID</th>
+                      <th className="px-4 md:px-6 py-3 text-left">Item Name</th>
+                      <th className="px-4 md:px-6 py-3 text-left">Category</th>
+                      <th className="px-4 md:px-6 py-3 text-left">Date Lost</th>
+                      <th className="px-4 md:px-6 py-3 text-left">Status</th>
+                      <th className="px-4 md:px-6 py-3 text-left"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {filteredItems.map((item) => (
+                      <tr key={item.lostID}>
+                        <td className="px-4 md:px-6 py-2 text-sm">
+                          {item.lostID}
+                        </td>
+                        <td className="px-4 md:px-6 py-2 text-sm">
+                          {item.lost_item_name}
+                        </td>
+                        <td className="px-4 md:px-6 py-2 text-sm">
+                          {item.category}
+                        </td>
+                        <td className="px-4 md:px-6 py-2 text-sm">
+                          {item.dateLost}
+                        </td>
+                        <td className="px-4 md:px-6 py-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              item.status === "Found"
+                                ? "bg-green-500 text-white"
+                                : item.status === "Matched"
+                                  ? "bg-orange-500 text-white"
+                                  : "bg-red-500 text-white"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="px-4 md:px-6 py-2">
+                          <button
+                            className="text-gray-400 hover:text-gray-600"
+                            onClick={() => handleEditClick(item)}
+                          >
+                            <PencilSquareIcon className="w-5 h-5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
