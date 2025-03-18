@@ -635,7 +635,7 @@ function AdminItems() {
           </h1>
           <div className="flex items-center gap-2">
             <button
-              className="hidden md:flex p-2 text-amber-500 hover:text-amber-600"
+              className="hidden md:flex hover:text-gray-600"
               onClick={handleDownloadPDF}
               title="Download Report"
             >
