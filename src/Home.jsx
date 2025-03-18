@@ -107,7 +107,7 @@ const Home = () => {
         {/* Google Sign-In Button */}
         <button
           onClick={signInWithGoogle}
-          className="cursor-pointer w-full flex items-center justify-center gap-3 bg-blue-600 text-white py-2 sm:py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
+          className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white py-2 sm:py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300"
         >
           <img
             src="https://i.imgur.com/5YjiD4v.png"
