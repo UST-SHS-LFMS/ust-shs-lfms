@@ -84,21 +84,6 @@ const AddAdminForm = () => {
       <div className="flex-1 p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-[#FFA500]">ADD ADMIN</h1>
-
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <input
-                type="search"
-                placeholder="Search"
-                className="pl-10 pr-4 py-2 w-64 rounded-lg bg-[#F3E6FF]"
-              />
-              <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" />
-            </div>
-
-            <button className="flex items-center">
-              <FunnelIcon className="w-5 h-5" />
-            </button>
-          </div>
         </div>
 
         {/* Add Admin Form */}
@@ -173,7 +158,7 @@ const AddAdminForm = () => {
             <button
               type="button"
               onClick={() => window.history.back()} // Navigate back
-              className="px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
+              className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
             >
               Back
             </button>
@@ -181,13 +166,13 @@ const AddAdminForm = () => {
               <button
                 type="button"
                 onClick={handleClear}
-                className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
               >
                 Clear
               </button>
               <button
                 type="submit"
-                className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
+                className={`cursor-pointer px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
                   !isFormValid || loading
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-green-600"
@@ -221,7 +206,7 @@ const AddAdminForm = () => {
             <div className="flex justify-center">
               <button
                 onClick={() => navigate("/manage-admins")}
-                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
+                className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
               >
                 Done
               </button>

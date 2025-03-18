@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-
 function EditItem({ item, onClose, onDelete }) {
   const [formData, setFormData] = useState({
     category: "",
@@ -39,8 +38,9 @@ function EditItem({ item, onClose, onDelete }) {
     "15th Floor",
   ];
 
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
-  
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
+
   // Populate form with selected item details
   useEffect(() => {
     if (item) {
@@ -66,14 +66,11 @@ function EditItem({ item, onClose, onDelete }) {
       console.log("📤 Sending update request for lostID:", item.lostID);
       console.log("📤 Payload:", formData);
 
-      const response = await fetch(
-        `${API_URL}/api/items/${item.lostID}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${API_URL}/api/items/${item.lostID}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -93,12 +90,9 @@ function EditItem({ item, onClose, onDelete }) {
     try {
       console.log("🗑️ Sending delete request for lostID:", item.lostID);
 
-      const response = await fetch(
-        `${API_URL}/api/items/${item.lostID}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${API_URL}/api/items/${item.lostID}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -120,7 +114,7 @@ function EditItem({ item, onClose, onDelete }) {
         {/* Close "x" button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="cursor-pointer absolute top-4 right-4 text-gray-500 hover:text-gray-700"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +163,7 @@ function EditItem({ item, onClose, onDelete }) {
                 name="dateLost"
                 value={formData.dateLost}
                 onChange={handleChange}
-                className="w-full border rounded p-2 mt-1"
+                className="cursor-pointer w-full border rounded p-2 mt-1"
               />
             </div>
 
@@ -227,13 +221,13 @@ function EditItem({ item, onClose, onDelete }) {
         <div className="flex justify-between mt-6">
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-500 text-white rounded-4xl hover:bg-red-600 transition-colors duration-200"
+            className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-4xl hover:bg-red-600 transition-colors duration-200"
           >
             Remove
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
+            className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
           >
             Save
           </button>

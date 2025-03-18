@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import StudentSidebar from "../../components/student/StudentSidebar";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../../firebase"; // Import your Firebase storage instance
+import { storage } from "../../firebase";
+import { TrashIcon } from "@heroicons/react/24/solid";
 
 function AddLost() {
   const [newLostItem, setNewLostItem] = useState("");
@@ -36,6 +37,12 @@ function AddLost() {
     } else {
       setStatus("File size must be less than 5MB.");
     }
+  };
+
+  // Handle image deletion
+  const handleImageDelete = () => {
+    setImageFile(null);
+    setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
   };
 
   // Check if all required fields are filled
@@ -105,6 +112,7 @@ function AddLost() {
         setNewLocationLost("");
         setNewDateLost("");
         setImageFile(null);
+        setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
       } else {
         setIsAdding(false);
         setStatus("Error adding lost item");
@@ -264,7 +272,6 @@ function AddLost() {
                   "10th Floor",
                   "11th Floor",
                   "12th Floor",
-                  "13th Floor",
                   "14th Floor",
                   "15th Floor",
                 ].map((floor) => (
@@ -285,6 +292,7 @@ function AddLost() {
               <input
                 type="date"
                 id="newDateLost"
+                min="2021-12-10"
                 max={new Date().toISOString().split("T")[0]}
                 value={newDateLost}
                 onChange={(e) => setNewDateLost(e.target.value)}
@@ -295,7 +303,7 @@ function AddLost() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Upload Image (Max 5MB) <span className="text-red-600">*</span>
+                Upload Image (Max 5MB)
               </label>
               <input
                 type="file"
@@ -304,13 +312,24 @@ function AddLost() {
                 onChange={handleImageChange}
                 className="hidden"
               />
-              <label htmlFor="imageUpload" className="cursor-pointer">
-                <img
-                  src={previewUrl}
-                  alt="Upload Preview"
-                  className="w-40 h-30 object-cover rounded-lg border border-gray-300"
-                />
-              </label>
+              <div className="flex items-center gap-2 mt-1">
+                <label htmlFor="imageUpload" className="cursor-pointer">
+                  <img
+                    src={previewUrl}
+                    alt="Upload Preview"
+                    className="w-40 h-30 object-cover rounded-lg border border-gray-300"
+                  />
+                </label>
+                {imageFile && (
+                  <button
+                    type="button"
+                    onClick={handleImageDelete}
+                    className="cursor-pointer text-red-500 hover:text-red-600 transition-colors duration-200"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -324,8 +343,10 @@ function AddLost() {
                 setNewCategory("");
                 setNewLocationLost("");
                 setNewDateLost("");
+                setImageFile(null);
+                setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
               }}
-              className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+              className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
             >
               Clear
             </button>
@@ -333,7 +354,7 @@ function AddLost() {
               type="button"
               onClick={() => setShowConfirmationModal(true)}
               disabled={!isFormValid()}
-              className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
+              className={`cursor-pointer px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
                 isFormValid()
                   ? "hover:bg-green-600"
                   : "opacity-50 cursor-not-allowed"
@@ -409,7 +430,7 @@ function AddLost() {
             </div>
             <button
               onClick={() => navigate("/student-items")}
-              className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+              className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
             >
               Done
             </button>

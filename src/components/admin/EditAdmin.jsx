@@ -54,7 +54,7 @@ const EditAdmin = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-4 text-gray-500 hover:text-gray-700"
+          className="cursor-pointer absolute top-2 right-4 text-gray-500 hover:text-gray-700"
         >
           ✕
         </button>
@@ -80,13 +80,13 @@ const EditAdmin = ({
         <div className="flex justify-between mt-6">
           <button
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-500 text-white rounded-4xl hover:bg-red-600"
+            className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-4xl hover:bg-red-600"
           >
             Remove
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
+            className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
           >
             Save
           </button>

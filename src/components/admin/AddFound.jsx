@@ -444,10 +444,11 @@ function AddFound() {
               <input
                 type="date"
                 id="newDateFound"
+                min="2021-12-10"
                 max={new Date().toISOString().split("T")[0]}
                 value={newDateFound}
                 onChange={(e) => setNewDateFound(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                className="cursor-pointer mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 required
               />
             </div>
@@ -493,14 +494,14 @@ function AddFound() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
+              className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
             >
               Back
             </button>
             {/* Flex container for Claim button and QR Code icon */}
             <div className="flex justify-end items-center gap-2">
               {/* Clickable QR Code Icon */}
-              <button onClick={startScanner} type="button" className="p-1 rounded-full hover:bg-gray-200 transition">
+              <button onClick={startScanner} type="button" className="cursor-pointer text-gray-800 hover:text-gray-950 transition">
                 <QrCodeIcon className="w-7 h-7" />
               </button>
               <button
@@ -514,7 +515,7 @@ function AddFound() {
                   setFoundByName("") // Clear Full Name
                   setFoundByID("") // Clear Student ID
                 }}
-                className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >
                 Clear
               </button>
@@ -522,7 +523,7 @@ function AddFound() {
                 type="button"
                 onClick={() => setShowConfirmationModal(true)} // Show confirmation modal
                 disabled={!isFormValid()} // Disable if form is not valid
-                className={`px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
+                className={`cursor-pointer px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
                   isFormValid() ? "hover:bg-green-600" : "opacity-50 cursor-not-allowed"
                 } transition-colors duration-200`}
               >
@@ -572,7 +573,7 @@ function AddFound() {
             </div>
             <button
               onClick={() => setShowSuccessPopup(false)}
-              className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+              className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
             >
               Done
             </button>
@@ -582,7 +583,7 @@ function AddFound() {
 
       {/* QR Scanner Modal */}
       {showScanner && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/75 z-[60]">
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[60]">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold">Scan QR Code</h3>

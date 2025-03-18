@@ -56,7 +56,7 @@ function ItemFilter({
         <div className="flex justify-end">
           <button
             onClick={onClose}
-            className="text-gray-600 hover:text-gray-800"
+            className="cursor-pointer text-gray-600 hover:text-gray-800"
           >
             ✕
           </button>
@@ -130,13 +130,13 @@ function ItemFilter({
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={handleReset}
-            className="px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
+            className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
           >
             Reset
           </button>
           <button
             onClick={handleApply}
-            className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition"
+            className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition"
             disabled={isLoading}
           >
             {isLoading ? "Applying..." : "Apply"}

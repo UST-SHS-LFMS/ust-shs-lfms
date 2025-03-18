@@ -16,7 +16,8 @@ function StudentItems() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState(null); // State for modal
   const navigate = useNavigate();
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   useEffect(() => {
     const auth = getAuth();
@@ -65,14 +66,11 @@ function StudentItems() {
   // Handle saving edits
   const handleSave = async (lostID, updatedData) => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/items/${lostID}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedData),
-        }
-      );
+      const response = await fetch(`${API_URL}/api/items/${lostID}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update item");
@@ -93,12 +91,9 @@ function StudentItems() {
   // Handle deleting an item
   const handleDelete = async (lostID) => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/items/${lostID}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${API_URL}/api/items/${lostID}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete item");
@@ -132,33 +127,30 @@ function StudentItems() {
       <StudentSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-4 md:p-6">
+      <div className="flex-1 p-4 md:p-6 overflow-hidden">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-  {/* Heading and Search/Filter in one line for mobile */}
-  <div className="flex items-center justify-between w-full md:w-auto mb-4 md:mb-0">
-    <h1 className="text-xl md:text-3xl font-bold text-[#FFA500] whitespace-nowrap mr-4">
-      MY LOST ITEMS
-    </h1>
+        <div className="flex flex-row flex-wrap md:flex-nowrap items-center justify-between mb-6 gap-2">
+          <h1 className="text-xl md:text-3xl font-bold text-[#FFA500] whitespace-nowrap">
+            MY LOST ITEMS
+          </h1>
 
-    {/* Search and Filter */}
-    <div className="flex items-center gap-2">
-      <button className="flex items-center">
-        <FunnelIcon className="w-5 h-5" />
-      </button>
-      <div className="relative">
-        <input
-          type="search"
-          placeholder="Search"
-          className="pl-8 pr-4 py-1.5 w-32 md:w-48 rounded-4xl bg-gray-200 text-sm"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-        <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 top-2 text-gray-500" />
-      </div>
-    </div>
-  </div>
-</div>
+          {/* Search and Filter */}
+          <div className="flex items-center gap-2 ml-auto">
+            <button className="flex items-center">
+              <FunnelIcon className="cursor-pointer w-5 h-5" />
+            </button>
+            <div className="relative">
+              <input
+                type="search"
+                placeholder="Search"
+                className="pl-8 pr-4 py-1.5 w-32 md:w-48 rounded-4xl bg-gray-200 text-sm"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+              <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 top-2 text-gray-500" />
+            </div>
+          </div>
+        </div>
 
         {/* Error state */}
         {error && (
@@ -225,7 +217,7 @@ function StudentItems() {
                             className="text-gray-400 hover:text-gray-600"
                             onClick={() => handleEditClick(item)}
                           >
-                            <PencilSquareIcon className="w-5 h-5" />
+                            <PencilSquareIcon className="cursor-pointer w-5 h-5" />
                           </button>
                         </td>
                       </tr>

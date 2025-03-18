@@ -5,17 +5,22 @@ const faqs = [
   {
     question: "How do I report a lost item?",
     answer:
-      "You can report a lost item by filling out the form in the 'Lost Items' section.",
+      "You can report a lost item by filling out the form in the 'Report Item' section.",
   },
   {
-    question: "Where can I claim a found item?",
+    question: "What do I do after reporting a lost item?",
     answer:
-      "Found items can be claimed at the Lost and Found Office located in the admin building.",
+      "The UST-SHS Office will automatically send you an email if the system has found a match for your item.",
+  },
+  {
+    question: "Where can I claim an item?",
+    answer:
+      "Found items can be claimed at the UST-SHS Office at the 8th floor.",
   },
   {
     question: "What should I do if I found an item?",
     answer:
-      "Please submit the found item to the Lost and Found Office so it can be logged and returned to its owner.",
+      "Please submit the found item to the UST-SHS Office at the 8th floor so it can be logged and returned to its owner.",
   },
 ];
 
@@ -34,7 +39,7 @@ const FAQAccordion = () => {
           className="border border-amber-300 rounded-lg overflow-hidden transition-shadow hover:shadow-md"
         >
           <button
-            className={`w-full p-4 text-left font-medium text-lg flex justify-between items-center transition-colors ${
+            className={`w-full p-4 text-left font-medium text-base md:text-lg flex justify-between items-center transition-colors ${
               openIndex === index
                 ? "bg-amber-200 text-amber-900"
                 : "bg-amber-100 text-amber-800 hover:bg-amber-150"
@@ -70,7 +75,9 @@ const FAQAccordion = () => {
             role="region"
             aria-labelledby={`faq-question-${index}`}
           >
-            <p className="p-4 text-gray-700 bg-white">{faq.answer}</p>
+            <p className="p-4 text-sm md:text-base text-gray-700 bg-white">
+              {faq.answer}
+            </p>
           </div>
         </div>
       ))}
@@ -81,9 +88,12 @@ const FAQAccordion = () => {
 function StudentHelp() {
   return (
     <div className="flex min-h-screen bg-amber-50/50">
+      {/* Sidebar - Hidden on mobile */}
       <StudentSidebar />
-      <div className="flex-1 p-6">
-        <h1 className="text-3xl font-bold text-[#FFA500] mb-6">
+
+      {/* Main Content */}
+      <div className="flex-1 p-4 md:p-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#FFA500] mb-6">
           HELP & SUPPORT
         </h1>
         <FAQAccordion />

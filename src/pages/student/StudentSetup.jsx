@@ -215,7 +215,7 @@ function UserSetup() {
         <div className="flex justify-end space-x-4 mt-6">
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
+            className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
           >
             Save
           </button>

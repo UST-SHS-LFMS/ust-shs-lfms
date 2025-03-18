@@ -69,7 +69,8 @@ function AdminItems() {
   const [statuses, setStatuses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [qrCodes, setQrCodes] = useState({});
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   const getActiveEndpoint = useCallback(() => {
     switch (activeTab) {
@@ -118,8 +119,6 @@ function AdminItems() {
       console.error("Error generating QR code:", error);
     }
   }, []);
-  
-  
 
   const handleDownloadPDF = async () => {
     try {
@@ -162,24 +161,25 @@ function AdminItems() {
     console.log("DateField:", dateField);
 
     try {
-      const response = await axios.get(
-        `${API_URL}/api/${endpoint}`,
-        {
-          params: {
-            dateField,
-            date: filters.date || "",
-            orderBy: filters.orderBy || "",
-            category: filters.category || "",
-            status: filters.status || "",
-            department: activeTab === "VIEW CICS" ? "CICS" : undefined,
-          },
-        }
-      );
+      const response = await axios.get(`${API_URL}/api/${endpoint}`, {
+        params: {
+          dateField,
+          date: filters.date || "",
+          orderBy: filters.orderBy || "",
+          category: filters.category || "",
+          status: filters.status || "",
+          department: activeTab === "VIEW CICS" ? "CICS" : undefined,
+        },
+      });
 
       let processedData = response.data;
       console.log(`Fetched ${activeTab} data:`, processedData); // Add this line for debugging
 
-      if (activeTab === "FOUND ITEMS" || activeTab === "LOST ITEMS") {
+      if (
+        activeTab === "FOUND ITEMS" ||
+        activeTab === "LOST ITEMS" ||
+        activeTab === "ARCHIVE"
+      ) {
         processedData = processedData.filter(
           (item) => item.department === "SHS"
         );
@@ -399,9 +399,17 @@ function AdminItems() {
               <td className="px-6 py-2 text-sm">{item.dateFound}</td>
               <td className="px-6 py-2 text-sm">
                 {qrCodes[item.id] && (
-                  <a href={`${API_URL}/api/admin/items/${item.id}`} target="_blank" rel="noopener noreferrer">
-                  <img src={qrCodes[item.id]} alt="QR Code" className="w-8 h-8" />
-                </a>
+                  <a
+                    href={`${API_URL}/api/admin/items/${item.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={qrCodes[item.id]}
+                      alt="QR Code"
+                      className="w-8 h-8"
+                    />
+                  </a>
                 )}
               </td>
               <td>
@@ -409,7 +417,7 @@ function AdminItems() {
                   onClick={() => handleItemClick(item)}
                   className="text-gray-400 hover:text-gray-600"
                 >
-                  <InformationCircleIcon className="w-5 h-5" />
+                  <InformationCircleIcon className="cursor-pointer w-5 h-5" />
                 </button>
               </td>
             </tr>
@@ -469,7 +477,7 @@ function AdminItems() {
                   onClick={() => handleItemClick(item)}
                   className="text-gray-400 hover:text-gray-600"
                 >
-                  <InformationCircleIcon className="w-5 h-5" />
+                  <InformationCircleIcon className="cursor-pointer w-5 h-5" />
                 </button>
               </td>
             </tr>
@@ -513,7 +521,7 @@ function AdminItems() {
                     onClick={() => handleItemClick(item)}
                     className="text-gray-400 hover:text-gray-600"
                   >
-                    <InformationCircleIcon className="w-5 h-5" />
+                    <InformationCircleIcon className="cursor-pointer w-5 h-5" />
                   </button>
                 </td>
               </tr>
@@ -530,45 +538,52 @@ function AdminItems() {
     }
 
     return (
-      <table className="w-full">
-        <thead className="bg-gray-50 text-sm text-gray-600">
-          <tr>
-            <th className="px-6 py-3 text-left">Item ID</th>
-            <th className="px-6 py-3 text-left">Item Name</th>
-            <th className="px-6 py-3 text-left">Item Category</th>
-            <th className="px-6 py-3 text-left">Location</th>
-            <th className="px-6 py-3 text-left">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item.id || `archive-${Math.random()}`}>
-              <td className="px-6 py-2 text-sm">
-                {item.foundID || item.lostID || "N/A"}
-              </td>
-              <td className="px-6 py-2 text-sm">
-                {item.found_item_name || item.lost_item_name || "N/A"}
-              </td>
-              <td className="px-6 py-2 text-sm">{item.category || "N/A"}</td>
-              <td className="px-6 py-2 text-sm">
-                {item.locationFound || item.locationLost || "N/A"}
-              </td>
-              <td className="px-6 py-2 text-sm">
-                {item.dateFound || item.dateLost || "N/A"}
-              </td>
-
-              <td>
-                <button
-                  onClick={() => handleItemClick(item)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <InformationCircleIcon className="w-5 h-5" />
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        {" "}
+        {/* Ensures table doesn't get cut off */}
+        <table className="w-full min-w-max">
+          {" "}
+          {/* Forces full width */}
+          <thead className="bg-gray-50 text-sm text-gray-600">
+            <tr>
+              <th className="px-6 py-3 text-left">Item ID</th>
+              <th className="px-6 py-3 text-left">Item Name</th>
+              <th className="px-6 py-3 text-left">Item Category</th>
+              <th className="px-6 py-3 text-left">Location</th>
+              <th className="px-6 py-3 text-left">Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id || `archive-${Math.random()}`}>
+                <td className="px-6 py-2 text-sm">
+                  {item.foundID || item.lostID || "N/A"}
+                </td>
+                <td className="px-6 py-2 text-sm">
+                  {item.found_item_name || item.lost_item_name || "N/A"}
+                </td>
+                <td className="px-6 py-2 text-sm">{item.category || "N/A"}</td>
+                <td className="px-6 py-2 text-sm">
+                  {item.locationFound || item.locationLost || "N/A"}
+                </td>
+                <td className="px-6 py-2 text-sm">
+                  {item.dateFound || item.dateLost || "N/A"}
+                </td>
+                <td className="px-6 py-2 text-sm">
+                  {" "}
+                  {/* Fixed alignment */}
+                  <button
+                    onClick={() => handleItemClick(item)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <InformationCircleIcon className="cursor-pointer w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   };
 
@@ -599,7 +614,7 @@ function AdminItems() {
                   onClick={() => handleItemClick(item)}
                   className="text-gray-400 hover:text-gray-600"
                 >
-                  <InformationCircleIcon className="w-5 h-5" />
+                  <InformationCircleIcon className="cursor-pointer w-5 h-5" />
                 </button>
               </td>
             </tr>
@@ -610,52 +625,50 @@ function AdminItems() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FFF8F0]">
-      <AdminSidebar />
-      <div className="flex-1 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-amber-500">
+    <div className="flex min-h-screen bg-[#FFF8F0] overflow-hidden">
+      <AdminSidebar className="hidden md:block" />
+
+      <div className="flex-1 p-4 md:p-6 w-full">
+        <div className="flex items-center justify-between w-full mb-6">
+          <h1 className="text-xl md:text-3xl font-bold text-amber-500 whitespace-nowrap mr-4">
             LOST & FOUND ITEMS
+          </h1>
+          <div className="flex items-center gap-2">
             <button
+              className="hidden md:flex p-2 text-amber-500 hover:text-amber-600"
               onClick={handleDownloadPDF}
-              className="p-2 text-amber-500 hover:text-amber-600"
               title="Download Report"
             >
-              <ArrowDownOnSquareIcon className="w-6 h-6" />
+              <ArrowDownOnSquareIcon className="cursor-pointer w-6 h-6" />
             </button>
-          </h1>
-          <div className="flex items-center gap-4">
             <button
               className="flex items-center hover:text-gray-600"
               onClick={() => setIsItemFilterOpen(true)}
             >
-              <FunnelIcon className="w-5 h-5" />
+              <FunnelIcon className="cursor-pointer w-5 h-5" />
             </button>
-            <div className="relative">
+            <div className="relative w-full md:w-64">
               <input
                 type="search"
                 placeholder="Search"
-                className="pl-10 pr-4 py-2 w-64 rounded-4xl bg-gray-200"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full rounded-full bg-gray-200 text-sm"
               />
               <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto">
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto whitespace-nowrap">
           {tabItems.map((tab) => (
             <button
               key={tab}
-              onClick={() => {
-                console.log("Changing tab to:", tab);
-                handleTabChange(tab);
-              }}
+              onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
                 activeTab === tab
                   ? "bg-white shadow-sm"
-                  : "text-gray-500 hover:bg-white/50"
+                  : "text-gray-500 hover:bg-black/10"
               }`}
             >
               {tab}
@@ -669,7 +682,7 @@ function AdminItems() {
                   activeTab === "FOUND ITEMS" ? "/add-found" : "/add-lost"
                 )
               }
-              className="ml-auto px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
+              className="cursor-pointer ml-auto px-3 md:px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 text-sm md:text-base whitespace-nowrap"
             >
               + Add Item
             </button>
@@ -680,10 +693,11 @@ function AdminItems() {
           {loading ? (
             <p className="text-center p-4">Loading...</p>
           ) : (
-            <>
-              {console.log("Current tab content:", activeTab)}
+            <div className="overflow-x-auto">
+              {" "}
+              {/* Add this wrapper for horizontal scrolling */}
               {renderTabContent()}
-            </>
+            </div>
           )}
         </div>
 
@@ -697,11 +711,11 @@ function AdminItems() {
         <ItemFilter
           isOpen={isItemFilterOpen}
           onClose={() => setIsItemFilterOpen(false)}
-          onApplyFilters={handleApplyFilters}
-          onResetFilters={handleResetFilters}
-          initialFilters={filters}
-          categories={categories}
-          statuses={statuses}
+          onApplyFilters={() => {}}
+          onResetFilters={() => {}}
+          initialFilters={initialFilterState}
+          categories={[]}
+          statuses={[]}
         />
       </div>
     </div>

@@ -267,7 +267,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return (
           <button
             onClick={() => setClaimFormOpen(true)} // Open the claim form
-            className="px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
+            className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
           >
             Claim
           </button>
@@ -276,14 +276,14 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return (
           <div className="flex justify-between">
             {/* Cancel Match Button (Left) */}
-            <button onClick={cancelMatch} className="px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600">
+            <button onClick={cancelMatch} className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600">
               Cancel Match
             </button>
 
             {/* Mark as Claimed Button (Right) */}
             <button
               onClick={() => setMatchClaimFormOpen(true)}
-              className="px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
+              className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
             >
               Claim
             </button>
@@ -372,7 +372,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
         <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
           {/* Close Button */}
-          <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700">
             ✕
           </button>
 
@@ -403,7 +403,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
             <button
               onClick={() => setMatchClaimFormOpen(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
               ✕
             </button>
@@ -447,7 +447,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
             <button
               onClick={() => setClaimFormOpen(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
               ✕
             </button>
@@ -485,7 +485,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                       setClaimFormOpen(true)
                       console.log("isClaimFormOpen:", isClaimFormOpen)
                     }}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
+                    className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
                   >
                     Claim
                   </button>
@@ -508,7 +508,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                     setScanner(null)
                   }
                 }}
-                className="text-gray-500 hover:text-gray-700"
+                className="cursor-pointer text-gray-500 hover:text-gray-700"
               >
                 ✕
               </button>

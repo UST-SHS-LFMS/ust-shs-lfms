@@ -33,7 +33,7 @@ const FAQAccordion = () => {
           className="border border-amber-300 rounded-lg overflow-hidden transition-shadow hover:shadow-md"
         >
           <button
-            className={`w-full p-4 text-left font-medium text-lg flex justify-between items-center transition-colors ${
+            className={`w-full p-3 md:p-4 text-left font-medium text-base md:text-lg flex justify-between items-center transition-colors ${
               openIndex === index
                 ? "bg-amber-200 text-amber-900"
                 : "bg-amber-100 text-amber-800 hover:bg-amber-150"
@@ -59,7 +59,7 @@ const FAQAccordion = () => {
           <div
             id={`faq-answer-${index}`}
             className={`transition-all duration-200 ease-in-out overflow-hidden ${
-              openIndex === index ? "max-h-96 p-4 bg-white text-gray-700" : "max-h-0"
+              openIndex === index ? "max-h-96 p-3 md:p-4 bg-white text-gray-700" : "max-h-0"
             }`}
             role="region"
             aria-labelledby={`faq-question-${index}`}
@@ -76,9 +76,11 @@ const FAQAccordion = () => {
 function AdminHelp() {
   return (
     <div className="flex min-h-screen bg-amber-50/50">
-      <AdminSidebar />
-      <div className="flex-1 p-6">
-        <h1 className="text-3xl font-bold text-[#FFA500] mb-6">HELP & SUPPORT</h1>
+      <AdminSidebar className="hidden md:block" /> {/* Hide sidebar on mobile */}
+      <div className="flex-1 p-4 md:p-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#FFA500] mb-4 md:mb-6">
+          HELP & SUPPORT
+        </h1>
         <FAQAccordion />
       </div>
     </div>
