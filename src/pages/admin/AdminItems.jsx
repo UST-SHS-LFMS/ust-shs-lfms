@@ -373,6 +373,17 @@ function AdminItems() {
       return <p className="text-center p-4">No items found.</p>
     }
 
+    const paginatedItems = getPaginatedItems(filteredItems);
+
+    return (
+      <>
+        {renderTable(paginatedItems)}
+        {renderPagination(filteredItems)}
+      </>
+    );
+  };
+
+  const renderTable = (items) => {
     switch (activeTab) {
       case "FOUND ITEMS":
         return renderFoundItemsTable(filteredItems)
@@ -404,7 +415,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -459,7 +470,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.lostID}</td>
@@ -514,7 +525,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Date Matched</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {items.map((item) => {
             console.log("Rendering match item:", item)
             return (
@@ -558,7 +569,7 @@ function AdminItems() {
               <th className="px-6 py-3 text-left">Date</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200">
             {items.map((item) => (
               <tr key={item.id || `archive-${Math.random()}`}>
                 <td className="px-6 py-2 text-sm">{item.foundID || item.lostID || "N/A"}</td>
@@ -596,7 +607,8 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Date Found</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
+          
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -669,11 +681,7 @@ function AdminItems() {
           {loading ? (
             <p className="text-center p-4">Loading...</p>
           ) : (
-            <div className="overflow-x-auto">
-              {" "}
-              {/* Add this wrapper for horizontal scrolling */}
-              {renderTabContent()}
-            </div>
+            <div className="overflow-x-auto">{renderTabContent()}</div>
           )}
         </div>
 

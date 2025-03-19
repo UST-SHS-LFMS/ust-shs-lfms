@@ -46,12 +46,12 @@ const AdminSidebar = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-56 bg-white text-gray-400 flex-col shadow-2xl shadow-gray-400 p-4 relative z-10">
+      <div className="hidden md:flex md:w-56 bg-white text-gray-400 flex-col shadow-2xl shadow-gray-400 p-4 fixed h-screen z-10">
         <div className="flex items-center mb-6 font-bold text-amber-500">
           <span className="whitespace-nowrap ml-2">WELCOME!</span>
         </div>
 
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 space-y-2 overflow-y-auto">
           {sidebarItems.map((item, index) => (
             <Link
               key={index}
@@ -76,6 +76,9 @@ const AdminSidebar = () => {
           <span>Log Out</span>
         </button>
       </div>
+
+      {/* Spacer div to prevent content from being hidden behind the fixed sidebar */}
+      <div className="hidden md:block md:w-56"></div>
 
       {/* Mobile Bottom Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white text-gray-400 shadow-2xl shadow-gray-400 z-10">

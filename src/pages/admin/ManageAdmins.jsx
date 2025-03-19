@@ -4,6 +4,7 @@ import {
   MagnifyingGlassIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import EditAdmin from "../../components/admin/EditAdmin";
 
@@ -12,8 +13,11 @@ function ManageAdmins() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const navigate = useNavigate();
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   useEffect(() => {
     const fetchAdmins = async () => {
@@ -29,6 +33,11 @@ function ManageAdmins() {
     fetchAdmins();
   }, []);
 
+  useEffect(() => {
+    // Reset to first page when search query changes
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   const handleEditClick = (employee) => {
     setSelectedEmployee(employee);
     setIsEditModalOpen(true);
@@ -41,7 +50,9 @@ function ManageAdmins() {
 
   const handleRoleUpdated = (updatedId, newRole) => {
     setEmployees((prev) =>
-      prev.map((emp) => (emp.id === updatedId ? { ...emp, role: newRole } : emp))
+      prev.map((emp) =>
+        emp.id === updatedId ? { ...emp, role: newRole } : emp
+      )
     );
     setIsEditModalOpen(false);
   };
@@ -54,6 +65,14 @@ function ManageAdmins() {
     (employee) =>
       employee.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       employee.employeeNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedEmployees = filteredEmployees.slice(
+    startIndex,
+    startIndex + itemsPerPage
   );
 
   return (
@@ -99,7 +118,7 @@ function ManageAdmins() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredEmployees.map((employee) => (
+                {paginatedEmployees.map((employee) => (
                   <tr key={employee.id}>
                     <td className="px-4 md:px-6 py-2 text-sm">
                       {employee.employeeNumber}
@@ -124,6 +143,55 @@ function ManageAdmins() {
                   </tr>
                 ))}
               </tbody>
+              {/* Pagination inside table footer */}
+              {filteredEmployees.length > 0 && (
+                <tfoot className="border-t border-gray-200">
+                  <tr>
+                    <td colSpan="5">
+                      <div className="flex justify-center items-center py-4 space-x-2">
+                        {/* Previous Button */}
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                          className={`p-2 rounded-full ${
+                            currentPage === 1
+                              ? "bg-gray-200 cursor-not-allowed"
+                              : "bg-white hover:bg-gray-100"
+                          } border border-gray-300`}
+                        >
+                          <ChevronLeftIcon className="w-2 h-2 text-gray-700" />
+                        </button>
+
+                        {/* Page Indicator */}
+                        <span className="px-4 py-2 text-sm font-medium text-gray-700">
+                          Page {currentPage} of {totalPages || 1}
+                        </span>
+
+                        {/* Next Button */}
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={
+                            currentPage === totalPages || totalPages === 0
+                          }
+                          className={`p-2 rounded-full ${
+                            currentPage === totalPages || totalPages === 0
+                              ? "bg-gray-200 cursor-not-allowed"
+                              : "bg-white hover:bg-gray-100"
+                          } border border-gray-300`}
+                        >
+                          <ChevronRightIcon className="w-2 h-2 text-gray-700" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>
