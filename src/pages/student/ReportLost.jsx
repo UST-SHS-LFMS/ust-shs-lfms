@@ -143,7 +143,7 @@ function AddLost() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-[#FFA500]">
-            ADD LOST ITEM
+            REPORT LOST ITEM
           </h1>
         </div>
 

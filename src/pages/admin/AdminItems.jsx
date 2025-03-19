@@ -4,7 +4,12 @@ import {
   MagnifyingGlassIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
-import { FunnelIcon, ArrowDownOnSquareIcon } from "@heroicons/react/24/solid";
+import {
+  FunnelIcon,
+  ArrowDownOnSquareIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/solid";
 import ItemInformation from "../../components/admin/ItemInformation";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import ItemFilter from "../../components/admin/ItemFilter";
@@ -69,6 +74,8 @@ function AdminItems() {
   const [statuses, setStatuses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [qrCodes, setQrCodes] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const API_URL =
     "https://ust-shs-lost-and-found-management-system.onrender.com";
 
@@ -312,6 +319,53 @@ function AdminItems() {
     );
   };
 
+  const getPaginatedItems = (items) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return items.slice(startIndex, endIndex);
+  };
+
+  const renderPagination = (items) => {
+    const totalPages = Math.ceil(items.length / itemsPerPage);
+
+    return (
+      <div className="flex justify-center items-center mt-4 mb-4 space-x-2">
+        {/* Previous Button */}
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className={`p-2 rounded-full ${
+            currentPage === 1
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-white hover:bg-gray-100"
+          } border border-gray-300`}
+        >
+          <ChevronLeftIcon className="w-2 h-2 text-gray-700" />
+        </button>
+
+        {/* Page Indicator */}
+        <span className="px-4 py-2 text-sm font-medium text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        {/* Next Button */}
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+          className={`p-2 rounded-full ${
+            currentPage === totalPages
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-white hover:bg-gray-100"
+          } border border-gray-300`}
+        >
+          <ChevronRightIcon className="w-2 h-2 text-gray-700" />
+        </button>
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     console.log("renderTabContent called with activeTab:", activeTab);
     if (loading) {
@@ -345,17 +399,28 @@ function AdminItems() {
       return <p className="text-center p-4">No items found.</p>;
     }
 
+    const paginatedItems = getPaginatedItems(filteredItems);
+
+    return (
+      <>
+        {renderTable(paginatedItems)}
+        {renderPagination(filteredItems)}
+      </>
+    );
+  };
+
+  const renderTable = (items) => {
     switch (activeTab) {
       case "FOUND ITEMS":
-        return renderFoundItemsTable(filteredItems);
+        return renderFoundItemsTable(items);
       case "LOST ITEMS":
-        return renderLostItemsTable(filteredItems);
+        return renderLostItemsTable(items);
       case "POTENTIAL MATCHES":
-        return renderMatchItemsTable(filteredItems);
+        return renderMatchItemsTable(items);
       case "ARCHIVE":
-        return renderArchiveItemsTable(filteredItems);
+        return renderArchiveItemsTable(items);
       case "VIEW CICS":
-        return renderCICSItemsTable(filteredItems);
+        return renderCICSItemsTable(items);
       default:
         return <p className="text-center p-4">No items available.</p>;
     }
@@ -376,7 +441,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -442,7 +507,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.lostID}</td>
@@ -504,7 +569,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Date Matched</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {items.map((item) => {
             console.log("Rendering match item:", item);
             return (
@@ -553,7 +618,7 @@ function AdminItems() {
               <th className="px-6 py-3 text-left">Date</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200">
             {items.map((item) => (
               <tr key={item.id || `archive-${Math.random()}`}>
                 <td className="px-6 py-2 text-sm">
@@ -602,7 +667,8 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Date Found</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
+          
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -693,11 +759,7 @@ function AdminItems() {
           {loading ? (
             <p className="text-center p-4">Loading...</p>
           ) : (
-            <div className="overflow-x-auto">
-              {" "}
-              {/* Add this wrapper for horizontal scrolling */}
-              {renderTabContent()}
-            </div>
+            <div className="overflow-x-auto">{renderTabContent()}</div>
           )}
         </div>
 
