@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect, useCallback } from "react"
 import axios from "axios"
 import { MagnifyingGlassIcon, InformationCircleIcon } from "@heroicons/react/24/outline"
@@ -96,7 +98,7 @@ function AdminItems() {
 
   const generateQRCode = useCallback(async (item) => {
     try {
-      const itemUrl = `${window.location.origin}/admin/items}`
+      const itemUrl = `${window.location.origin}/admin/items/${item.id || item.matchId}`
       const qrCodeDataURL = await QRCode.toDataURL(itemUrl)
       setQrCodes((prevQrCodes) => ({
         ...prevQrCodes,
@@ -150,6 +152,11 @@ function AdminItems() {
     console.log("Applying filters:", filters)
 
     try {
+      // IMPORTANT: Firestore has limitations on combining orderBy with where clauses
+      // Strategy: Fetch with minimal filters first, then apply remaining filters client-side
+
+      // Step 1: Determine which filters to apply server-side vs client-side
+      // For Firestore, we'll prioritize status filter server-side since it's most restrictive
       const serverFilters = {
         dateField,
         department: activeTab === "VIEW CICS" ? "CICS" : undefined,
@@ -162,14 +169,14 @@ function AdminItems() {
         serverFilters.category = filters.category
       }
 
-      // Date and orderBy together won't work because of firestore limitations
+      // Don't send date and orderBy together to avoid Firestore limitations
       if (filters.date && !serverFilters.status && !serverFilters.category) {
         serverFilters.date = filters.date
       }
 
       console.log("Server-side filters:", serverFilters)
 
-      // Fetch data with server-side filters
+      // Step 2: Fetch data with server-side filters
       const response = await axios.get(`${API_URL}/api/${endpoint}`, {
         params: serverFilters,
       })
@@ -181,7 +188,7 @@ function AdminItems() {
         processedData = processedData.filter((item) => item.department === "SHS")
       }
 
-      // Apply remaining filters client-side
+      // Step 3: Apply remaining filters client-side
       if (filters.category && !serverFilters.category) {
         processedData = processedData.filter((item) => item.category === filters.category)
       }
@@ -203,6 +210,7 @@ function AdminItems() {
         })
       }
 
+      // Always apply ordering client-side to avoid Firestore limitations
       if (filters.orderBy) {
         processedData.sort((a, b) => {
           const dateA = new Date(a[dateField] || 0)
@@ -373,17 +381,6 @@ function AdminItems() {
       return <p className="text-center p-4">No items found.</p>
     }
 
-    const paginatedItems = getPaginatedItems(filteredItems);
-
-    return (
-      <>
-        {renderTable(paginatedItems)}
-        {renderPagination(filteredItems)}
-      </>
-    );
-  };
-
-  const renderTable = (items) => {
     switch (activeTab) {
       case "FOUND ITEMS":
         return renderFoundItemsTable(filteredItems)
@@ -415,7 +412,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody>
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -470,7 +467,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody>
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.lostID}</td>
@@ -525,7 +522,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Date Matched</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody>
           {items.map((item) => {
             console.log("Rendering match item:", item)
             return (
@@ -569,7 +566,7 @@ function AdminItems() {
               <th className="px-6 py-3 text-left">Date</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody>
             {items.map((item) => (
               <tr key={item.id || `archive-${Math.random()}`}>
                 <td className="px-6 py-2 text-sm">{item.foundID || item.lostID || "N/A"}</td>
@@ -607,8 +604,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Date Found</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          
+        <tbody>
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -681,7 +677,11 @@ function AdminItems() {
           {loading ? (
             <p className="text-center p-4">Loading...</p>
           ) : (
-            <div className="overflow-x-auto">{renderTabContent()}</div>
+            <div className="overflow-x-auto">
+              {" "}
+              {/* Add this wrapper for horizontal scrolling */}
+              {renderTabContent()}
+            </div>
           )}
         </div>
 
