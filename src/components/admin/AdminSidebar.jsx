@@ -47,8 +47,12 @@ const AdminSidebar = () => {
     <>
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-56 bg-white text-gray-400 flex-col shadow-2xl shadow-gray-400 p-4 fixed h-screen z-10">
-        <div className="flex items-center mb-6 font-bold text-amber-500">
-          <span className="whitespace-nowrap ml-2">WELCOME!</span>
+      <div className="flex items-center mb-2">
+          <img
+            src="https://i.imgur.com/GamDbNv.png"
+            alt="Welcome"
+            className="w-full h-auto"
+          />
         </div>
 
         <nav className="flex-1 space-y-2 overflow-y-auto">
