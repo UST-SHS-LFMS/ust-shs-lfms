@@ -6,7 +6,8 @@ function StudentProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -94,29 +95,64 @@ function StudentProfile() {
               </p>
             </div>
 
-            {/* Student Number */}
-            <div>
-              <h3 className="text-lg md:text-xl font-semibold">Student No.</h3>
-              <p className="text-gray-600 text-sm md:text-base">
-                {profile.studentNumber || "N/A"}
-              </p>
-            </div>
+            {/* Conditional rendering based on role */}
+            {profile.role === "student" ? (
+              <>
+                {/* Student Number */}
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold">
+                    Student Number
+                  </h3>
+                  <p className="text-gray-600 text-sm md:text-base">
+                    {profile.studentNumber || "N/A"}
+                  </p>
+                </div>
 
-            {/* Grade Level and Strand */}
-            <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0">
-              <div>
-                <h3 className="text-lg md:text-xl font-semibold">Grade Level</h3>
-                <p className="text-gray-600 text-sm md:text-base">
-                  {profile.gradeLevel || "N/A"}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg md:text-xl font-semibold">Strand</h3>
-                <p className="text-gray-600 text-sm md:text-base">
-                  {profile.strand || "N/A"}
-                </p>
-              </div>
-            </div>
+                {/* Grade Level and Strand */}
+                <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0">
+                  <div>
+                    <h3 className="text-lg md:text-xl font-semibold">
+                      Grade Level
+                    </h3>
+                    <p className="text-gray-600 text-sm md:text-base">
+                      {profile.gradeLevel || "N/A"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-semibold">Strand</h3>
+                    <p className="text-gray-600 text-sm md:text-base">
+                      {profile.strand || "N/A"}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : profile.role === "faculty" ? (
+              <>
+                {/* Employee Number */}
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold">
+                    Employee Number
+                  </h3>
+                  <p className="text-gray-600 text-sm md:text-base">
+                    {profile.employeeNumber || "N/A"}
+                  </p>
+                </div>
+
+                {/* Affiliation */}
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold">
+                    Affiliation
+                  </h3>
+                  <p className="text-gray-600 text-sm md:text-base">
+                    {profile.affiliation || "N/A"}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p className="text-gray-600 text-sm md:text-base">
+                Role not recognized.
+              </p>
+            )}
           </div>
         </div>
       </div>
