@@ -258,7 +258,6 @@ function EditItem({ item, onClose, onDelete, onSave }) {
             <button
               onClick={() => {
                 setShowSuccessPopup(false); // Close success popup
-                onClose(); // Close the edit modal
               }}
               className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
             >
