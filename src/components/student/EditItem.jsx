@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function EditItem({ item, onClose, onDelete }) {
+function EditItem({ item, onClose, onDelete, onSave }) {
   const [formData, setFormData] = useState({
     category: "",
     dateLost: "",
@@ -8,6 +8,8 @@ function EditItem({ item, onClose, onDelete }) {
     lost_item_desc: "",
     lost_item_name: "",
   });
+
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   // Define options for Category and Location Lost dropdowns
   const categories = [
@@ -63,9 +65,6 @@ function EditItem({ item, onClose, onDelete }) {
   // Handle Save
   const handleSave = async () => {
     try {
-      console.log("📤 Sending update request for lostID:", item.lostID);
-      console.log("📤 Payload:", formData);
-
       const response = await fetch(`${API_URL}/api/items/${item.lostID}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -73,15 +72,13 @@ function EditItem({ item, onClose, onDelete }) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Server error: ${response.status}`);
+        throw new Error("Failed to update item");
       }
 
-      console.log("✅ Item updated successfully");
-      onClose();
+      onSave(item.lostID, formData); // Update parent component state
+      setShowSuccessPopup(true); // Show success popup
     } catch (error) {
-      console.error("🔥 Error updating item:", error.message);
-      alert(`Error updating item: ${error.message}`);
+      console.error("Error updating item:", error);
     }
   };
 
@@ -233,6 +230,36 @@ function EditItem({ item, onClose, onDelete }) {
           </button>
         </div>
       </div>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img
+                src="https://i.imgur.com/eFvkfQz.png"
+                alt="Checkmark"
+                className="w-12 h-12"
+              />
+              <h2 className="text-lg font-medium text-gray-800">
+                Item updated successfully!
+              </h2>
+              <p className="text-s text-gray-500">
+                Your changes have been saved.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setShowSuccessPopup(false); // Close success popup
+                onClose(); // Close the modal
+              }}
+              className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
