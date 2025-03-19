@@ -337,6 +337,13 @@ function AddLost() {
 
           {/* Buttons */}
           <div className="col-span-1 md:col-span-2 flex justify-end gap-4 mt-6">
+             <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
+            >
+              Back
+            </button>
             <button
               type="button"
               onClick={() => {

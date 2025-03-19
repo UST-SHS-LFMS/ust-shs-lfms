@@ -1,44 +1,29 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 
-function ItemFilter({
-  isOpen,
-  onClose,
-  onApplyFilters,
-  onResetFilters,
-  initialFilters,
-  categories,
-  statuses,
-}) {
-  const [filters, setFilters] = useState(initialFilters);
-  const [isLoading, setIsLoading] = useState(false);
+function ItemFilter({ isOpen, onClose, onApplyFilters, onResetFilters, initialFilters, categories, statuses }) {
+  const [filters, setFilters] = useState(initialFilters)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    setFilters(initialFilters, onApplyFilters);
-  }, [initialFilters, onApplyFilters]);
+    setFilters(initialFilters)
+  }, [initialFilters, onApplyFilters])
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
+    setFilters((prev) => ({ ...prev, [key]: value }))
+  }
 
   const handleApply = async () => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500)); // fetch delay
-  
-    // Check if filters are empty
-    const isFilterEmpty =
-      !filters.date && !filters.orderBy && !filters.category && !filters.status;
-  
-    if (isFilterEmpty) {
-      onApplyFilters((prevItems) => sortItems(prevItems)); // Sort if no filters
-    } else {
-      onApplyFilters(filters);
-    }
-  
-    setIsLoading(false);
-    onClose();
-  };
+    setIsLoading(true)
+    await new Promise((resolve) => setTimeout(resolve, 500)) // fetch delay
+
+    // Apply all filters together instead of checking if they're empty
+    onApplyFilters(filters)
+
+    setIsLoading(false)
+    onClose()
+  }
 
   const handleReset = () => {
     setFilters({
@@ -46,27 +31,22 @@ function ItemFilter({
       orderBy: "",
       category: "",
       status: "",
-    });
-    onResetFilters();
-  };
+    })
+    onResetFilters()
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 md:w-1/2 lg:w-1/3">
         <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="cursor-pointer text-gray-600 hover:text-gray-800"
-          >
+          <button onClick={onClose} className="cursor-pointer text-gray-600 hover:text-gray-800">
             ✕
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Date
-            </label>
+            <label className="block font-semibold text-gray-700 mb-1">Date</label>
             <input
               type="date"
               className="w-full border border-gray-300 rounded-md p-2"
@@ -76,9 +56,7 @@ function ItemFilter({
           </div>
 
           <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Order By
-            </label>
+            <label className="block font-semibold text-gray-700 mb-1">Order By</label>
             <select
               className="w-full border border-gray-300 rounded-md p-2"
               value={filters.orderBy}
@@ -91,9 +69,7 @@ function ItemFilter({
           </div>
 
           <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Category
-            </label>
+            <label className="block font-semibold text-gray-700 mb-1">Category</label>
             <select
               className="w-full border border-gray-300 rounded-md p-2"
               value={filters.category}
@@ -109,9 +85,7 @@ function ItemFilter({
           </div>
 
           <div>
-            <label className="block font-semibold text-gray-700 mb-1">
-              Status
-            </label>
+            <label className="block font-semibold text-gray-700 mb-1">Status</label>
             <select
               className="w-full border border-gray-300 rounded-md p-2"
               value={filters.status}
@@ -144,7 +118,8 @@ function ItemFilter({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default ItemFilter;
+export default ItemFilter
+
