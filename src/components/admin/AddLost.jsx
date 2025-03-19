@@ -165,6 +165,7 @@ function AddLost() {
                 onChange={(e) => setNewLostItem(e.target.value)}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Name"
+                maxLength="50"
                 required
               />
             </div>
@@ -183,6 +184,7 @@ function AddLost() {
                 onChange={(e) => setNewLostItemDesc(e.target.value)}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Description"
+                maxLength="50"
                 required
               />
             </div>

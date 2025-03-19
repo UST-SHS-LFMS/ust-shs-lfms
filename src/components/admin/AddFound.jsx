@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import AdminSidebar from "../../components/admin/AdminSidebar"
@@ -343,6 +341,7 @@ function AddFound() {
                 onChange={(e) => setNewFoundItem(e.target.value)}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Name"
+                maxLength="50"
                 required
               />
             </div>
@@ -359,6 +358,7 @@ function AddFound() {
                 onChange={(e) => setNewFoundItemDesc(e.target.value)}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Description"
+                maxLength="50"
                 required
               />
             </div>
@@ -425,7 +425,6 @@ function AddFound() {
                   "10th Floor",
                   "11th Floor",
                   "12th Floor",
-                  "13th Floor",
                   "14th Floor",
                   "15th Floor",
                 ].map((floor) => (
@@ -467,6 +466,7 @@ function AddFound() {
                   onChange={(e) => setFoundByName(e.target.value)}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Full Name"
+                  maxLength="50"
                   required
                 />
               </div>
@@ -480,9 +480,12 @@ function AddFound() {
                   type="text"
                   id="studentID"
                   value={foundByID}
-                  onChange={(e) => setFoundByID(e.target.value)}
+                  onChange={(e) => setFoundByID(e.target.value.replace(/[^0-9]/g, ''))}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Student ID"
+                  maxLength="10"
+                  step="1"  // Only allow whole numbers
+                  inputMode="numeric"  
                   required
                 />
               </div>
