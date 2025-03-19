@@ -82,22 +82,23 @@ function StudentItems() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedData),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to update item");
       }
-
-      // Update the UI
+  
+      // Optimistically update the UI
       setItems((prevItems) =>
         prevItems.map((item) =>
           item.lostID === lostID ? { ...item, ...updatedData } : item
         )
       );
+  
       handleClose(); // Close the modal after saving
     } catch (error) {
       console.error("Error updating item:", error);
     }
-  };
+  };  
 
   // Handle deleting an item
   const handleDelete = async (lostID) => {
@@ -272,11 +273,11 @@ function StudentItems() {
       {/* EditItem Modal */}
       {selectedItem && (
         <EditItem
-          item={selectedItem}
-          onClose={handleClose}
-          onSave={handleSave}
-          onDelete={handleDelete}
-        />
+        item={selectedItem}
+        onClose={handleClose}
+        onSave={handleSave} // ✅ Pass handleSave to EditItem
+        onDelete={handleDelete}
+      />
       )}
 
       {/* ItemFilter Popup */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function EditItem({ item, onClose, onDelete }) {
+function EditItem({ item, onClose, onDelete, onSave }) {
   const [formData, setFormData] = useState({
     category: "",
     dateLost: "",
@@ -67,25 +67,27 @@ function EditItem({ item, onClose, onDelete }) {
     try {
       console.log("📤 Sending update request for lostID:", item.lostID);
       console.log("📤 Payload:", formData);
-
+  
       const response = await fetch(`${API_URL}/api/items/${item.lostID}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
-
+  
       console.log("✅ Item updated successfully");
+  
+      onSave(item.lostID, formData); // ✅ Update the parent component's state immediately
       setShowSuccessPopup(true); // Show success popup
     } catch (error) {
       console.error("🔥 Error updating item:", error.message);
       alert(`Error updating item: ${error.message}`);
     }
-  };
+  };  
 
   // Handle Delete
   const handleDelete = async () => {
