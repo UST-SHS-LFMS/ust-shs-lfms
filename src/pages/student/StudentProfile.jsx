@@ -63,7 +63,7 @@ function StudentProfile() {
 
         {/* Profile Content */}
         <div className="mt-6 md:mt-8">
-          <h1 className="text-3xl md:text-5xl font-bold text-orange-400">
+          <h1 className="text-3xl md:text-5xl font-bold text-amber-400">
             PROFILE
           </h1>
           <div className="mt-6 md:mt-8 space-y-4 md:space-y-6">

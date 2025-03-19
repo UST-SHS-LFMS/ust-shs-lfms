@@ -165,8 +165,13 @@ function AddLost() {
                 onChange={(e) => setNewLostItem(e.target.value)}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Name"
+                maxLength="50"
                 required
               />
+              {/* Display character count */}
+              <p className="text-sm text-gray-500 mt-1">
+                {newLostItem.length}/50 characters
+              </p>
             </div>
 
             <div>
@@ -183,8 +188,13 @@ function AddLost() {
                 onChange={(e) => setNewLostItemDesc(e.target.value)}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Description"
+                maxLength="100"
                 required
               />
+              {/* Display character count */}
+              <p className="text-sm text-gray-500 mt-1">
+                {newLostItemDesc.length}/100 characters
+              </p>
             </div>
 
             <div>
@@ -198,7 +208,7 @@ function AddLost() {
                 id="newCategory"
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                className="cursor-pointer mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 required
               >
                 <option value="" disabled>
@@ -253,7 +263,7 @@ function AddLost() {
                 id="newLocationLost"
                 value={newLocationLost}
                 onChange={(e) => setNewLocationLost(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                className="cursor-pointer mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 required
               >
                 <option value="" disabled>
@@ -296,7 +306,7 @@ function AddLost() {
                 max={new Date().toISOString().split("T")[0]}
                 value={newDateLost}
                 onChange={(e) => setNewDateLost(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                className="cursor-pointer t-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 required
               />
             </div>
@@ -378,7 +388,7 @@ function AddLost() {
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => setShowConfirmationModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
               >
                 No
               </button>
@@ -387,7 +397,7 @@ function AddLost() {
                   setShowConfirmationModal(false);
                   onSubmitLostItem();
                 }}
-                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
                 Yes
               </button>
