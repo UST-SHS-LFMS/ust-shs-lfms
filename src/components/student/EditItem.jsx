@@ -65,29 +65,22 @@ function EditItem({ item, onClose, onDelete, onSave }) {
   // Handle Save
   const handleSave = async () => {
     try {
-      console.log("📤 Sending update request for lostID:", item.lostID);
-      console.log("📤 Payload:", formData);
-  
       const response = await fetch(`${API_URL}/api/items/${item.lostID}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Server error: ${response.status}`);
+        throw new Error("Failed to update item");
       }
-  
-      console.log("✅ Item updated successfully");
-  
-      onSave(item.lostID, formData); // ✅ Update the parent component's state immediately
+
+      onSave(item.lostID, formData); // Update parent component state
       setShowSuccessPopup(true); // Show success popup
     } catch (error) {
-      console.error("🔥 Error updating item:", error.message);
-      alert(`Error updating item: ${error.message}`);
+      console.error("Error updating item:", error);
     }
-  };  
+  };
 
   // Handle Delete
   const handleDelete = async () => {
@@ -258,6 +251,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
             <button
               onClick={() => {
                 setShowSuccessPopup(false); // Close success popup
+                onClose(); // Close the modal
               }}
               className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
             >
