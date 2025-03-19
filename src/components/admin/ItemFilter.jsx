@@ -25,17 +25,17 @@ function ItemFilter({
   const handleApply = async () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500)); // fetch delay
-  
+
     // Check if filters are empty
     const isFilterEmpty =
       !filters.date && !filters.orderBy && !filters.category && !filters.status;
-  
+
     if (isFilterEmpty) {
       onApplyFilters((prevItems) => sortItems(prevItems)); // Sort if no filters
     } else {
       onApplyFilters(filters);
     }
-  
+
     setIsLoading(false);
     onClose();
   };

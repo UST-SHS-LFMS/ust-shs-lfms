@@ -8,6 +8,7 @@ import { FunnelIcon } from "@heroicons/react/24/solid";
 import StudentSidebar from "../../components/student/StudentSidebar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import EditItem from "../../components/student/EditItem";
+import ItemFilter from "../../components/admin/ItemFilter"; // Import the ItemFilter component
 
 function StudentItems() {
   const [items, setItems] = useState([]);
@@ -15,9 +16,19 @@ function StudentItems() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState(null); // State for modal
+  const [isFilterOpen, setIsFilterOpen] = useState(false); // State for filter popup
+  const [filters, setFilters] = useState({
+    date: "",
+    orderBy: "",
+    category: "",
+    status: "",
+  });
   const navigate = useNavigate();
   const API_URL =
     "https://ust-shs-lost-and-found-management-system.onrender.com";
+
+  const categories = ["Electronics", "Clothing", "Books", "Other"]; // Example categories
+  const statuses = ["Matched", "Unmatched"]; // Example statuses
 
   useEffect(() => {
     const auth = getAuth();
@@ -114,12 +125,37 @@ function StudentItems() {
     setSearchQuery(event.target.value);
   };
 
-  // Filter items based on search query across all columns
-  const filteredItems = items.filter((item) =>
-    Object.values(item).some((value) =>
+  // Handle filter apply
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters);
+    // Implement your filtering logic here
+    // For example, filter the items based on the newFilters
+  };
+
+  // Handle filter reset
+  const handleResetFilters = () => {
+    setFilters({
+      date: "",
+      orderBy: "",
+      category: "",
+      status: "",
+    });
+    // Reset the items to the original list
+  };
+
+  // Filter items based on search query and filters
+  const filteredItems = items.filter((item) => {
+    const matchesSearchQuery = Object.values(item).some((value) =>
       value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
+    );
+
+    const matchesFilters =
+      (!filters.date || item.dateLost === filters.date) &&
+      (!filters.category || item.category === filters.category) &&
+      (!filters.status || item.status === filters.status);
+
+    return matchesSearchQuery && matchesFilters;
+  });
 
   return (
     <div className="flex min-h-screen bg-[#FFF8F0]">
@@ -136,7 +172,10 @@ function StudentItems() {
 
           {/* Search and Filter */}
           <div className="flex items-center gap-2 ml-auto">
-            <button className="flex items-center">
+            <button
+              className="flex items-center"
+              onClick={() => setIsFilterOpen(true)}
+            >
               <FunnelIcon className="cursor-pointer w-5 h-5" />
             </button>
             <div className="relative">
@@ -202,23 +241,23 @@ function StudentItems() {
                         <td className="px-4 md:px-6 py-2">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              item.status === "Found"
+                              item.status === "Matched"
                                 ? "bg-green-500 text-white"
-                                : item.status === "Matched"
-                                  ? "bg-orange-500 text-white"
-                                  : "bg-red-500 text-white"
+                                : "bg-red-500 text-white"
                             }`}
                           >
                             {item.status}
                           </span>
                         </td>
                         <td className="px-4 md:px-6 py-2">
-                          <button
-                            className="text-gray-400 hover:text-gray-600"
-                            onClick={() => handleEditClick(item)}
-                          >
-                            <PencilSquareIcon className="cursor-pointer w-5 h-5" />
-                          </button>
+                          {item.status === "Pending" && (
+                            <button
+                              className="text-gray-400 hover:text-gray-600"
+                              onClick={() => handleEditClick(item)}
+                            >
+                              <PencilSquareIcon className="cursor-pointer w-5 h-5" />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -239,6 +278,17 @@ function StudentItems() {
           onDelete={handleDelete}
         />
       )}
+
+      {/* ItemFilter Popup */}
+      <ItemFilter
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onApplyFilters={handleApplyFilters}
+        onResetFilters={handleResetFilters}
+        initialFilters={filters}
+        categories={categories}
+        statuses={statuses}
+      />
     </div>
   );
 }
