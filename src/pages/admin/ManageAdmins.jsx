@@ -45,7 +45,6 @@ function ManageAdmins() {
 
   const handleAdminDeleted = (deletedId) => {
     setEmployees((prev) => prev.filter((emp) => emp.id !== deletedId));
-    setIsEditModalOpen(false);
   };
 
   const handleRoleUpdated = (updatedId, newRole) => {
@@ -54,7 +53,6 @@ function ManageAdmins() {
         emp.id === updatedId ? { ...emp, role: newRole } : emp
       )
     );
-    setIsEditModalOpen(false);
   };
 
   const handleSearchChange = (event) => {

@@ -11,19 +11,21 @@ const EditAdmin = ({
   if (!isOpen || !employee) return null;
 
   const [role, setRole] = useState(employee.role);
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   // Handle updating the admin's role
   const handleSave = async () => {
     try {
-      const response = await axios.put(
-        `${API_URL}/api/admins/${employee.id}`,
-        { role }
-      );
+      const response = await axios.put(`${API_URL}/api/admins/${employee.id}`, {
+        role,
+      });
       if (response.status === 200) {
-        alert("Admin role updated successfully");
+        setPopupMessage("Admin role updated successfully!");
+        setShowPopup(true);
         onSaveSuccess(employee.id, role); // Notify parent component
-        onClose();
       }
     } catch (error) {
       alert("Error updating admin role");
@@ -31,16 +33,15 @@ const EditAdmin = ({
     }
   };
 
-  // Handle deleting the admin
   const handleDelete = async () => {
     try {
       const response = await axios.delete(
         `${API_URL}/api/admins/${employee.id}`
       );
       if (response.status === 200) {
-        alert("Admin deleted successfully");
+        setPopupMessage("Admin removed successfully!");
+        setShowPopup(true);
         onDeleteSuccess(employee.id); // Notify parent component
-        onClose();
       }
     } catch (error) {
       alert("Error deleting admin");
@@ -92,6 +93,38 @@ const EditAdmin = ({
           </button>
         </div>
       </div>
+
+      {/* Success Popup Modal */}
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative">
+            {/* Checkmark image and message */}
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <img
+                src="https://i.imgur.com/eFvkfQz.png"
+                alt="Checkmark"
+                className="w-12 h-12"
+              />
+              <h2 className="text-lg font-medium text-gray-800">
+                {popupMessage}
+              </h2>
+            </div>
+
+            {/* Done button */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  setShowPopup(false);
+                  onClose(); // Close the edit modal after success
+                }}
+                className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

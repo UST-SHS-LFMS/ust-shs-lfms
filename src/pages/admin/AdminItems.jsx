@@ -340,7 +340,7 @@ function AdminItems() {
               : "bg-white hover:bg-gray-100"
           } border border-gray-300`}
         >
-          <ChevronLeftIcon className="w-2 h-2 text-gray-700" />
+          <ChevronLeftIcon className="cursor-pointer w-2 h-2 text-gray-700" />
         </button>
 
         {/* Page Indicator */}
@@ -360,7 +360,7 @@ function AdminItems() {
               : "bg-white hover:bg-gray-100"
           } border border-gray-300`}
         >
-          <ChevronRightIcon className="w-2 h-2 text-gray-700" />
+          <ChevronRightIcon className="cursor-pointer w-2 h-2 text-gray-700" />
         </button>
       </div>
     );
@@ -668,7 +668,6 @@ function AdminItems() {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -701,14 +700,14 @@ function AdminItems() {
           </h1>
           <div className="flex items-center gap-2">
             <button
-              className="hidden md:flex hover:text-gray-600"
+              className="hidden md:flex text-gray-800 hover:text-gray-950"
               onClick={handleDownloadPDF}
               title="Download Report"
             >
               <ArrowDownOnSquareIcon className="cursor-pointer w-6 h-6" />
             </button>
             <button
-              className="flex items-center hover:text-gray-600"
+              className="flex items-center text-gray-800 hover:text-gray-950"
               onClick={() => setIsItemFilterOpen(true)}
             >
               <FunnelIcon className="cursor-pointer w-5 h-5" />
@@ -734,7 +733,7 @@ function AdminItems() {
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
                 activeTab === tab
                   ? "bg-white shadow-sm"
-                  : "text-gray-500 hover:bg-black/10"
+                  : "text-gray-500 hover:bg-black/10 cursor-pointer"
               }`}
             >
               {tab}
@@ -750,7 +749,7 @@ function AdminItems() {
               }
               className="cursor-pointer ml-auto px-3 md:px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 text-sm md:text-base whitespace-nowrap"
             >
-              + Add Item
+              {activeTab === "FOUND ITEMS" ? "+ Add Found" : "+ Add Lost"}
             </button>
           )}
         </div>

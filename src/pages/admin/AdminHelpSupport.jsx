@@ -33,7 +33,7 @@ const FAQAccordion = () => {
           className="border border-amber-300 rounded-lg overflow-hidden transition-shadow hover:shadow-md"
         >
           <button
-            className={`w-full p-3 md:p-4 text-left font-medium text-base md:text-lg flex justify-between items-center transition-colors ${
+            className={`cursor-pointer w-full p-3 md:p-4 text-left font-medium text-base md:text-lg flex justify-between items-center transition-colors ${
               openIndex === index
                 ? "bg-amber-200 text-amber-900"
                 : "bg-amber-100 text-amber-800 hover:bg-amber-150"
