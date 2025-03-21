@@ -401,7 +401,7 @@ function AddFound() {
                   }
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="Item Name"
+                placeholder="Enter the general name of the item (e.g., Tumbler)"
                 maxLength="50"
                 required
               />
@@ -429,7 +429,7 @@ function AddFound() {
                   }
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="Item Description"
+                placeholder="Enter details like brand, color, etc. (e.g., Hydro Flask, Blue)"
                 maxLength="100"
                 required
               />
@@ -582,7 +582,11 @@ function AddFound() {
                   type="text"
                   id="fullName"
                   value={foundByName}
-                  onChange={(e) => setFoundByName(e.target.value)}
+                  onChange={(e) => {
+                    if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                      setFoundByName(e.target.value);
+                    }
+                  }}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Full Name"
                   maxLength="100"
@@ -606,13 +610,14 @@ function AddFound() {
                   type="text"
                   id="studentID"
                   value={foundByID}
-                  onChange={(e) =>
-                    setFoundByID(e.target.value.replace(/[^0-9]/g, ""))
-                  }
+                  onChange={(e) => {
+                    // Filter out non-numeric characters and emojis
+                    const filteredValue = e.target.value.replace(/[^0-9]/g, "");
+                    setFoundByID(filteredValue);
+                  }}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Student/Employee No."
                   maxLength="10"
-                  step="1" // Only allow whole numbers
                   inputMode="numeric"
                   required
                 />
@@ -718,7 +723,7 @@ function AddFound() {
           </div>
         </div>
       )}
-      
+
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">

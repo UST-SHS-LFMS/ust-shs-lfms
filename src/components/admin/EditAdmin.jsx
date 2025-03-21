@@ -68,18 +68,20 @@ const EditAdmin = ({
             </span>{" "}
             {employee.fullName}
           </p>
+
           <p>
             <span className="text-gray-700">
               <strong>Email:</strong>
             </span>{" "}
             {employee.email}
           </p>
+
           {/* Role Dropdown */}
           <label className="block font-semibold text-gray-700 text-m">
             Role:
           </label>
           <select
-            className="w-full border rounded-lg p-2 text-m"
+            className="cursor-pointer w-full border rounded-lg p-2 text-m"
             value={role}
             onChange={(e) => setRole(e.target.value)}
           >
