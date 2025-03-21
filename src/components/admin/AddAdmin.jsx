@@ -50,7 +50,10 @@ const AddAdminForm = () => {
   }, [formData]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const emojiRegex = /[\u{1F600}-\u{1F6FF}]/gu;
+    const filteredValue = value.replace(emojiRegex, '');
+    setFormData({ ...formData, [name]: filteredValue });
   };
 
   const handleClear = () => {

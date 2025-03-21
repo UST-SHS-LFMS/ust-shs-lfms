@@ -175,7 +175,7 @@ function AddLost() {
                   }
                 }}                
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="Item Name"
+                placeholder="Enter the general name of the item (e.g., Tumbler)"
                 maxLength="50"
                 required
               />
@@ -202,7 +202,7 @@ function AddLost() {
                   }
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="Item Description"
+                placeholder="Enter details like brand, color, etc. (e.g., Hydro Flask, Blue)"
                 maxLength="100"
                 required
               />

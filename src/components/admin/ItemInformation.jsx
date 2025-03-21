@@ -421,14 +421,18 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
             >
               ✕
             </button>
-            <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+            <h2 className="text-lg font-bold mb-4 text-gray-700">Claimed by</h2>
             <form onSubmit={handleMatchClaimSubmit}>
               <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="Full Name"
                   value={claimedByName}
-                  onChange={(e) => setClaimedByName(e.target.value)}
+                  onChange={(e) => {
+                    if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                      setClaimedByName(e.target.value);
+                    }
+                  }}
                   className="w-full p-2 border rounded-lg"
                   required
                 />
@@ -465,14 +469,18 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
             >
               ✕
             </button>
-            <h2 className="text-lg font-bold mb-4">Claimed by</h2>
+            <h2 className="text-lg font-bold mb-4 text-gray-700">Claimed by</h2>
             <form onSubmit={handleClaimSubmit}>
               <div className="space-y-4">
                 <input
                   type="text"
                   placeholder="Full Name"
                   value={claimedByName}
-                  onChange={(e) => setClaimedByName(e.target.value)}
+                  onChange={(e) => {
+                    if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                      setClaimedByName(e.target.value);
+                    }
+                  }}
                   className="w-full p-2 border rounded-lg"
                   maxLength="100"
                   required
