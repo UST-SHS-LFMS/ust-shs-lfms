@@ -25,10 +25,18 @@ const faqs = [
 ];
 
 const FAQAccordion = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndices, setOpenIndices] = useState(new Set());
 
   const toggleFAQ = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
+    setOpenIndices((prevIndices) => {
+      const newIndices = new Set(prevIndices);
+      if (newIndices.has(index)) {
+        newIndices.delete(index);
+      } else {
+        newIndices.add(index);
+      }
+      return newIndices;
+    });
   };
 
   return (
@@ -40,19 +48,19 @@ const FAQAccordion = () => {
         >
           <button
             className={`cursor-pointer w-full p-4 text-left font-medium text-base md:text-lg flex justify-between items-center transition-colors ${
-              openIndex === index
+              openIndices.has(index)
                 ? "bg-amber-200 text-amber-900"
                 : "bg-amber-100 text-amber-800 hover:bg-amber-150"
             }`}
             onClick={() => toggleFAQ(index)}
-            aria-expanded={openIndex === index}
+            aria-expanded={openIndices.has(index)}
             aria-controls={`faq-answer-${index}`}
           >
             <span className="flex-1">{faq.question}</span>
             <span className="ml-4 w-6 h-6 flex items-center justify-center rounded-full bg-amber-300 text-amber-800 transition-transform duration-200 ease-in-out">
               <svg
                 className={`w-4 h-4 transform transition-transform duration-200 ${
-                  openIndex === index ? "rotate-180" : ""
+                  openIndices.has(index) ? "rotate-180" : ""
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -70,7 +78,7 @@ const FAQAccordion = () => {
           <div
             id={`faq-answer-${index}`}
             className={`transition-all duration-200 ease-in-out overflow-hidden ${
-              openIndex === index ? "max-h-96" : "max-h-0"
+              openIndices.has(index) ? "max-h-96" : "max-h-0"
             }`}
             role="region"
             aria-labelledby={`faq-question-${index}`}

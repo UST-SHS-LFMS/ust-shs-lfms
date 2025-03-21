@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { QrCodeIcon } from "@heroicons/react/24/outline";
 import { Html5QrcodeScanner } from "html5-qrcode";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase";
+import { TrashIcon } from "@heroicons/react/24/solid";
 
 function AddFound() {
   const [foundItems, setFoundItems] = useState([]);
@@ -22,6 +25,11 @@ function AddFound() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State for success popup visibility
   const [showScanner, setShowScanner] = useState(false); // State for QR scanner visibility
   const [scanner, setScanner] = useState(null); // State to store scanner instance
+  const [imageFile, setImageFile] = useState(null); // Stores the selected image file
+  const [previewUrl, setPreviewUrl] = useState(
+    "https://i.imgur.com/v3LZMXQ.jpeg"
+  );
+  const [isAdding, setIsAdding] = useState(false);
 
   const navigate = useNavigate();
   const API_URL =
@@ -35,6 +43,29 @@ function AddFound() {
       }
     };
   }, [scanner]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileType = file.type;
+      if (fileType !== "image/jpeg" && fileType !== "image/png") {
+        setStatus("Only JPG and PNG files are allowed.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setStatus("File size must be less than 5MB.");
+        return;
+      }
+      setImageFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+    }
+  };
+
+  const handleImageDelete = () => {
+    setImageFile(null);
+    setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
+  };
 
   // Check if all required fields are filled
   const isFormValid = () => {
@@ -279,6 +310,16 @@ function AddFound() {
         return;
       }
 
+      setIsAdding(true);
+
+      // Upload image to Firebase Storage
+      let photoURL = null;
+      if (imageFile) {
+        const storageRef = ref(storage, `shs-photos/${imageFile.name}`);
+        await uploadBytes(storageRef, imageFile);
+        photoURL = await getDownloadURL(storageRef);
+      }
+
       const response = await fetch(`${API_URL}/api/found-items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -291,10 +332,12 @@ function AddFound() {
           department: "SHS",
           foundByName: foundByName, // Include Full Name in the request
           foundByID: foundByID, // Include Student ID in the request
+          ...(photoURL && { photoURL }), // Include photoURL if it exists
         }),
       });
 
       if (response.ok) {
+        setIsAdding(false);
         getFoundItems();
         getMatches(); // Call getMatches() only after successful submission
         setShowSuccessPopup(true); // Show the success popup
@@ -307,10 +350,14 @@ function AddFound() {
         setNewDateFound("");
         setFoundByName(""); // Clear Full Name
         setFoundByID(""); // Clear Student ID
+        setImageFile(null); // Clear image file
+        setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg"); // Reset preview URL
       } else {
+        setIsAdding(false);
         setStatus("Error adding found item");
       }
     } catch (err) {
+      setIsAdding(false);
       setStatus("Error adding found item");
       console.error(err);
     }
@@ -348,7 +395,11 @@ function AddFound() {
                 type="text"
                 id="newFoundItem"
                 value={newFoundItem}
-                onChange={(e) => setNewFoundItem(e.target.value)}
+                onChange={(e) => {
+                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                    setNewFoundItem(e.target.value);
+                  }
+                }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Name"
                 maxLength="50"
@@ -372,7 +423,11 @@ function AddFound() {
                 type="text"
                 id="newFoundItemDesc"
                 value={newFoundItemDesc}
-                onChange={(e) => setNewFoundItemDesc(e.target.value)}
+                onChange={(e) => {
+                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                    setNewFoundItemDesc(e.target.value);
+                  }
+                }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Description"
                 maxLength="100"
@@ -417,6 +472,37 @@ function AddFound() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Upload Image (JPG/PNG, Max 5MB)
+              </label>
+              <input
+                type="file"
+                id="imageUpload"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <div className="flex items-center gap-2 mt-1">
+                <label htmlFor="imageUpload" className="cursor-pointer">
+                  <img
+                    src={previewUrl}
+                    alt="Upload Preview"
+                    className="w-40 h-30 object-cover rounded-lg border border-gray-300"
+                  />
+                </label>
+                {imageFile && (
+                  <button
+                    type="button"
+                    onClick={handleImageDelete}
+                    className="cursor-pointer text-red-500 hover:text-red-600 transition-colors duration-200"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -513,7 +599,7 @@ function AddFound() {
                   htmlFor="studentID"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Student No.
+                  Student/Employee No.
                   <div className="inline text-red-600">*</div>
                 </label>
                 <input
@@ -524,7 +610,7 @@ function AddFound() {
                     setFoundByID(e.target.value.replace(/[^0-9]/g, ""))
                   }
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                  placeholder="Student ID"
+                  placeholder="Student/Employee No."
                   maxLength="10"
                   step="1" // Only allow whole numbers
                   inputMode="numeric"
@@ -565,6 +651,8 @@ function AddFound() {
                   setNewDateFound("");
                   setFoundByName(""); // Clear Full Name
                   setFoundByID(""); // Clear Student ID
+                  setImageFile(null); // Clear image file
+                  setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg"); // Reset preview URL
                 }}
                 className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >
@@ -616,6 +704,21 @@ function AddFound() {
         </div>
       )}
 
+      {/* Adding... Popup */}
+      {isAdding && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+              <h2 className="text-lg font-medium text-gray-800">Adding...</h2>
+              <p className="text-s text-gray-500">
+                Please wait while we add your item.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">

@@ -30,14 +30,21 @@ function AddLost() {
   // Handle image file change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size <= 5 * 1024 * 1024) {
+    if (file) {
+      const fileType = file.type;
+      if (fileType !== "image/jpeg" && fileType !== "image/png") {
+        setStatus("Only JPG and PNG files are allowed.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setStatus("File size must be less than 5MB.");
+        return;
+      }
       setImageFile(file);
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
-    } else {
-      setStatus("File size must be less than 5MB.");
     }
-  };
+  };  
 
   // Handle image deletion
   const handleImageDelete = () => {
@@ -162,7 +169,11 @@ function AddLost() {
                 type="text"
                 id="newLostItem"
                 value={newLostItem}
-                onChange={(e) => setNewLostItem(e.target.value)}
+                onChange={(e) => {
+                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                    setNewLostItem(e.target.value);
+                  }
+                }}                
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Name"
                 maxLength="50"
@@ -185,7 +196,11 @@ function AddLost() {
                 type="text"
                 id="newLostItemDesc"
                 value={newLostItemDesc}
-                onChange={(e) => setNewLostItemDesc(e.target.value)}
+                onChange={(e) => {
+                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                    setNewLostItemDesc(e.target.value);
+                  }
+                }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 placeholder="Item Description"
                 maxLength="100"
@@ -313,7 +328,7 @@ function AddLost() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Upload Image (Max 5MB)
+                Upload Image (JPG/PNG, Max 5MB)
               </label>
               <input
                 type="file"
