@@ -61,14 +61,25 @@ const EditAdmin = ({
         </button>
 
         {/* Modal Content */}
-        <div className="space-y-3">
+        <div className="space-y-3 text-m">
           <p>
-            <strong>Employee:</strong> {employee.fullName}
+            <span className="text-gray-700">
+              <strong>Employee:</strong>
+            </span>{" "}
+            {employee.fullName}
+          </p>
+          <p>
+            <span className="text-gray-700">
+              <strong>Email:</strong>
+            </span>{" "}
+            {employee.email}
           </p>
           {/* Role Dropdown */}
-          <label className="block font-semibold">Role:</label>
+          <label className="block font-semibold text-gray-700 text-m">
+            Role:
+          </label>
           <select
-            className="w-full border rounded-lg p-2"
+            className="w-full border rounded-lg p-2 text-m"
             value={role}
             onChange={(e) => setRole(e.target.value)}
           >

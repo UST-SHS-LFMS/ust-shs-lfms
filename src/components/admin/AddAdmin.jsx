@@ -9,7 +9,7 @@ const AddAdminForm = () => {
     fullName: "",
     email: "",
     employeeNumber: "",
-    role: "", // Default selection
+    role: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -17,6 +17,26 @@ const AddAdminForm = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
+  const [existingAdmins, setExistingAdmins] = useState([]);
+
+  // Fetch existing admins from the backend API when the component mounts
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/admins`);
+        if (response.ok) {
+          const data = await response.json();
+          setExistingAdmins(data); // Save the admin list to state
+        } else {
+          console.error("Failed to fetch admins");
+        }
+      } catch (error) {
+        console.error("Error fetching admins:", error);
+      }
+    };
+
+    fetchAdmins();
+  }, []);
 
   // Check if all fields are filled to enable the Submit button
   useEffect(() => {
@@ -44,6 +64,17 @@ const AddAdminForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if the entered email already exists
+    const isEmailTaken = existingAdmins.some(
+      (admin) => admin.email === formData.email
+    );
+
+    if (isEmailTaken) {
+      alert("Admin already exists.");
+      return; // Prevent form submission
+    }
+
     setShowConfirmationModal(true); // Show the confirmation modal
   };
 
@@ -71,7 +102,7 @@ const AddAdminForm = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="Juan Dela Cruz"
+                placeholder="Full Name"
                 maxLength="100"
                 required
               />
@@ -94,7 +125,7 @@ const AddAdminForm = () => {
                   handleChange(e);
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="juandcruz@ust.edu.ph"
+                placeholder="UST Email"
                 maxLength="50"
                 required
               />
@@ -103,20 +134,29 @@ const AddAdminForm = () => {
                 {formData.email.length}/50 characters
               </p>
 
-              {/* Email validation message */}
+              {/* Email validation messages */}
               {!formData.email.endsWith("@ust.edu.ph") &&
                 formData.email.length > 0 && (
                   <p className="text-sm text-red-600 mt-1">
                     Email must end with @ust.edu.ph
                   </p>
                 )}
+
+              {/* Check if email is already taken */}
+              {existingAdmins.some(
+                (admin) => admin.email === formData.email
+              ) && (
+                <p className="text-sm text-red-600 mt-1">
+                  Admin already exists.
+                </p>
+              )}
             </div>
           </div>
 
           <div className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Employee Number <span className="text-red-600">*</span>
+                Employee No. <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -128,7 +168,7 @@ const AddAdminForm = () => {
                   handleChange({ target: { name: "employeeNumber", value } });
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="0123456789"
+                placeholder="Employee No."
                 maxLength="10"
                 required
               />
