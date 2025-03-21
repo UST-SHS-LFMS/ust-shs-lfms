@@ -160,6 +160,32 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
     </>
   );
 
+  const renderCICSContent = () => (
+    <>
+      <p>
+        <strong>Category:</strong> {item.category}
+      </p>
+      <p>
+        <strong>Date Found:</strong> {item.dateFound}
+      </p>
+      <p>
+        <strong>Found ID:</strong> {item.foundID || item.lostID || "N/A"}
+      </p>
+      <p>
+        <strong>Description:</strong> {item.found_item_desc || item.lost_item_desc || "N/A"}
+      </p>
+      <p>
+        <strong>Item Name:</strong> {item.found_item_name || item.lost_item_name || "N/A"}
+      </p>
+      <p>
+        <strong>Location Found:</strong> {item.locationFound || item.locationLost || "N/A"}
+      </p>
+      <p>
+        <strong>Status:</strong> {item.status}
+      </p>
+    </>
+  );
+
   const renderLostContent = () => (
     <>
       <p>
@@ -239,7 +265,10 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           <strong>Status:</strong> {lostItem.status}
         </p>
       </>
+
+      
     );
+
   };
 
   const renderContent = () => {
@@ -252,6 +281,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         return renderMatchContent();
       case "ARCHIVE":
         return renderFoundContent(); // Assuming archive displays found content
+      case "VIEW CICS":
+        return renderCICSContent();
       default:
         return <p>No information available.</p>;
     }
