@@ -442,7 +442,9 @@ function AdminItems() {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {items.map((item) => (
+          {items.map((item) => {
+            if (item.id === "DO NOT DELETE") return null;
+            return(
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
               <td className="px-6 py-2 text-sm">{item.found_item_name}</td>
@@ -486,7 +488,8 @@ function AdminItems() {
                 </button>
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     );
@@ -508,7 +511,9 @@ function AdminItems() {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {items.map((item) => (
+          {items.map((item) => {
+            if (item.id === "DO NOT DELETE") return null;
+            return(
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.lostID}</td>
               <td className="px-6 py-2 text-sm">{item.lost_item_name}</td>
@@ -546,7 +551,8 @@ function AdminItems() {
                 </button>
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     );
@@ -571,6 +577,7 @@ function AdminItems() {
         </thead>
         <tbody className="divide-y divide-gray-200">
           {items.map((item) => {
+             if (item.id === "DO NOT DELETE") return null;
             console.log("Rendering match item:", item);
             return (
               <tr key={item.id || item.matchId || `match-${Math.random()}`}>
@@ -619,7 +626,9 @@ function AdminItems() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {items.map((item) => (
+            {items.map((item) => {
+              if (item.id === "DO NOT DELETE") return null;
+              return(
               <tr key={item.id || `archive-${Math.random()}`}>
                 <td className="px-6 py-2 text-sm">
                   {item.foundID || item.lostID || "N/A"}
@@ -645,7 +654,8 @@ function AdminItems() {
                   </button>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
