@@ -92,7 +92,7 @@ function AdminHelp() {
     <div className="flex min-h-screen bg-amber-50/50">
       <AdminSidebar className="hidden md:block" /> {/* Hide sidebar on mobile */}
       <div className="flex-1 p-4 md:p-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#FFA500] mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-amber-500 mb-4 md:mb-6">
           HELP & SUPPORT
         </h1>
         <FAQAccordion />

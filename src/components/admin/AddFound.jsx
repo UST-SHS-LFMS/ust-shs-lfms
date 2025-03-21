@@ -377,7 +377,7 @@ function AddFound() {
       {/* Main Content */}
       <div className="flex-1 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-[#FFA500]">ADD FOUND ITEM</h1>
+          <h1 className="text-3xl font-bold text-amber-500">ADD FOUND ITEM</h1>
         </div>
 
         {/* Add Found Item Form */}

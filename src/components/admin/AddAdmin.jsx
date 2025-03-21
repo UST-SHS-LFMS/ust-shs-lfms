@@ -86,7 +86,7 @@ const AddAdminForm = () => {
       {/* Main Content */}
       <div className="flex-1 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-[#FFA500]">ADD ADMIN</h1>
+          <h1 className="text-3xl font-bold text-amber-500">ADD ADMIN</h1>
         </div>
 
         {/* Add Admin Form */}

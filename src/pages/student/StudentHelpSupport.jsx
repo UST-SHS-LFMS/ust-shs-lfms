@@ -101,7 +101,7 @@ function StudentHelp() {
 
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#FFA500] mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-amber-500 mb-6">
           HELP & SUPPORT
         </h1>
         <FAQAccordion />

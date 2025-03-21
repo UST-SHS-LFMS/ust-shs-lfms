@@ -97,7 +97,7 @@ function UserSetup() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-[#FFF8F0] px-4">
       <div className="w-full max-w-4xl flex justify-between items-center mb-4 px-4">
-        <h1 className="text-4xl font-bold text-[#FFA500]">REGISTRATION</h1>
+        <h1 className="text-4xl font-bold text-amber-500">REGISTRATION</h1>
       </div>
 
       <div className="w-full max-w-4xl px-4">

@@ -61,7 +61,7 @@ function AdminProfile() {
       {/* Main Content */}
       <div className="w-full md:ml-48 p-4 md:p-8 flex-1">
         <div className="mx-auto max-w-4xl mt-12 md:mt-16">
-          <h1 className="text-3xl md:text-5xl font-bold text-orange-400">
+          <h1 className="text-3xl md:text-5xl font-bold text-amber-500">
             PROFILE
           </h1>
           <div className="mt-6 md:mt-8 space-y-4 md:space-y-6">
