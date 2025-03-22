@@ -116,7 +116,7 @@ function AdminItems() {
   //window.location.origin automatically switches between localhost and deployed domain for later
   const generateQRCode = useCallback(async (item) => {
     try {
-      const itemUrl = `${window.location.origin}/admin/items/${item.id || item.matchId}`;
+      const itemUrl = `https://ust-shs-lost-and-found.netlify.app/items`;
       const qrCodeDataURL = await QRCode.toDataURL(itemUrl);
       setQrCodes((prevQrCodes) => ({
         ...prevQrCodes,
@@ -444,50 +444,50 @@ function AdminItems() {
         <tbody className="divide-y divide-gray-200">
           {items.map((item) => {
             if (item.id === "DO NOT DELETE") return null;
-            return(
-            <tr key={item.id}>
-              <td className="px-6 py-2 text-sm">{item.foundID}</td>
-              <td className="px-6 py-2 text-sm">{item.found_item_name}</td>
-              <td className="px-6 py-2 text-sm">{item.category}</td>
-              <td className="px-6 py-2">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    item.status === "Matched"
-                      ? "bg-green-500 text-white"
-                      : item.status === "Pending"
-                        ? "bg-red-500 text-white"
-                        : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {item.status}
-                </span>
-              </td>
-              <td className="px-6 py-2 text-sm">{item.locationFound}</td>
-              <td className="px-6 py-2 text-sm">{item.dateFound}</td>
-              <td className="px-6 py-2 text-sm">
-                {qrCodes[item.id] && (
-                  <a
-                    href={`${API_URL}/api/admin/items/${item.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+            return (
+              <tr key={item.id}>
+                <td className="px-6 py-2 text-sm">{item.foundID}</td>
+                <td className="px-6 py-2 text-sm">{item.found_item_name}</td>
+                <td className="px-6 py-2 text-sm">{item.category}</td>
+                <td className="px-6 py-2">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      item.status === "Matched"
+                        ? "bg-green-500 text-white"
+                        : item.status === "Pending"
+                          ? "bg-red-500 text-white"
+                          : "bg-gray-100 text-gray-600"
+                    }`}
                   >
-                    <img
-                      src={qrCodes[item.id]}
-                      alt="QR Code"
-                      className="w-8 h-8"
-                    />
-                  </a>
-                )}
-              </td>
-              <td>
-                <button
-                  onClick={() => handleItemClick(item)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <InformationCircleIcon className="cursor-pointer w-5 h-5" />
-                </button>
-              </td>
-            </tr>
+                    {item.status}
+                  </span>
+                </td>
+                <td className="px-6 py-2 text-sm">{item.locationFound}</td>
+                <td className="px-6 py-2 text-sm">{item.dateFound}</td>
+                <td className="px-6 py-2 text-sm">
+                  {qrCodes[item.id] && (
+                    <a
+                      href={`https://ust-shs-lost-and-found.netlify.app/items`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={qrCodes[item.id] || "/placeholder.svg"}
+                        alt="QR Code"
+                        className="w-8 h-8"
+                      />
+                    </a>
+                  )}
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleItemClick(item)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <InformationCircleIcon className="cursor-pointer w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
             );
           })}
         </tbody>
@@ -513,44 +513,50 @@ function AdminItems() {
         <tbody className="divide-y divide-gray-200">
           {items.map((item) => {
             if (item.id === "DO NOT DELETE") return null;
-            return(
-            <tr key={item.id}>
-              <td className="px-6 py-2 text-sm">{item.lostID}</td>
-              <td className="px-6 py-2 text-sm">{item.lost_item_name}</td>
-              <td className="px-6 py-2 text-sm">{item.category}</td>
-              <td className="px-6 py-2">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    item.status === "Matched"
-                      ? "bg-green-500 text-white"
-                      : item.status === "Pending"
-                        ? "bg-red-500 text-white"
-                        : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {item.status}
-                </span>
-              </td>
-              <td className="px-6 py-2 text-sm">{item.locationLost}</td>
-              <td className="px-6 py-2 text-sm">{item.dateLost}</td>
-              <td className="px-6 py-2 text-sm">
-                {qrCodes[item.id] && (
-                  <img
-                    src={qrCodes[item.id] || "/placeholder.svg"}
-                    alt="QR Code"
-                    className="w-8 h-8"
-                  />
-                )}
-              </td>
-              <td>
-                <button
-                  onClick={() => handleItemClick(item)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <InformationCircleIcon className="cursor-pointer w-5 h-5" />
-                </button>
-              </td>
-            </tr>
+            return (
+              <tr key={item.id}>
+                <td className="px-6 py-2 text-sm">{item.lostID}</td>
+                <td className="px-6 py-2 text-sm">{item.lost_item_name}</td>
+                <td className="px-6 py-2 text-sm">{item.category}</td>
+                <td className="px-6 py-2">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      item.status === "Matched"
+                        ? "bg-green-500 text-white"
+                        : item.status === "Pending"
+                          ? "bg-red-500 text-white"
+                          : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {item.status}
+                  </span>
+                </td>
+                <td className="px-6 py-2 text-sm">{item.locationLost}</td>
+                <td className="px-6 py-2 text-sm">{item.dateLost}</td>
+                <td className="px-6 py-2 text-sm">
+                  {qrCodes[item.id] && (
+                    <a
+                      href={`https://ust-shs-lost-and-found.netlify.app/items`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={qrCodes[item.id] || "/placeholder.svg"}
+                        alt="QR Code"
+                        className="w-8 h-8"
+                      />
+                    </a>
+                  )}
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleItemClick(item)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <InformationCircleIcon className="cursor-pointer w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
             );
           })}
         </tbody>
@@ -577,7 +583,7 @@ function AdminItems() {
         </thead>
         <tbody className="divide-y divide-gray-200">
           {items.map((item) => {
-             if (item.id === "DO NOT DELETE") return null;
+            if (item.id === "DO NOT DELETE") return null;
             console.log("Rendering match item:", item);
             return (
               <tr key={item.id || item.matchId || `match-${Math.random()}`}>
@@ -628,32 +634,34 @@ function AdminItems() {
           <tbody className="divide-y divide-gray-200">
             {items.map((item) => {
               if (item.id === "DO NOT DELETE") return null;
-              return(
-              <tr key={item.id || `archive-${Math.random()}`}>
-                <td className="px-6 py-2 text-sm">
-                  {item.foundID || item.lostID || "N/A"}
-                </td>
-                <td className="px-6 py-2 text-sm">
-                  {item.found_item_name || item.lost_item_name || "N/A"}
-                </td>
-                <td className="px-6 py-2 text-sm">{item.category || "N/A"}</td>
-                <td className="px-6 py-2 text-sm">
-                  {item.locationFound || item.locationLost || "N/A"}
-                </td>
-                <td className="px-6 py-2 text-sm">
-                  {item.dateFound || item.dateLost || "N/A"}
-                </td>
-                <td className="px-6 py-2 text-sm">
-                  {" "}
-                  {/* Fixed alignment */}
-                  <button
-                    onClick={() => handleItemClick(item)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <InformationCircleIcon className="cursor-pointer w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
+              return (
+                <tr key={item.id || `archive-${Math.random()}`}>
+                  <td className="px-6 py-2 text-sm">
+                    {item.foundID || item.lostID || "N/A"}
+                  </td>
+                  <td className="px-6 py-2 text-sm">
+                    {item.found_item_name || item.lost_item_name || "N/A"}
+                  </td>
+                  <td className="px-6 py-2 text-sm">
+                    {item.category || "N/A"}
+                  </td>
+                  <td className="px-6 py-2 text-sm">
+                    {item.locationFound || item.locationLost || "N/A"}
+                  </td>
+                  <td className="px-6 py-2 text-sm">
+                    {item.dateFound || item.dateLost || "N/A"}
+                  </td>
+                  <td className="px-6 py-2 text-sm">
+                    {" "}
+                    {/* Fixed alignment */}
+                    <button
+                      onClick={() => handleItemClick(item)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <InformationCircleIcon className="cursor-pointer w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
               );
             })}
           </tbody>
@@ -782,11 +790,11 @@ function AdminItems() {
         <ItemFilter
           isOpen={isItemFilterOpen}
           onClose={() => setIsItemFilterOpen(false)}
-          onApplyFilters={() => {}}
-          onResetFilters={() => {}}
+          onApplyFilters={handleApplyFilters}
+          onResetFilters={handleResetFilters}
           initialFilters={initialFilterState}
-          categories={[]}
-          statuses={[]}
+          categories={categories}
+          statuses={statuses}
         />
       </div>
     </div>
