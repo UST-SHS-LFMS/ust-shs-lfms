@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useCallback } from "react"
 import axios from "axios"
 import { MagnifyingGlassIcon, InformationCircleIcon } from "@heroicons/react/24/outline"
@@ -98,7 +96,7 @@ function AdminItems() {
 
   const generateQRCode = useCallback(async (item) => {
     try {
-      const itemUrl = `${window.location.origin}/admin/items/${item.id || item.matchId}`
+      const itemUrl = `https://ust-shs-lost-and-found.netlify.app/admin/items/`
       const qrCodeDataURL = await QRCode.toDataURL(itemUrl)
       setQrCodes((prevQrCodes) => ({
         ...prevQrCodes,
@@ -202,7 +200,6 @@ function AdminItems() {
           const itemDate = item[dateField]
           if (!itemDate) return false
 
-          // Convert both dates to YYYY-MM-DD format for comparison
           const filterDate = new Date(filters.date).toISOString().split("T")[0]
           const itemDateFormatted = new Date(itemDate).toISOString().split("T")[0]
 
@@ -397,6 +394,7 @@ function AdminItems() {
     }
   }
 
+   //link to items page
   const renderFoundItemsTable = (items) => {
     return (
       <table className="w-full">
@@ -435,7 +433,7 @@ function AdminItems() {
               <td className="px-6 py-2 text-sm">{item.dateFound}</td>
               <td className="px-6 py-2 text-sm">
                 {qrCodes[item.id] && (
-                  <a href={`${API_URL}/api/admin/items/${item.id}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`https://ust-shs-lost-and-found.netlify.app/items`} target="_blank" rel="noopener noreferrer">
                     <img src={qrCodes[item.id] || "/placeholder.svg"} alt="QR Code" className="w-8 h-8" />
                   </a>
                 )}
@@ -452,6 +450,7 @@ function AdminItems() {
     )
   }
 
+  //link to items page
   const renderLostItemsTable = (items) => {
     return (
       <table className="w-full">
@@ -490,7 +489,9 @@ function AdminItems() {
               <td className="px-6 py-2 text-sm">{item.dateLost}</td>
               <td className="px-6 py-2 text-sm">
                 {qrCodes[item.id] && (
+                   <a href={`https://ust-shs-lost-and-found.netlify.app/items`} target="_blank" rel="noopener noreferrer"> 
                   <img src={qrCodes[item.id] || "/placeholder.svg"} alt="QR Code" className="w-8 h-8" />
+                  </a>
                 )}
               </td>
               <td>
