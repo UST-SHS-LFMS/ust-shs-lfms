@@ -31,7 +31,7 @@ function StudentSearch() {
       <StudentSidebar />
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 md:px-12 lg:px-20 py-10 text-center">
-        <h1 className="text-2xl md:text-3xl font-bold text-amber-400 mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-amber-500 mb-6">
           SEARCH A CATEGORY
         </h1>
 

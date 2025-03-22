@@ -97,7 +97,7 @@ function UserSetup() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-[#FFF8F0] px-4">
       <div className="w-full max-w-4xl flex justify-between items-center mb-4 px-4">
-        <h1 className="text-4xl font-bold text-[#FFA500]">REGISTRATION</h1>
+        <h1 className="text-4xl font-bold text-amber-500">REGISTRATION</h1>
       </div>
 
       <div className="w-full max-w-4xl px-4">
@@ -119,7 +119,7 @@ function UserSetup() {
                   name="affiliation"
                   value={formData.affiliation}
                   onChange={handleChange}
-                  className="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+                  className="cursor-pointer w-full mt-1 p-3 border border-gray-300 rounded-lg"
                 >
                   <option value="">Select Affiliation</option>
                   <option value="STEM">STEM</option>
@@ -133,7 +133,7 @@ function UserSetup() {
                 )}
 
                 <label className="block text-gray-700 font-semibold mt-4">
-                  Employee Number <span className="text-red-500">*</span>
+                  Employee No. <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -141,7 +141,7 @@ function UserSetup() {
                   value={formData.employeeNumber}
                   onChange={handleChange}
                   className="w-full mt-1 p-3 border border-gray-300 rounded-lg"
-                  placeholder="Enter Employee Number"
+                  placeholder="Employee No."
                 />
                 {errors.employeeNumber && (
                   <p className="text-red-500 text-sm">
@@ -161,7 +161,7 @@ function UserSetup() {
                   name="gradeLevel"
                   value={formData.gradeLevel}
                   onChange={handleChange}
-                  className="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+                  className="cursor-pointer w-full mt-1 p-3 border border-gray-300 rounded-lg"
                 >
                   <option value="">Select Grade Level</option>
                   <option value="11">Grade 11</option>
@@ -172,7 +172,7 @@ function UserSetup() {
                 )}
 
                 <label className="block text-gray-700 font-semibold mt-4">
-                  Student Number <span className="text-red-500">*</span>
+                  Student No. <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -180,7 +180,7 @@ function UserSetup() {
                   value={formData.studentNumber}
                   onChange={handleChange}
                   className="w-full mt-1 p-3 border border-gray-300 rounded-lg"
-                  placeholder="Enter Student Number"
+                  placeholder="Student No."
                 />
                 {errors.studentNumber && (
                   <p className="text-red-500 text-sm">{errors.studentNumber}</p>
@@ -195,7 +195,7 @@ function UserSetup() {
                   name="strand"
                   value={formData.strand}
                   onChange={handleChange}
-                  className="w-full mt-1 p-3 border border-gray-300 rounded-lg"
+                  className="cursor-pointer w-full mt-1 p-3 border border-gray-300 rounded-lg"
                 >
                   <option value="">Select Strand</option>
                   <option value="STEM">STEM</option>

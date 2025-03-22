@@ -340,10 +340,59 @@ function AdminItems() {
     if (!searchTerm) return items
     return items.filter((item) =>
       Object.values(item).some(
-        (value) => typeof value === "string" && value.toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
-    )
-  }
+        (value) =>
+          typeof value === "string" &&
+          value.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  };
+
+  const getPaginatedItems = (items) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return items.slice(startIndex, endIndex);
+  };
+
+  const renderPagination = (items) => {
+    const totalPages = Math.ceil(items.length / itemsPerPage);
+
+    return (
+      <div className="flex justify-center items-center mt-4 mb-4 space-x-2">
+        {/* Previous Button */}
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className={`p-2 rounded-full ${
+            currentPage === 1
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-white hover:bg-gray-100"
+          } border border-gray-300`}
+        >
+          <ChevronLeftIcon className="cursor-pointer w-2 h-2 text-gray-700" />
+        </button>
+
+        {/* Page Indicator */}
+        <span className="px-4 py-2 text-sm font-medium text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        {/* Next Button */}
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+          className={`p-2 rounded-full ${
+            currentPage === totalPages
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-white hover:bg-gray-100"
+          } border border-gray-300`}
+        >
+          <ChevronRightIcon className="cursor-pointer w-2 h-2 text-gray-700" />
+        </button>
+      </div>
+    );
+  };
 
   const renderTabContent = () => {
     console.log("renderTabContent called with activeTab:", activeTab)
@@ -410,8 +459,10 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody>
-          {items.map((item) => (
+        <tbody className="divide-y divide-gray-200">
+          {items.map((item) => {
+            if (item.id === "DO NOT DELETE") return null;
+            return(
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
               <td className="px-6 py-2 text-sm">{item.found_item_name}</td>
@@ -444,7 +495,8 @@ function AdminItems() {
                 </button>
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     )
@@ -466,8 +518,10 @@ function AdminItems() {
             <th className="px-6 py-3 text-left"></th>
           </tr>
         </thead>
-        <tbody>
-          {items.map((item) => (
+        <tbody className="divide-y divide-gray-200">
+          {items.map((item) => {
+            if (item.id === "DO NOT DELETE") return null;
+            return(
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.lostID}</td>
               <td className="px-6 py-2 text-sm">{item.lost_item_name}</td>
@@ -500,7 +554,8 @@ function AdminItems() {
                 </button>
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     )
@@ -525,7 +580,8 @@ function AdminItems() {
         </thead>
         <tbody>
           {items.map((item) => {
-            console.log("Rendering match item:", item)
+             if (item.id === "DO NOT DELETE") return null;
+            console.log("Rendering match item:", item);
             return (
               <tr key={item.id || item.matchId || `match-${Math.random()}`}>
                 <td className="px-6 py-2 text-sm">{item.matchId || "N/A"}</td>
@@ -567,8 +623,10 @@ function AdminItems() {
               <th className="px-6 py-3 text-left">Date</th>
             </tr>
           </thead>
-          <tbody>
-            {items.map((item) => (
+          <tbody className="divide-y divide-gray-200">
+            {items.map((item) => {
+              if (item.id === "DO NOT DELETE") return null;
+              return(
               <tr key={item.id || `archive-${Math.random()}`}>
                 <td className="px-6 py-2 text-sm">{item.foundID || item.lostID || "N/A"}</td>
                 <td className="px-6 py-2 text-sm">{item.found_item_name || item.lost_item_name || "N/A"}</td>
@@ -583,7 +641,8 @@ function AdminItems() {
                   </button>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -605,7 +664,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Date Found</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {items.map((item) => (
             <tr key={item.id}>
               <td className="px-6 py-2 text-sm">{item.foundID}</td>
@@ -632,10 +691,17 @@ function AdminItems() {
         <div className="flex items-center justify-between w-full mb-6">
           <h1 className="text-xl md:text-3xl font-bold text-amber-500 whitespace-nowrap mr-4">LOST & FOUND ITEMS</h1>
           <div className="flex items-center gap-2">
-            <button className="hidden md:flex hover:text-gray-600" onClick={handleDownloadPDF} title="Download Report">
+            <button
+              className="hidden md:flex text-gray-800 hover:text-gray-950"
+              onClick={handleDownloadPDF}
+              title="Download Report"
+            >
               <ArrowDownOnSquareIcon className="cursor-pointer w-6 h-6" />
             </button>
-            <button className="flex items-center hover:text-gray-600" onClick={() => setIsItemFilterOpen(true)}>
+            <button
+              className="flex items-center text-gray-800 hover:text-gray-950"
+              onClick={() => setIsItemFilterOpen(true)}
+            >
               <FunnelIcon className="cursor-pointer w-5 h-5" />
             </button>
             <div className="relative w-full md:w-64">
@@ -657,7 +723,9 @@ function AdminItems() {
               key={tab}
               onClick={() => handleTabChange(tab)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
-                activeTab === tab ? "bg-white shadow-sm" : "text-gray-500 hover:bg-black/10"
+                activeTab === tab
+                  ? "bg-white shadow-sm"
+                  : "text-gray-500 hover:bg-black/10 cursor-pointer"
               }`}
             >
               {tab}
@@ -669,7 +737,7 @@ function AdminItems() {
               onClick={() => navigate(activeTab === "FOUND ITEMS" ? "/add-found" : "/add-lost")}
               className="cursor-pointer ml-auto px-3 md:px-5 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600 text-sm md:text-base whitespace-nowrap"
             >
-              + Add Item
+              {activeTab === "FOUND ITEMS" ? "+ Add Found" : "+ Add Lost"}
             </button>
           )}
         </div>

@@ -35,7 +35,6 @@ function EditItem({ item, onClose, onDelete, onSave }) {
     "10th Floor",
     "11th Floor",
     "12th Floor",
-    "13th Floor",
     "14th Floor",
     "15th Floor",
   ];
@@ -59,7 +58,15 @@ function EditItem({ item, onClose, onDelete, onSave }) {
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  
+    // Regular expression to detect emojis
+    const emojiRegex = /[\u{1F600}-\u{1F6FF}]/gu; // Covers most common emojis
+  
+    // Remove emojis from the input value
+    const filteredValue = value.replace(emojiRegex, '');
+  
+    // Update the form data
+    setFormData((prev) => ({ ...prev, [name]: filteredValue }));
   };
 
   // Handle Save
@@ -97,7 +104,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
       }
 
       console.log("✅ Item deleted successfully");
-      onDelete(item.lostID); // ✅ Remove from UI only if the API succeeds
+      onDelete(item.lostID);
       onClose();
     } catch (error) {
       console.error("🔥 Error deleting item:", error.message);
@@ -140,7 +147,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full border rounded p-2 mt-1"
+                className="cursor-pointer w-full border rounded p-2 mt-1"
               >
                 <option value="">Select a category</option>
                 {categories.map((category, index) => (
@@ -158,6 +165,8 @@ function EditItem({ item, onClose, onDelete, onSave }) {
               <input
                 type="date"
                 name="dateLost"
+                min="2021-12-10"
+                max={new Date().toISOString().split("T")[0]}
                 value={formData.dateLost}
                 onChange={handleChange}
                 className="cursor-pointer w-full border rounded p-2 mt-1"
@@ -172,7 +181,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 name="locationLost"
                 value={formData.locationLost}
                 onChange={handleChange}
-                className="w-full border rounded p-2 mt-1"
+                className="cursor-pointer w-full border rounded p-2 mt-1"
               >
                 <option value="">Select a location</option>
                 {locations.map((location, index) => (
@@ -196,20 +205,28 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 value={formData.lost_item_name}
                 onChange={handleChange}
                 className="w-full border rounded p-2 mt-1"
+                maxLength="50"
               />
+              <p className="text-sm text-gray-500 mt-1">
+                {formData.lost_item_name.length}/50 characters
+              </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Description
+                Item Description
               </label>
               <textarea
                 name="lost_item_desc"
                 value={formData.lost_item_desc}
                 onChange={handleChange}
                 className="w-full border rounded p-2 mt-1"
-                rows="4"
+                maxLength={50} // Add maxLength attribute
               />
+              {/* Display character count */}
+              <p className="text-sm text-gray-500 mt-1">
+                {formData.lost_item_desc.length}/50 characters
+              </p>
             </div>
           </div>
         </div>

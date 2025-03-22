@@ -165,7 +165,7 @@ function StudentItems() {
       <div className="flex-1 p-4 md:p-6 overflow-hidden">
         {/* Header */}
         <div className="flex flex-row flex-wrap md:flex-nowrap items-center justify-between mb-6 gap-2">
-          <h1 className="text-xl md:text-3xl font-bold text-[#FFA500] whitespace-nowrap">
+          <h1 className="text-xl md:text-3xl font-bold text-amber-500 whitespace-nowrap">
             MY LOST ITEMS
           </h1>
 

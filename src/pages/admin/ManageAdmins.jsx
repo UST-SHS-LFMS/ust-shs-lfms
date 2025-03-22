@@ -45,7 +45,6 @@ function ManageAdmins() {
 
   const handleAdminDeleted = (deletedId) => {
     setEmployees((prev) => prev.filter((emp) => emp.id !== deletedId));
-    setIsEditModalOpen(false);
   };
 
   const handleRoleUpdated = (updatedId, newRole) => {
@@ -54,7 +53,6 @@ function ManageAdmins() {
         emp.id === updatedId ? { ...emp, role: newRole } : emp
       )
     );
-    setIsEditModalOpen(false);
   };
 
   const handleSearchChange = (event) => {
@@ -81,7 +79,7 @@ function ManageAdmins() {
 
       <div className="flex-1 p-4 md:p-6 w-full">
         <div className="flex items-center justify-between w-full mb-6">
-          <h1 className="text-xl md:text-3xl font-bold text-[#FFA500] whitespace-nowrap mr-4">
+          <h1 className="text-xl md:text-3xl font-bold text-amber-500 whitespace-nowrap mr-4">
             MANAGE ADMINS
           </h1>
           <div className="relative w-full md:w-64">

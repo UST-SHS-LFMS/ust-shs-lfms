@@ -6,7 +6,8 @@ function AdminProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
-  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL =
+    "https://ust-shs-lost-and-found-management-system.onrender.com";
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -59,22 +60,8 @@ function AdminProfile() {
 
       {/* Main Content */}
       <div className="w-full md:ml-48 p-4 md:p-8 flex-1">
-        {/* Logos */}
-        <div className="flex justify-end space-x-4 mt-12 md:mt-0">
-          <img
-            src="https://i.imgur.com/mZTPNjN.png"
-            alt="Logo 1"
-            className="h-8 w-8 md:h-12 md:w-12"
-          />
-          <img
-            src="https://i.imgur.com/zLWyGhA.png"
-            alt="Logo 2"
-            className="h-8 w-8 md:h-12 md:w-12"
-          />
-        </div>
-
-        <div className="mt-6 md:mt-8">
-          <h1 className="text-3xl md:text-5xl font-bold text-orange-400">
+        <div className="mx-auto max-w-4xl mt-12 md:mt-16">
+          <h1 className="text-3xl md:text-5xl font-bold text-amber-500">
             PROFILE
           </h1>
           <div className="mt-6 md:mt-8 space-y-4 md:space-y-6">

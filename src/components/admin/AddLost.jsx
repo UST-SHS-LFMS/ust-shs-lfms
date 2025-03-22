@@ -30,14 +30,21 @@ function AddLost() {
   // Handle image file change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size <= 5 * 1024 * 1024) {
+    if (file) {
+      const fileType = file.type;
+      if (fileType !== "image/jpeg" && fileType !== "image/png") {
+        setStatus("Only JPG and PNG files are allowed.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setStatus("File size must be less than 5MB.");
+        return;
+      }
       setImageFile(file);
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
-    } else {
-      setStatus("File size must be less than 5MB.");
     }
-  };
+  };  
 
   // Handle image deletion
   const handleImageDelete = () => {
@@ -142,8 +149,8 @@ function AddLost() {
       <div className="flex-1 p-4 md:p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#FFA500]">
-            ADD LOST ITEM
+          <h1 className="text-2xl md:text-3xl font-bold text-amber-500">
+            REPORT LOST ITEM
           </h1>
         </div>
 
@@ -162,12 +169,20 @@ function AddLost() {
                 type="text"
                 id="newLostItem"
                 value={newLostItem}
-                onChange={(e) => setNewLostItem(e.target.value)}
+                onChange={(e) => {
+                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                    setNewLostItem(e.target.value);
+                  }
+                }}                
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="Item Name"
+                placeholder="Enter the general name of the item (e.g., Tumbler)"
                 maxLength="50"
                 required
               />
+              {/* Display character count */}
+              <p className="text-sm text-gray-500 mt-1">
+                {newLostItem.length}/50 characters
+              </p>
             </div>
 
             <div>
@@ -181,12 +196,20 @@ function AddLost() {
                 type="text"
                 id="newLostItemDesc"
                 value={newLostItemDesc}
-                onChange={(e) => setNewLostItemDesc(e.target.value)}
+                onChange={(e) => {
+                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
+                    setNewLostItemDesc(e.target.value);
+                  }
+                }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
-                placeholder="Item Description"
-                maxLength="50"
+                placeholder="Enter details like brand, color, etc. (e.g., Hydro Flask, Blue)"
+                maxLength="100"
                 required
               />
+              {/* Display character count */}
+              <p className="text-sm text-gray-500 mt-1">
+                {newLostItemDesc.length}/100 characters
+              </p>
             </div>
 
             <div>
@@ -200,7 +223,7 @@ function AddLost() {
                 id="newCategory"
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                className="cursor-pointer mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 required
               >
                 <option value="" disabled>
@@ -255,7 +278,7 @@ function AddLost() {
                 id="newLocationLost"
                 value={newLocationLost}
                 onChange={(e) => setNewLocationLost(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                className="cursor-pointer mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 required
               >
                 <option value="" disabled>
@@ -298,14 +321,14 @@ function AddLost() {
                 max={new Date().toISOString().split("T")[0]}
                 value={newDateLost}
                 onChange={(e) => setNewDateLost(e.target.value)}
-                className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
+                className="cursor-pointer t-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Upload Image (Max 5MB)
+              Upload Image (JPG/PNG, Max 5MB)
               </label>
               <input
                 type="file"
@@ -336,41 +359,50 @@ function AddLost() {
           </div>
 
           {/* Buttons */}
-          <div className="col-span-1 md:col-span-2 flex justify-end gap-4 mt-6">
-             <button
+          <div className="col-span-1 md:col-span-2 flex justify-between gap-4 mt-6">
+            {/* Back Button (Left Side) */}
+            <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() =>
+                navigate("/items", { state: { activeTab: "LOST ITEMS" } })
+              }
               className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
             >
               Back
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setNewLostItem("");
-                setNewLostItemDesc("");
-                setNewCategory("");
-                setNewLocationLost("");
-                setNewDateLost("");
-                setImageFile(null);
-                setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
-              }}
-              className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
-            >
-              Clear
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowConfirmationModal(true)}
-              disabled={!isFormValid()}
-              className={`cursor-pointer px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
-                isFormValid()
-                  ? "hover:bg-green-600"
-                  : "opacity-50 cursor-not-allowed"
-              } transition-colors duration-200`}
-            >
-              Submit
-            </button>
+
+            <div className="flex gap-4">
+              {/* Clear Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setNewLostItem("");
+                  setNewLostItemDesc("");
+                  setNewCategory("");
+                  setNewLocationLost("");
+                  setNewDateLost("");
+                  setImageFile(null);
+                  setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
+                }}
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+              >
+                Clear
+              </button>
+
+              {/* Submit Button */}
+              <button
+                type="button"
+                onClick={() => setShowConfirmationModal(true)}
+                disabled={!isFormValid()}
+                className={`cursor-pointer px-4 py-2 bg-green-500 text-white border border-green-500 rounded-4xl ${
+                  isFormValid()
+                    ? "hover:bg-green-600"
+                    : "opacity-50 cursor-not-allowed"
+                } transition-colors duration-200`}
+              >
+                Submit
+              </button>
+            </div>
           </div>
         </form>
 
@@ -387,7 +419,7 @@ function AddLost() {
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => setShowConfirmationModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
               >
                 No
               </button>
@@ -396,7 +428,7 @@ function AddLost() {
                   setShowConfirmationModal(false);
                   onSubmitLostItem();
                 }}
-                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
                 Yes
               </button>
