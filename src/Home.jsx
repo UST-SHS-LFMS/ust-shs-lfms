@@ -8,9 +8,8 @@ const Home = () => {
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const navigate = useNavigate();
-
-  // State to manage the current background image
   const [currentBg, setCurrentBg] = useState(0);
+  const [loading, setLoading] = useState(false); // Add this line
 
   const bgImages = [
     "https://i.imgur.com/pGxIF2u.jpeg",
@@ -30,6 +29,7 @@ const Home = () => {
   }, []);
 
   const signInWithGoogle = async () => {
+    setLoading(true); // Start loading
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
@@ -76,6 +76,8 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Google Sign-In Error:", error);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -107,14 +109,24 @@ const Home = () => {
         {/* Google Sign-In Button */}
         <button
           onClick={signInWithGoogle}
+          disabled={loading} // Disable the button while loading
           className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white py-2 sm:py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 cursor-pointer"
         >
-          <img
-            src="https://i.imgur.com/5YjiD4v.png"
-            alt="Google Logo"
-            className="w-4 h-4 sm:w-5 sm:h-5"
-          />
-          <span className="text-sm sm:text-base">Sign in with Google</span>
+          {loading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Signing in...</span>
+            </div>
+          ) : (
+            <>
+              <img
+                src="https://i.imgur.com/5YjiD4v.png"
+                alt="Google Logo"
+                className="w-4 h-4 sm:w-5 sm:h-5"
+              />
+              <span className="text-sm sm:text-base">Sign in with Google</span>
+            </>
+          )}
         </button>
       </div>
     </div>

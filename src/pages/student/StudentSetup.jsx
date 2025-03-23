@@ -31,15 +31,31 @@ function UserSetup() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // studentNumber and employeeNumber
+    // Allow only numeric input for studentNumber and employeeNumber
     if (
       (name === "studentNumber" || name === "employeeNumber") &&
-      !/^\d{0,10}$/.test(value)
+      !/^\d{0,10}$/.test(value) // Allow only up to 10 digits
     ) {
       return;
     }
 
+    // Update form data
     setFormData({ ...formData, [name]: value });
+
+    // Real-time validation for studentNumber and employeeNumber
+    if (name === "studentNumber" || name === "employeeNumber") {
+      if (!/^\d{10}$/.test(value)) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: `${name === "studentNumber" ? "Student No." : "Employee No."} must be exactly 10 digits.`,
+        }));
+      } else {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "", // Clear the error if the input is valid
+        }));
+      }
+    }
   };
 
   const validateForm = () => {
@@ -47,16 +63,20 @@ function UserSetup() {
     if (isFaculty) {
       if (!formData.affiliation)
         newErrors.affiliation = "Affiliation is required";
-      if (!/^\d{10}$/.test(formData.employeeNumber))
-        newErrors.employeeNumber = "Employee Number must be exactly 10 digits";
+      // Do not overwrite the employeeNumber error if it already exists
+      if (!errors.employeeNumber && !/^\d{10}$/.test(formData.employeeNumber)) {
+        newErrors.employeeNumber = "Employee No. must be exactly 10 digits";
+      }
     } else {
       if (!formData.gradeLevel)
         newErrors.gradeLevel = "Grade Level is required";
-      if (!/^\d{10}$/.test(formData.studentNumber))
-        newErrors.studentNumber = "Student Number must be exactly 10 digits";
       if (!formData.strand) newErrors.strand = "Strand is required";
+      // Do not overwrite the studentNumber error if it already exists
+      if (!errors.studentNumber && !/^\d{10}$/.test(formData.studentNumber)) {
+        newErrors.studentNumber = "Student No. must be 10 digits";
+      }
     }
-    setErrors(newErrors);
+    setErrors((prevErrors) => ({ ...prevErrors, ...newErrors }));
     return Object.keys(newErrors).length === 0;
   };
 
@@ -95,7 +115,7 @@ function UserSetup() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-[#FFF8F0] px-4">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-amber-50 px-4">
       <div className="w-full max-w-4xl flex justify-between items-center mb-4 px-4">
         <h1 className="text-4xl font-bold text-amber-500">REGISTRATION</h1>
       </div>

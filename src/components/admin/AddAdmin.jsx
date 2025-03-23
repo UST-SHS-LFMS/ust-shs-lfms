@@ -52,7 +52,7 @@ const AddAdminForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     const emojiRegex = /[\u{1F600}-\u{1F6FF}]/gu;
-    const filteredValue = value.replace(emojiRegex, '');
+    const filteredValue = value.replace(emojiRegex, "");
     setFormData({ ...formData, [name]: filteredValue });
   };
 
@@ -82,7 +82,7 @@ const AddAdminForm = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FFF8F0]">
+    <div className="flex min-h-screen bg-amber-50">
       {/* Sidebar */}
       <Sidebar />
 
@@ -175,18 +175,21 @@ const AddAdminForm = () => {
                 maxLength="10"
                 required
               />
-              {/* Display character count */}
-              <p className="text-sm text-gray-500 mt-1">
-                {formData.employeeNumber.length}/10 characters
-              </p>
 
               {/* Validation Message */}
-              {formData.employeeNumber.length > 0 &&
-                formData.employeeNumber.length !== 10 && (
+              <div className="min-h-[24px]">
+                {" "}
+                {/* Ensure consistent spacing */}
+                {formData.employeeNumber.length > 0 && (
                   <p className="text-sm text-red-600 mt-1">
-                    Employee number must be exactly 10 digits.
+                    {formData.employeeNumber.length !== 10
+                      ? "Employee number must be exactly 10 digits."
+                      : !/^\d+$/.test(formData.employeeNumber)
+                        ? "Employee No. must be digits."
+                        : ""}
                   </p>
                 )}
+              </div>
             </div>
 
             <div>

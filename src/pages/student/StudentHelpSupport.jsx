@@ -15,7 +15,7 @@ const faqs = [
   {
     question: "Where can I claim an item?",
     answer:
-      "Found items can be claimed at the UST-SHS Office at the 8th floor.",
+      "Found items can be claimed at the UST-SHS Office on the 8th floor.",
   },
   {
     question: "What should I do if I found an item?",
@@ -95,12 +95,12 @@ const FAQAccordion = () => {
 
 function StudentHelp() {
   return (
-    <div className="flex min-h-screen bg-amber-50/50">
+    <div className="flex min-h-screen bg-amber-50">
       {/* Sidebar - Hidden on mobile */}
       <StudentSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-4 md:p-6">
+      <div className="flex-1 h-screen overflow-auto p-4 md:p-6">
         <h1 className="text-2xl md:text-3xl font-bold text-amber-500 mb-6">
           HELP & SUPPORT
         </h1>

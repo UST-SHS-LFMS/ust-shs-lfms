@@ -157,12 +157,12 @@ function StudentItems() {
   });
 
   return (
-    <div className="flex min-h-screen bg-[#FFF8F0]">
+    <div className="flex min-h-screen bg-amber-50">
       {/* Sidebar - Hidden on mobile */}
       <StudentSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-4 md:p-6 overflow-hidden">
+      <div className="flex-1 p-4 md:p-6 h-screen overflow-auto">
         {/* Header */}
         <div className="flex flex-row flex-wrap md:flex-nowrap items-center justify-between mb-6 gap-2">
           <h1 className="text-xl md:text-3xl font-bold text-amber-500 whitespace-nowrap">

@@ -27,7 +27,7 @@ function StudentSearch() {
   }, [selectedCategory]);
 
   return (
-    <div className="flex min-h-screen bg-amber-50/50">
+    <div className="flex min-h-screen bg-amber-50">
       <StudentSidebar />
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 md:px-12 lg:px-20 py-10 text-center">

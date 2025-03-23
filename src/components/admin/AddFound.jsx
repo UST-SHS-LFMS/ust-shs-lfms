@@ -12,7 +12,6 @@ function AddFound() {
   const [lostItems, setLostItems] = useState([]);
   const [matches, setMatches] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState(new Set()); // Track matched pairs to avoid duplicate checks
-
   const [newFoundItem, setNewFoundItem] = useState("");
   const [newFoundItemDesc, setNewFoundItemDesc] = useState("");
   const [newCategory, setNewCategory] = useState("");
@@ -30,7 +29,7 @@ function AddFound() {
     "https://i.imgur.com/v3LZMXQ.jpeg"
   );
   const [isAdding, setIsAdding] = useState(false);
-
+  const [studentIDError, setStudentIDError] = useState("");
   const navigate = useNavigate();
   const API_URL =
     "https://ust-shs-lost-and-found-management-system.onrender.com";
@@ -69,14 +68,16 @@ function AddFound() {
 
   // Check if all required fields are filled
   const isFormValid = () => {
+    const isStudentIDValid = foundByID.length === 10;
     return (
       newFoundItem.trim() !== "" &&
       newFoundItemDesc.trim() !== "" &&
       newCategory.trim() !== "" &&
       newLocationFound.trim() !== "" &&
       newDateFound.trim() !== "" &&
-      foundByName.trim() !== "" && // Validate Full Name
-      foundByID.trim() !== "" // Validate Student ID
+      foundByName.trim() !== "" &&
+      foundByID.trim() !== "" &&
+      isStudentIDValid
     );
   };
 
@@ -289,9 +290,9 @@ function AddFound() {
     }
   };
 
-  // Handle new found item submission
   const onSubmitFoundItem = async () => {
     try {
+      // Check if all required fields are filled
       if (
         !newFoundItem ||
         !newFoundItemDesc ||
@@ -305,8 +306,15 @@ function AddFound() {
         return;
       }
 
+      // Validate Student/Employee No. length
+      if (foundByID.length !== 10) {
+        setStatus("Student/Employee No. must be exactly 10 digits.");
+        return;
+      }
+
+      // Check if the form is valid (including additional checks)
       if (!isFormValid()) {
-        setStatus("Please fill in all fields.");
+        setStatus("Please ensure all fields are filled correctly.");
         return;
       }
 
@@ -320,6 +328,7 @@ function AddFound() {
         photoURL = await getDownloadURL(storageRef);
       }
 
+      // Submit the form data
       const response = await fetch(`${API_URL}/api/found-items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -352,13 +361,14 @@ function AddFound() {
         setFoundByID(""); // Clear Student ID
         setImageFile(null); // Clear image file
         setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg"); // Reset preview URL
+        setStatus(""); // Clear any previous error messages
       } else {
         setIsAdding(false);
-        setStatus("Error adding found item");
+        setStatus("Error adding found item. Please try again.");
       }
     } catch (err) {
       setIsAdding(false);
-      setStatus("Error adding found item");
+      setStatus("Error adding found item.");
       console.error(err);
     }
   };
@@ -370,7 +380,7 @@ function AddFound() {
   }, []); // **getMatches() is NOT called here**
 
   return (
-    <div className="flex min-h-screen bg-[#FFF8F0]">
+    <div className="flex min-h-screen bg-amber-50">
       {/* Sidebar */}
       <AdminSidebar />
 
@@ -396,8 +406,13 @@ function AddFound() {
                 id="newFoundItem"
                 value={newFoundItem}
                 onChange={(e) => {
-                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
-                    setNewFoundItem(e.target.value);
+                  const value = e.target.value;
+                  if (
+                    !/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u.test(
+                      value
+                    )
+                  ) {
+                    setNewFoundItem(value);
                   }
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
@@ -424,8 +439,13 @@ function AddFound() {
                 id="newFoundItemDesc"
                 value={newFoundItemDesc}
                 onChange={(e) => {
-                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
-                    setNewFoundItemDesc(e.target.value);
+                  const value = e.target.value;
+                  if (
+                    !/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u.test(
+                      value
+                    )
+                  ) {
+                    setNewFoundItemDesc(value);
                   }
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
@@ -583,8 +603,13 @@ function AddFound() {
                   id="fullName"
                   value={foundByName}
                   onChange={(e) => {
-                    if (!/[\p{Emoji}]/u.test(e.target.value)) {
-                      setFoundByName(e.target.value);
+                    const value = e.target.value;
+                    if (
+                      !/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u.test(
+                        value
+                      )
+                    ) {
+                      setFoundByName(value);
                     }
                   }}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
@@ -614,6 +639,13 @@ function AddFound() {
                     // Filter out non-numeric characters and emojis
                     const filteredValue = e.target.value.replace(/[^0-9]/g, "");
                     setFoundByID(filteredValue);
+
+                    // Validate length and set error message
+                    if (filteredValue.length !== 10) {
+                      setStudentIDError("Student No. must be 10 digits.");
+                    } else {
+                      setStudentIDError("");
+                    }
                   }}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Student/Employee No."
@@ -621,6 +653,10 @@ function AddFound() {
                   inputMode="numeric"
                   required
                 />
+                {/* Display error message */}
+                {studentIDError && (
+                  <p className="text-red-600 text-sm mt-1">{studentIDError}</p>
+                )}
               </div>
             </div>
           </div>
@@ -658,6 +694,7 @@ function AddFound() {
                   setFoundByID(""); // Clear Student ID
                   setImageFile(null); // Clear image file
                   setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg"); // Reset preview URL
+                  setStudentIDError("");
                 }}
                 className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
               >
@@ -697,6 +734,10 @@ function AddFound() {
               </button>
               <button
                 onClick={() => {
+                  if (foundByID.length !== 10) {
+                    setStatus("Student No. must be 10 digits.");
+                    return;
+                  }
                   onSubmitFoundItem();
                   setShowConfirmationModal(false);
                 }}

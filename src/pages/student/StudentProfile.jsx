@@ -54,7 +54,7 @@ function StudentProfile() {
   }
 
   return (
-    <div className="flex min-h-screen bg-amber-50/50">
+    <div className="flex min-h-screen bg-amber-50">
       {/* Sidebar - Hidden on mobile */}
       <StudentSidebar />
 

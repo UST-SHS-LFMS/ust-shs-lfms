@@ -708,7 +708,7 @@ function AdminItems() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FFF8F0] overflow-hidden">
+    <div className="flex min-h-screen bg-amber-50 overflow-hidden">
       <AdminSidebar className="hidden md:block" />
 
       <div className="flex-1 p-4 md:p-6 w-full">

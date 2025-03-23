@@ -11,7 +11,6 @@ function AddLost() {
   const [foundItems, setFoundItems] = useState([]);
   const [matches, setMatches] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState(new Set()); // Track matched pairs
-
   const [newLostItem, setNewLostItem] = useState("");
   const [newLostItemDesc, setNewLostItemDesc] = useState("");
   const [newCategory, setNewCategory] = useState("");
@@ -28,25 +27,25 @@ function AddLost() {
     "https://i.imgur.com/v3LZMXQ.jpeg"
   );
   const [isAdding, setIsAdding] = useState(false); // State for loading popup
-
+  const [imageError, setImageError] = useState("");
   const navigate = useNavigate();
   const API_URL =
     "https://ust-shs-lost-and-found-management-system.onrender.com";
 
-  // Handle image file change
   // Handle image file change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const fileType = file.type;
       if (fileType !== "image/jpeg" && fileType !== "image/png") {
-        setStatus("Only JPG and PNG files are allowed.");
+        setImageError("Only JPG and PNG files are allowed.");
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setStatus("File size must be less than 5MB.");
+        setImageError("File size must be less than 5MB.");
         return;
       }
+      setImageError(""); // Clear error when valid file is selected
       setImageFile(file);
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
@@ -57,6 +56,7 @@ function AddLost() {
   const handleImageDelete = () => {
     setImageFile(null);
     setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
+    setImageError(""); // Clear error when image is deleted
   };
 
   // Check if all required fields are filled
@@ -294,7 +294,7 @@ function AddLost() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#FFF8F0]">
+    <div className="flex min-h-screen bg-amber-50">
       {/* Sidebar */}
       <AdminSidebar />
 
@@ -320,8 +320,13 @@ function AddLost() {
                 id="newLostItem"
                 value={newLostItem}
                 onChange={(e) => {
-                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
-                    setNewLostItem(e.target.value);
+                  const value = e.target.value;
+                  if (
+                    !/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u.test(
+                      value
+                    )
+                  ) {
+                    setNewLostItem(value);
                   }
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
@@ -348,8 +353,13 @@ function AddLost() {
                 id="newLostItemDesc"
                 value={newLostItemDesc}
                 onChange={(e) => {
-                  if (!/[\p{Emoji}]/u.test(e.target.value)) {
-                    setNewLostItemDesc(e.target.value);
+                  const value = e.target.value;
+                  if (
+                    !/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u.test(
+                      value
+                    )
+                  ) {
+                    setNewLostItemDesc(value);
                   }
                 }}
                 className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
@@ -510,6 +520,9 @@ function AddLost() {
                   </button>
                 )}
               </div>
+              {imageError && (
+                <p className="text-red-600 text-sm mt-1">{imageError}</p>
+              )}
             </div>
           </div>
 
@@ -569,7 +582,7 @@ function AddLost() {
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => setShowConfirmationModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 rounded-4xl hover:bg-gray-400 transition-colors duration-200"
               >
                 No
               </button>
@@ -578,7 +591,7 @@ function AddLost() {
                   setShowConfirmationModal(false);
                   onSubmitLostItem();
                 }}
-                className="px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
               >
                 Yes
               </button>
