@@ -373,6 +373,57 @@ function AddFound() {
     }
   };
 
+  const fetchUserDataByName = async () => {
+    if (!foundByName.trim()) return;
+  
+    try {
+      const response = await fetch(`${API_URL}/api/users/name/${foundByName}`);
+  
+      if (!response.ok) {
+        throw new Error(`No matching user found. Type it manually.`);
+      }
+  
+      const responseData = await response.json();
+      console.log("Fetched user data:", responseData);
+  
+      if (responseData.exists && responseData.data) {
+        setFoundByID(responseData.data.employeeNumber || responseData.data.studentNum || "");
+      } else {
+        setFoundByID("");
+        alert("No matching ID found for this name. Type it manually.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      alert(`Failed to fetch data: ${error.message}`);
+    }
+  };
+
+  const fetchUserDataByID = async (idNumber) => {
+    if (!idNumber) return;
+  
+    try {
+      const response = await fetch(`${API_URL}/api/users/id/${idNumber}`);
+  
+      if (!response.ok) {
+        throw new Error(`No matching user found. Type it manually.`);
+      }
+  
+      const responseData = await response.json();
+      console.log("Fetched user data:", responseData);
+  
+      if (responseData.exists && responseData.data) {
+        setFoundByName(responseData.data.fullName || "");
+      } else {
+        setFoundByName("");
+        alert("No matching name found for this ID. Type it manually.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      alert(`Failed to fetch data: ${error.message}`);
+    }
+  };
+
+
   // Fetch data on component mount
   useEffect(() => {
     getLostItems();
@@ -612,6 +663,7 @@ function AddFound() {
                       setFoundByName(value);
                     }
                   }}
+                  onBlur={fetchUserDataByName} // Fetch ID when user finishes typing name
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Full Name"
                   maxLength="100"
@@ -647,6 +699,7 @@ function AddFound() {
                       setStudentIDError("");
                     }
                   }}
+                  onBlur={(e) => fetchUserDataByID(e.target.value)} // Fetch name when user finishes typing ID
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full bg-white"
                   placeholder="Student/Employee No."
                   maxLength="10"
