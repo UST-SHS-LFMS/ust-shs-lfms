@@ -365,13 +365,16 @@ function AddFound() {
   }
 
   const fetchUserDataByName = async () => {
-    if (!foundByName.trim()) return;
+    if (!foundByName.trim()) {
+      setFoundByID(""); // Clear ID if input is empty
+      return;
+    }
   
     try {
       const response = await fetch(`${API_URL}/api/users/name/${foundByName}`);
   
       if (!response.ok) {
-        throw new Error(`No matching user found. Type it manually.`);
+        throw new Error("No matching user found. Type it manually.");
       }
   
       const responseData = await response.json();
@@ -385,18 +388,22 @@ function AddFound() {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      setFoundByID(""); // Clear ID on error
       alert(`Failed to fetch data: ${error.message}`);
     }
   };
-
+  
   const fetchUserDataByID = async (idNumber) => {
-    if (!idNumber) return;
+    if (!idNumber) {
+      setFoundByName(""); // Clear name if input is empty
+      return;
+    }
   
     try {
       const response = await fetch(`${API_URL}/api/users/id/${idNumber}`);
   
       if (!response.ok) {
-        throw new Error(`No matching user found. Type it manually.`);
+        throw new Error("No matching user found. Type it manually.");
       }
   
       const responseData = await response.json();
@@ -410,6 +417,7 @@ function AddFound() {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      setFoundByName(""); // Clear name on error
       alert(`Failed to fetch data: ${error.message}`);
     }
   };
