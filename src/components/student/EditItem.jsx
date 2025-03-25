@@ -58,13 +58,13 @@ function EditItem({ item, onClose, onDelete, onSave }) {
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     // Regular expression to detect emojis
     const emojiRegex = /[\u{1F600}-\u{1F6FF}]/gu; // Covers most common emojis
-  
+
     // Remove emojis from the input value
     const filteredValue = value.replace(emojiRegex, '');
-  
+
     // Update the form data
     setFormData((prev) => ({ ...prev, [name]: filteredValue }));
   };
@@ -113,8 +113,8 @@ function EditItem({ item, onClose, onDelete, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-2xl relative">
+    <div className="fixed inset-0 flex items-center justify-center md:ml-56 bg-black/50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-2xl relative mx-4">
         {/* Close "x" button */}
         <button
           onClick={onClose}
@@ -136,7 +136,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
           </svg>
         </button>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Left Column */}
           <div className="space-y-3">
             <div>
@@ -147,7 +147,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="cursor-pointer w-full border rounded p-2 mt-1"
+                className="cursor-pointer w-full border rounded p-2 mt-1 text-sm md:text-base"
               >
                 <option value="">Select a category</option>
                 {categories.map((category, index) => (
@@ -169,7 +169,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 max={new Date().toISOString().split("T")[0]}
                 value={formData.dateLost}
                 onChange={handleChange}
-                className="cursor-pointer w-full border rounded p-2 mt-1"
+                className="cursor-pointer w-full border rounded p-2 mt-1 text-sm md:text-base"
               />
             </div>
 
@@ -181,7 +181,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 name="locationLost"
                 value={formData.locationLost}
                 onChange={handleChange}
-                className="cursor-pointer w-full border rounded p-2 mt-1"
+                className="cursor-pointer w-full border rounded p-2 mt-1 text-sm md:text-base"
               >
                 <option value="">Select a location</option>
                 {locations.map((location, index) => (
@@ -204,10 +204,10 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 name="lost_item_name"
                 value={formData.lost_item_name}
                 onChange={handleChange}
-                className="w-full border rounded p-2 mt-1"
+                className="w-full border rounded p-2 mt-1 text-sm md:text-base"
                 maxLength="50"
               />
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs md:text-sm text-gray-500 mt-1">
                 {formData.lost_item_name.length}/50 characters
               </p>
             </div>
@@ -220,11 +220,11 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 name="lost_item_desc"
                 value={formData.lost_item_desc}
                 onChange={handleChange}
-                className="w-full border rounded p-2 mt-1"
-                maxLength={50} // Add maxLength attribute
+                className="w-full border rounded p-2 mt-1 text-sm md:text-base"
+                maxLength={50}
+                rows={3}
               />
-              {/* Display character count */}
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs md:text-sm text-gray-500 mt-1">
                 {formData.lost_item_desc.length}/50 characters
               </p>
             </div>
@@ -235,13 +235,13 @@ function EditItem({ item, onClose, onDelete, onSave }) {
         <div className="flex justify-between mt-6">
           <button
             onClick={handleDelete}
-            className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-4xl hover:bg-red-600 transition-colors duration-200"
+            className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-4xl hover:bg-red-600 transition-colors duration-200 text-sm md:text-base"
           >
             Remove
           </button>
           <button
             onClick={handleSave}
-            className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
+            className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200 text-sm md:text-base"
           >
             Save
           </button>
@@ -250,8 +250,8 @@ function EditItem({ item, onClose, onDelete, onSave }) {
 
       {/* Success Popup */}
       {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+        <div className="fixed inset-0 flex items-center justify-center md:ml-56 bg-black/50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center mx-4 w-11/12 max-w-md">
             <div className="flex flex-col items-center gap-2 mb-4">
               <img
                 src="https://i.imgur.com/eFvkfQz.png"
@@ -270,7 +270,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
                 setShowSuccessPopup(false); // Close success popup
                 onClose(); // Close the modal
               }}
-              className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200"
+              className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-4xl hover:bg-green-600 transition-colors duration-200 w-full md:w-auto"
             >
               Done
             </button>

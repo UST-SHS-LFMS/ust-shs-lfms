@@ -294,18 +294,20 @@ function AddLost() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-amber-50">
+    <div className="flex flex-col md:flex-row min-h-screen bg-amber-50">
       {/* Sidebar */}
       <AdminSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-amber-500">ADD LOST ITEM</h1>
+      <div className="flex-1 p-3 md:p-6 h-screen overflow-auto">
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-amber-500">
+            ADD LOST ITEM
+          </h1>
         </div>
 
         {/* Add Lost Item Form */}
-        <form className="grid grid-cols-2 gap-8 p-10">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 p-4 md:p-10">
           <div className="flex flex-col gap-4">
             <div>
               <label
@@ -505,9 +507,9 @@ function AddLost() {
               <div className="flex items-center gap-2 mt-1">
                 <label htmlFor="imageUpload" className="cursor-pointer">
                   <img
-                    src={previewUrl}
+                    src={previewUrl || "/placeholder.svg"}
                     alt="Upload Preview"
-                    className="w-40 h-30 object-cover rounded-lg border border-gray-300"
+                    className="w-32 h-24 md:w-40 md:h-30 object-cover rounded-lg border border-gray-300"
                   />
                 </label>
                 {imageFile && (
@@ -527,17 +529,17 @@ function AddLost() {
           </div>
 
           {/* Buttons */}
-          <div className="col-span-2 flex justify-between gap-4 mt-6">
+          <div className="col-span-1 md:col-span-2 flex flex-col md:flex-row justify-between gap-4 mt-6">
             <button
               type="button"
               onClick={() =>
                 navigate("/items", { state: { activeTab: "LOST ITEMS" } })
               }
-              className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200"
+              className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200 w-full md:w-auto"
             >
               Back
             </button>
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
               <button
                 type="button"
                 onClick={() => {
@@ -550,7 +552,7 @@ function AddLost() {
                   setImageFile(null);
                   setPreviewUrl("https://i.imgur.com/v3LZMXQ.jpeg");
                 }}
-                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200"
+                className="cursor-pointer px-4 py-2 bg-gray-300 text-gray-700 border border-gray-300 rounded-4xl hover:bg-gray-400 not-visited:transition-colors duration-200 w-full md:w-auto"
               >
                 Clear
               </button>
@@ -562,7 +564,7 @@ function AddLost() {
                   isFormValid()
                     ? "hover:bg-green-600"
                     : "opacity-50 cursor-not-allowed"
-                } transition-colors duration-200`}
+                } transition-colors duration-200 w-full md:w-auto`}
               >
                 Submit
               </button>
@@ -576,7 +578,7 @@ function AddLost() {
       {/* Confirmation Modal */}
       {showConfirmationModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-lg text-center max-w-xs md:max-w-md mx-4">
             <h2 className="text-xl font-bold mb-4">Are you sure?</h2>
             <p className="mb-4">Make sure all information is correct.</p>
             <div className="flex justify-center gap-4">
@@ -603,7 +605,7 @@ function AddLost() {
       {/* Adding... Popup */}
       {isAdding && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-lg text-center max-w-xs md:max-w-md mx-4">
             <div className="flex flex-col items-center gap-2 mb-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
               <h2 className="text-lg font-medium text-gray-800">Adding...</h2>
@@ -618,7 +620,7 @@ function AddLost() {
       {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
+          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-lg text-center max-w-xs md:max-w-md mx-4">
             <div className="flex flex-col items-center gap-2 mb-4">
               <img
                 src="https://i.imgur.com/eFvkfQz.png"
