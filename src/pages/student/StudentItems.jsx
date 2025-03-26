@@ -171,12 +171,6 @@ function StudentItems() {
 
           {/* Search and Filter */}
           <div className="flex items-center gap-2 ml-auto">
-            <button
-              className="flex items-center"
-              onClick={() => setIsFilterOpen(true)}
-            >
-              <FunnelIcon className="cursor-pointer w-5 h-5" />
-            </button>
             <div className="relative">
               <input
                 type="search"
