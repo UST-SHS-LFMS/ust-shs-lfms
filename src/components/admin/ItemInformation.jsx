@@ -2,7 +2,7 @@ import { QrCodeIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect } from "react";
-import {collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   const [isClaimFormOpen, setClaimFormOpen] = useState(false);
@@ -16,32 +16,36 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
   const API_URL =
     "https://ust-shs-lost-and-found-management-system.onrender.com";
 
-    useEffect(() => {
-      // Cleanup function for the scanner
-      return () => {
-        if (scanner) {
-          scanner.clear();
-        }
-      };
-    }, [scanner]); // Runs only when scanner changes
-    
+  useEffect(() => {
+    // Cleanup function for the scanner
+    return () => {
+      if (scanner) {
+        scanner.clear();
+      }
+    };
+  }, [scanner]); // Runs only when scanner changes
+
   if (!isOpen || !item) return null;
 
   const fetchUserDataByName = async () => {
     if (!claimedByName.trim()) return;
-  
+
     try {
-      const response = await fetch(`${API_URL}/api/users/name/${claimedByName}`);
-  
+      const response = await fetch(
+        `${API_URL}/api/users/name/${claimedByName}`
+      );
+
       if (!response.ok) {
         throw new Error(`Server responded with status: ${response.status}`);
       }
-  
+
       const responseData = await response.json();
       console.log("Fetched user data:", responseData);
-  
+
       if (responseData.exists && responseData.data) {
-        setClaimedByID(responseData.data.employeeNumber || responseData.data.studentNum || "");
+        setClaimedByID(
+          responseData.data.employeeNumber || responseData.data.studentNum || ""
+        );
         setIsIDLocked(true);
       } else {
         setClaimedByID("");
@@ -56,17 +60,17 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
 
   const fetchUserDataByID = async (idNumber) => {
     if (!idNumber) return;
-  
+
     try {
       const response = await fetch(`${API_URL}/api/users/id/${idNumber}`);
-  
+
       if (!response.ok) {
         throw new Error(`Server responded with status: ${response.status}`);
       }
-  
+
       const responseData = await response.json();
       console.log("Fetched user data:", responseData);
-  
+
       if (responseData.exists && responseData.data) {
         setClaimedByName(responseData.data.fullName || "");
       } else {
@@ -77,7 +81,6 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       alert(`Failed to fetch data: ${error.message}`);
     }
   };
-  
 
   const handleClaimSubmit = async (e) => {
     e.preventDefault();
@@ -226,13 +229,16 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         <strong>Found ID:</strong> {item.foundID || item.lostID || "N/A"}
       </p>
       <p>
-        <strong>Description:</strong> {item.found_item_desc || item.lost_item_desc || "N/A"}
+        <strong>Description:</strong>{" "}
+        {item.found_item_desc || item.lost_item_desc || "N/A"}
       </p>
       <p>
-        <strong>Item Name:</strong> {item.found_item_name || item.lost_item_name || "N/A"}
+        <strong>Item Name:</strong>{" "}
+        {item.found_item_name || item.lost_item_name || "N/A"}
       </p>
       <p>
-        <strong>Location Found:</strong> {item.locationFound || item.locationLost || "N/A"}
+        <strong>Location Found:</strong>{" "}
+        {item.locationFound || item.locationLost || "N/A"}
       </p>
       <p>
         <strong>Status:</strong> {item.status}
@@ -319,10 +325,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           <strong>Status:</strong> {lostItem.status}
         </p>
       </>
-
-      
     );
-
   };
 
   const renderContent = () => {
@@ -514,7 +517,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   placeholder="Full Name"
                   value={claimedByName}
                   onChange={(e) => setClaimedByName(e.target.value)}
-                  onBlur={fetchEmployeeOrStudentNumber} // Fetch the number when user stops typing
+                  onBlur={fetchUserDataByName} // Fetch the number when user stops typing
                   className="w-full p-2 border rounded-lg"
                   maxLength="100"
                   required
@@ -525,17 +528,25 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   value={claimedByID}
                   onChange={(e) => {
                     if (!isIDLocked) {
-                      const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
                       setClaimedByID(value);
                     }
                   }}
-                  onBlur={fetchFullName} // Fetch the full name when ID is entered first
+                  onBlur={() => fetchUserDataByID(claimedByID)} // Fetch the full name when ID is entered first
                   className={`w-full p-2 border rounded-lg ${isIDLocked ? "bg-gray-100" : ""}`}
                   required
                   readOnly={isIDLocked}
                 />
                 <div className="flex justify-end items-center gap-2">
-                  <QrCodeIcon className="w-7 h-7 " />
+                  <button
+                    onClick={startScanner}
+                    type="button"
+                    className="p-1 text-gray-700 hover:text-gray-950 transition"
+                  >
+                    <QrCodeIcon className="cursor-pointer w-7 h-7" />
+                  </button>
                   <button
                     type="submit"
                     className="px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
@@ -549,88 +560,94 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         </div>
       )}
 
-{isClaimFormOpen && (
-  <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-    <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative min-h-[310px] h-auto">
-      <button
-        onClick={() => setClaimFormOpen(false)}
-        className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
-      <h2 className="text-lg font-bold mb-4 text-gray-700">Claimed by</h2>
-      <form onSubmit={handleClaimSubmit}>
-        <div className="space-y-4">
-          {/* Full Name Input */}
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={claimedByName}
-            onChange={(e) => setClaimedByName(e.target.value)}
-            onBlur={fetchUserDataByName} // Fetch ID when user finishes typing name
-            className="w-full p-2 border rounded-lg"
-            maxLength="100"
-            required
-          />
-          <p className="text-sm text-gray-500 mt-1">{claimedByName.length}/100 characters</p>
-
-          {/* Student Number Input */}
-          <input
-            type="text"
-            placeholder="Employee/Student No."
-            value={claimedByID}
-            onChange={(e) => {
-              if (!isIDLocked) {
-                const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-                setClaimedByID(value);
-              }
-            }}
-            onBlur={(e) => fetchUserDataByID(e.target.value)} // Fetch name when user finishes typing ID
-            className={`w-full p-2 border rounded-lg ${isIDLocked ? "bg-gray-100" : ""}`}
-            required
-            readOnly={isIDLocked}
-          />
-          {claimedByID.length > 0 && claimedByID.length !== 10 && (
-            <p className="text-sm text-red-600">Student number must be exactly 10 digits.</p>
-          )}
-
-          {/* Flex Container for Claim, Clear, and QR Code */}
-          <div className="flex justify-end items-center gap-2">
-            {/* Clickable QR Code Icon */}
+      {isClaimFormOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative min-h-[310px] h-auto">
             <button
-              onClick={startScanner}
-              type="button"
-              className="p-1 text-gray-700 hover:text-gray-950 transition"
+              onClick={() => setClaimFormOpen(false)}
+              className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
-              <QrCodeIcon className="cursor-pointer w-7 h-7" />
+              ✕
             </button>
+            <h2 className="text-lg font-bold mb-4 text-gray-700">Claimed by</h2>
+            <form onSubmit={handleClaimSubmit}>
+              <div className="space-y-4">
+                {/* Full Name Input */}
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={claimedByName}
+                  onChange={(e) => setClaimedByName(e.target.value)}
+                  onBlur={fetchUserDataByName} // Fetch ID when user finishes typing name
+                  className="w-full p-2 border rounded-lg"
+                  maxLength="100"
+                  required
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  {claimedByName.length}/100 characters
+                </p>
 
-            {/* Clear Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setClaimedByName("");
-                setClaimedByID("");
-                setIsIDLocked(false);
-              }}
-              className="cursor-pointer px-4 py-2 bg-gray-400 text-white rounded-3xl hover:bg-gray-500"
-            >
-              Clear
-            </button>
+                {/* Student Number Input */}
+                <input
+                  type="text"
+                  placeholder="Employee/Student No."
+                  value={claimedByID}
+                  onChange={(e) => {
+                    if (!isIDLocked) {
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
+                      setClaimedByID(value);
+                    }
+                  }}
+                  onBlur={(e) => fetchUserDataByID(e.target.value)} // Fetch name when user finishes typing ID
+                  className={`w-full p-2 border rounded-lg ${isIDLocked ? "bg-gray-100" : ""}`}
+                  required
+                  readOnly={isIDLocked}
+                />
+                {claimedByID.length > 0 && claimedByID.length !== 10 && (
+                  <p className="text-sm text-red-600">
+                    Student number must be exactly 10 digits.
+                  </p>
+                )}
 
-            {/* Claim Button */}
-            <button
-              type="submit"
-              className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
-            >
-              Claim
-            </button>
+                {/* Flex Container for Claim, Clear, and QR Code */}
+                <div className="flex justify-end items-center gap-2">
+                  {/* Clickable QR Code Icon */}
+                  <button
+                    onClick={startScanner}
+                    type="button"
+                    className="p-1 text-gray-700 hover:text-gray-950 transition"
+                  >
+                    <QrCodeIcon className="cursor-pointer w-7 h-7" />
+                  </button>
+
+                  {/* Clear Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setClaimedByName("");
+                      setClaimedByID("");
+                      setIsIDLocked(false);
+                    }}
+                    className="cursor-pointer px-4 py-2 bg-gray-400 text-white rounded-3xl hover:bg-gray-500"
+                  >
+                    Clear
+                  </button>
+
+                  {/* Claim Button */}
+                  <button
+                    type="submit"
+                    className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
+                  >
+                    Claim
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
       {showScanner && (
         <div className="fixed inset-0 flex justify-center items-center bg-black/75 z-[60]">
           <div className="bg-white p-6 rounded-lg shadow-lg">
