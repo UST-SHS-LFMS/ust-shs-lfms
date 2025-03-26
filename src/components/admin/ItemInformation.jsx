@@ -543,13 +543,13 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   <button
                     onClick={startScanner}
                     type="button"
-                    className="p-1 text-gray-700 hover:text-gray-950 transition"
+                    className="cursor-pointer p-1 text-gray-700 hover:text-gray-950 transition"
                   >
                     <QrCodeIcon className="cursor-pointer w-7 h-7" />
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
+                    className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
                   >
                     Claim
                   </button>
@@ -617,7 +617,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   <button
                     onClick={startScanner}
                     type="button"
-                    className="p-1 text-gray-700 hover:text-gray-950 transition"
+                    className="cursor-pointer p-1 text-gray-700 hover:text-gray-950 transition"
                   >
                     <QrCodeIcon className="cursor-pointer w-7 h-7" />
                   </button>
