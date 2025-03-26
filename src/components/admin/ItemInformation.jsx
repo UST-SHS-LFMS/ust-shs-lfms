@@ -276,55 +276,58 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
     const { foundItem = {}, lostItem = {} } = item;
 
     return (
-      <>
-        <h3 className="text-md font-bold">Found Item</h3>
-        <p>
-          <strong>Category:</strong> {foundItem.category}
-        </p>
-        <p>
-          <strong>Date Found:</strong> {foundItem.dateFound}
-        </p>
-        <p>
-          <strong>Found ID:</strong> {foundItem.foundID}
-        </p>
-        <p>
-          <strong>Description:</strong> {foundItem.found_item_desc}
-        </p>
-        <p>
-          <strong>Item Name:</strong> {foundItem.found_item_name}
-        </p>
-        <p>
-          <strong>Location Found:</strong> {foundItem.locationFound}
-        </p>
-        <p>
-          <strong>Status:</strong> {foundItem.status}
-        </p>
-
-        <hr className="my-2" />
-
-        <h3 className="text-md font-bold">Lost Item</h3>
-        <p>
-          <strong>Category:</strong> {lostItem.category}
-        </p>
-        <p>
-          <strong>Date Lost:</strong> {lostItem.dateLost}
-        </p>
-        <p>
-          <strong>Lost ID:</strong> {lostItem.lostID}
-        </p>
-        <p>
-          <strong>Description:</strong> {lostItem.lost_item_desc}
-        </p>
-        <p>
-          <strong>Item Name:</strong> {lostItem.lost_item_name}
-        </p>
-        <p>
-          <strong>Location Lost:</strong> {lostItem.locationLost}
-        </p>
-        <p>
-          <strong>Status:</strong> {lostItem.status}
-        </p>
-      </>
+      <div className="grid grid-cols-2 gap-4">
+        {" "}
+        {/* Added grid layout */}
+        <div>
+          <h3 className="text-md font-bold mb-2">Found Item</h3>
+          <p>
+            <strong>Category:</strong> {foundItem.category}
+          </p>
+          <p>
+            <strong>Date Found:</strong> {foundItem.dateFound}
+          </p>
+          <p>
+            <strong>Found ID:</strong> {foundItem.foundID}
+          </p>
+          <p>
+            <strong>Description:</strong> {foundItem.found_item_desc}
+          </p>
+          <p>
+            <strong>Item Name:</strong> {foundItem.found_item_name}
+          </p>
+          <p>
+            <strong>Location Found:</strong> {foundItem.locationFound}
+          </p>
+          <p>
+            <strong>Status:</strong> {foundItem.status}
+          </p>
+        </div>
+        <div>
+          <h3 className="text-md font-bold mb-2">Lost Item</h3>
+          <p>
+            <strong>Category:</strong> {lostItem.category}
+          </p>
+          <p>
+            <strong>Date Lost:</strong> {lostItem.dateLost}
+          </p>
+          <p>
+            <strong>Lost ID:</strong> {lostItem.lostID}
+          </p>
+          <p>
+            <strong>Description:</strong> {lostItem.lost_item_desc}
+          </p>
+          <p>
+            <strong>Item Name:</strong> {lostItem.lost_item_name}
+          </p>
+          <p>
+            <strong>Location Lost:</strong> {lostItem.locationLost}
+          </p>
+          <p>
+            <strong>Status:</strong> {lostItem.status}
+          </p>
+        </div>
+      </div>
     );
   };
 
