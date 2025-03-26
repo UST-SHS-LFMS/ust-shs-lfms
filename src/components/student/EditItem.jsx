@@ -44,6 +44,7 @@ function EditItem({ item, onClose, onDelete, onSave }) {
 
   // Populate form with selected item details
   useEffect(() => {
+    console.log("Current item prop:", item); // Add this line
     if (item) {
       setFormData({
         category: item.category || "",

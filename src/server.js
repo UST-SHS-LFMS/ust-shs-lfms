@@ -654,13 +654,15 @@ app.get("/api/users/name/:fullName", async (req, res) => {
   try {
     const { fullName } = req.params;
     const usersRef = collection(db, "users");
-    
+
     // Query users where fullName matches
     const q = query(usersRef, where("fullName", "==", fullName));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-      return res.status(404).json({ exists: false, message: "User not found." });
+      return res
+        .status(404)
+        .json({ exists: false, message: "User not found." });
     }
 
     // Get the first matching user
@@ -676,7 +678,9 @@ app.get("/api/users/name/:fullName", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching user by name:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 });
 
@@ -884,6 +888,8 @@ app.get("/api/items", async (req, res) => {
         category: data.category,
         dateLost: data.dateLost,
         status: data.status,
+        locationLost: data.locationLost || "",
+        lost_item_desc: data.lost_item_desc || "",
       });
     });
 
