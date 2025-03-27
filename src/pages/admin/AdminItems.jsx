@@ -545,6 +545,7 @@ function AdminItems() {
             <th className="px-6 py-3 text-left">Lost ID</th>
             <th className="px-6 py-3 text-left">Found ID</th>
             <th className="px-6 py-3 text-left">Date Matched</th>
+            <th className="px-6 py-3 text-left">Claim</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
@@ -558,7 +559,7 @@ function AdminItems() {
                 <td className="px-6 py-2 text-sm">{item.foundID || "N/A"}</td>
                 <td className="px-6 py-2 text-sm">{item.matchTimestamp || "N/A"}</td>
 
-                <td>
+                <td className="px-6 py-2 text-sm text-left">
                   <button onClick={() => handleItemClick(item)} className="text-gray-400 hover:text-gray-600">
                     <InformationCircleIcon className="cursor-pointer w-5 h-5" />
                   </button>
