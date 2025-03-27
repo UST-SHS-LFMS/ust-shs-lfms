@@ -309,6 +309,8 @@ function AdminItems() {
     setFilters(initialFilterState)
   }
 
+  const filterItems = (items) => {
+    if (!searchTerm) return items
     return items.filter((item) =>
       Object.values(item).some(
         (value) => typeof value === "string" && value.toLowerCase().includes(searchTerm.toLowerCase()),
