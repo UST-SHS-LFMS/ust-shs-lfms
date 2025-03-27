@@ -260,6 +260,7 @@ function AddLost() {
       if (response.ok) {
         getLostItems();
         setIsAdding(false); // Hide the "Adding..." popup
+        getMatches() // Call getMatches() only after successful submission
         setShowSuccessPopup(true); // Show the success popup
 
         // Clear form fields

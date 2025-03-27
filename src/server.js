@@ -505,7 +505,7 @@ app.post("/api/moveMatchItem/:id", async (req, res) => {
     };
 
     // Move both items to archive
-    await setDoc(doc(db, archiveCollection, lostDocID), updatedLostItem);
+    //await setDoc(doc(db, archiveCollection, lostDocID), updatedLostItem);
     await setDoc(doc(db, archiveCollection, foundDocID), updatedFoundItem);
 
     // Delete from original collections
