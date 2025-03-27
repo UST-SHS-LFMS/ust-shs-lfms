@@ -50,7 +50,7 @@ function AdminItems() {
     "Electronics",
     "School Supplies & Stationery",
     "Tumblers & Food Containers",
-    "Clothing & Apparell",
+    "Clothing & Apparel",
     "Money & Valuables",
     "Documents",
     "Other",
