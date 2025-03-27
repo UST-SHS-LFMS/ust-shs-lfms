@@ -309,6 +309,12 @@ function AdminItems() {
     setFilters(initialFilterState)
   }
 
+    return items.filter((item) =>
+      Object.values(item).some(
+        (value) => typeof value === "string" && value.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
+    )
+  }
 
   const getPaginatedItems = (items) => {
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -731,4 +737,3 @@ function AdminItems() {
 }
 
 export default AdminItems
-
