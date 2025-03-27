@@ -50,11 +50,10 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       } else {
         setClaimedByID("");
         setIsIDLocked(false);
-        alert("No matching ID found for this name.");
+        alert("No matching ID found for this name. Type it manually");
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      alert(`Failed to fetch data: ${error.message}`);
+      setClaimedByID("");
     }
   };
 
@@ -74,11 +73,10 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       if (responseData.exists && responseData.data) {
         setClaimedByName(responseData.data.fullName || "");
       } else {
-        alert("No matching name found for this ID.");
+        alert("No matching name found for this ID. Type it manually");
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      alert(`Failed to fetch data: ${error.message}`);
+      setClaimedByName("");
     }
   };
 
