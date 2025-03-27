@@ -306,7 +306,7 @@ app.post("/api/matches", async (req, res) => {
       foundID,
       lostItem: lostItemData,
       foundItem: foundItemData,
-      matchTimestamp: new Date(),
+      matchTimestamp: new Date().toISOString().split("T")[0],
     });
 
     // Update statuses of lost and found items
