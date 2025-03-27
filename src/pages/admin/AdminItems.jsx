@@ -133,34 +133,45 @@ function AdminItems() {
 
   const handleDownloadPDF = async () => {
     try {
-      // Fetch the PDF
+      // Gather all items that have been processed and include their QR codes
+      const itemsWithQR = [...foundItems, ...lostItems, ...matchItems, ...archiveItems, ...cicsItems].map((item) => ({
+        id: item.foundID || item.lostID || item.matchId || item.id, // Get correct ID
+        qrCode: qrCodes[item.foundID || item.lostID || item.matchId || item.id] || "", // Get stored QR code
+      }));
+  
+      console.log("📄 Sending items to generate PDF:", itemsWithQR);
+  
+      // Send data to backend
       const response = await fetch(`${API_URL}/api/generate-pdf`, {
-        method: "GET",
-      })
-
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: itemsWithQR }), // Send items with QR codes
+      });
+  
       if (!response.ok) {
-        throw new Error(`Failed to download PDF: ${response.statusText}`)
+        throw new Error(`Failed to download PDF: ${response.statusText}`);
       }
-
-      const blob = await response.blob()
-
-      const url = window.URL.createObjectURL(blob)
-
-      const a = document.createElement("a")
-      a.href = url
-      a.download = "LostAndFoundReport.pdf"
-      document.body.appendChild(a)
-      a.click()
-
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+  
+      a.href = url;
+      a.download = "LostAndFoundReport.pdf";
+      document.body.appendChild(a);
+      a.click();
+  
       // Clean up
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("❌ Error downloading PDF:", error)
-
-      alert("Failed to download PDF. Please try again later.")
+      console.error("❌ Error downloading PDF:", error);
+      alert("Failed to download PDF. Please try again later.");
     }
-  }
+  };
+  
 
   const fetchItems = useCallback(async () => {
     setLoading(true)
@@ -298,14 +309,6 @@ function AdminItems() {
     setFilters(initialFilterState)
   }
 
-  const filterItems = (items) => {
-    if (!searchTerm) return items
-    return items.filter((item) =>
-      Object.values(item).some(
-        (value) => typeof value === "string" && value.toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
-    )
-  }
 
   const getPaginatedItems = (items) => {
     const startIndex = (currentPage - 1) * itemsPerPage
