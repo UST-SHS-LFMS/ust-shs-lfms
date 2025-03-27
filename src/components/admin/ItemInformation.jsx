@@ -539,6 +539,18 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   >
                     <QrCodeIcon className="cursor-pointer w-7 h-7" />
                   </button>
+              
+                    <button
+                    type="button"
+                    onClick={() => {
+                      setClaimedByName("")
+                      setClaimedByID("")
+                      setIsIDLocked(false)
+                    }}
+                    className="cursor-pointer px-4 py-2 bg-gray-400 text-white rounded-3xl hover:bg-gray-500"
+                  >
+                    Clear
+                  </button>
                   <button
                     type="submit"
                     className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
