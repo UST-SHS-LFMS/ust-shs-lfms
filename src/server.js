@@ -109,16 +109,6 @@ const applyFilters = (collectionRef, filters) => {
       )
     );
   }
-
-  //orderby and status simultaneous
-    if (filters.orderBy) {
-    q = query(
-      q,
-      where("status", "==", filters.status || "pending"), // Filter by status
-      orderBy(filters.dateField || "date", filters.orderBy === "newest" ? "desc" : "asc")
-    );
-  }
-
   return q;
 };
 
