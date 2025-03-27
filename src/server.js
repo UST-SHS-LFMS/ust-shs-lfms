@@ -112,7 +112,6 @@ const applyFilters = (collectionRef, filters) => {
   return q;
 };
 
-
 // API Endpoint to fetch lost items
 app.get("/api/lost-items", async (req, res) => {
   try {
@@ -998,13 +997,19 @@ app.post("/api/generate-pdf", async (req, res) => {
     const doc = new PDFDocumentWithTables({ margin: 30 });
 
     // Set headers for PDF download
-    res.setHeader("Content-Disposition", 'attachment; filename="LostAndFound_Report.pdf"');
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="LostAndFound_Report.pdf"'
+    );
     res.setHeader("Content-Type", "application/pdf");
 
     doc.pipe(res);
 
     // 🏫 Report Header
-    doc.fontSize(18).text("UST-SHS Lost and Found Report", { align: "center", underline: true });
+    doc.fontSize(18).text("UST-SHS Lost and Found Report", {
+      align: "center",
+      underline: true,
+    });
     doc.moveDown(1.5);
 
     // 📝 Add Lost Items Table with QR Codes
@@ -1026,13 +1031,6 @@ app.post("/api/generate-pdf", async (req, res) => {
     } else {
       doc.fontSize(12).text("No lost items found.");
     }
-
-    doc.end();
-  } catch (error) {
-    console.error("❌ Error generating PDF:", error);
-    res.status(500).send("Failed to generate PDF.");
-  }
-});
 
     // 📝 Fetch and Format Found Items (Only SHS)
     const foundItemsSnapshot = await getDocs(
