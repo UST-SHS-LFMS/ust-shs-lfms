@@ -19,19 +19,21 @@ function ManageAdmins() {
   const API_URL =
     "https://ust-shs-lost-and-found-management-system.onrender.com";
 
-  useEffect(() => {
-    const fetchAdmins = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/admins`);
-        const data = await response.json();
-        setEmployees(data);
-      } catch (error) {
-        console.error("Error fetching admins:", error);
-      }
-    };
-
-    fetchAdmins();
-  }, []);
+    useEffect(() => {
+      const fetchAdmins = async () => {
+        try {
+          const response = await fetch(`${API_URL}/api/admins`);
+          const data = await response.json();
+          // Sort by createdAt in descending order (newest first)
+          const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          setEmployees(sortedData);
+        } catch (error) {
+          console.error("Error fetching admins:", error);
+        }
+      };
+    
+      fetchAdmins();
+    }, []);
 
   useEffect(() => {
     // Reset to first page when search query changes
