@@ -113,6 +113,16 @@ function EditItem({ item, onClose, onDelete, onSave }) {
     }
   };
 
+  const isFormValid = () => {
+    return (
+      formData.category &&
+      formData.dateLost &&
+      formData.locationLost &&
+      formData.lost_item_name &&
+      formData.lost_item_desc
+    );
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center md:ml-56 bg-black/50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-2xl relative mx-4">
@@ -240,12 +250,17 @@ function EditItem({ item, onClose, onDelete, onSave }) {
           >
             Remove
           </button>
-          <button
-            onClick={handleSave}
-            className="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded-4xl hover:bg-blue-600 transition-colors duration-200 text-sm md:text-base"
-          >
-            Save
-          </button>
+<button
+  onClick={handleSave}
+  disabled={!isFormValid()}
+  className={`px-4 py-2 text-white rounded-4xl transition-colors duration-200 text-sm md:text-base ${
+    isFormValid() 
+      ? "bg-blue-500 hover:bg-blue-600 cursor-pointer" 
+      : "bg-gray-400 cursor-not-allowed"
+  }`}
+>
+  Save
+</button>
         </div>
       </div>
 
