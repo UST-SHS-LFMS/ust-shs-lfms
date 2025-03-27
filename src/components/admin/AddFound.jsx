@@ -381,15 +381,10 @@ function AddFound() {
       console.log("Fetched user data:", responseData);
   
       if (responseData.exists && responseData.data) {
-        setFoundByID(responseData.data.employeeNumber || responseData.data.studentNum || "");
-      } else {
-        setFoundByID("");
-        alert("No matching ID found for this name. Type it manually.");
-      }
+        setFoundByID(responseData.data.employeeNumber || responseData.data.studentNum);
+      } else {}
     } catch (error) {
-      console.error("Error fetching user data:", error);
       setFoundByID(""); // Clear ID on error
-      alert(`Failed to fetch data: ${error.message}`);
     }
   };
   
@@ -410,15 +405,10 @@ function AddFound() {
       console.log("Fetched user data:", responseData);
   
       if (responseData.exists && responseData.data) {
-        setFoundByName(responseData.data.fullName || "");
-      } else {
-        setFoundByName("");
-        alert("No matching name found for this ID. Type it manually.");
-      }
+        setFoundByName(responseData.data.fullName);
+      } else {}
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      setFoundByName(""); // Clear name on error
-      alert(`Failed to fetch data: ${error.message}`);
+      setFoundByName("");
     }
   };
 

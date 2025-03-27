@@ -43,15 +43,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       console.log("Fetched user data:", responseData);
 
       if (responseData.exists && responseData.data) {
-        setClaimedByID(
-          responseData.data.employeeNumber || responseData.data.studentNum || ""
-        );
-        setIsIDLocked(true);
-      } else {
-        setClaimedByID("");
-        setIsIDLocked(false);
-        alert("No matching ID found for this name. Type it manually");
-      }
+        setClaimedByID(responseData.data.employeeNumber || responseData.data.studentNum);
+      } else {}
     } catch (error) {
       setClaimedByID("");
     }
@@ -71,10 +64,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       console.log("Fetched user data:", responseData);
 
       if (responseData.exists && responseData.data) {
-        setClaimedByName(responseData.data.fullName || "");
-      } else {
-        alert("No matching name found for this ID. Type it manually");
-      }
+        setClaimedByName(responseData.data.fullName);
+      } else {}
     } catch (error) {
       setClaimedByName("");
     }
