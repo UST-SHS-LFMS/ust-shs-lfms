@@ -78,20 +78,24 @@ const applyFilters = (collectionRef, filters) => {
     const endDate = new Date(startDate);
     endDate.setHours(23, 59, 59, 999);
 
+    // Convert to YYYY-MM-DD format since Firestore stores dates as strings
+    const startDateString = startDate.toISOString().split("T")[0]; // "YYYY-MM-DD"
+    const endDateString = endDate.toISOString().split("T")[0]; // "YYYY-MM-DD"
+
     q = query(
       q,
-      where(filters.dateField, ">=", startDate.toISOString()),
-      where(filters.dateField, "<", endDate.toISOString())
+      where(filters.dateField, ">=", startDateString),
+      where(filters.dateField, "<=", endDateString)
     );
   }
 
   // Apply category filter if provided
-  if (filters.category && filters.category !== "") {
+  if (filters.category) {
     q = query(q, where("category", "==", filters.category));
   }
 
   // Apply status filter if provided
-  if (filters.status && filters.status !== "") {
+  if (filters.status) {
     q = query(q, where("status", "==", filters.status));
   }
 
@@ -108,6 +112,7 @@ const applyFilters = (collectionRef, filters) => {
 
   return q;
 };
+
 
 // API Endpoint to fetch lost items
 app.get("/api/lost-items", async (req, res) => {
