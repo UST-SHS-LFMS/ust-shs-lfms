@@ -992,72 +992,47 @@ app.delete("/api/items/:lostID", async (req, res) => {
 });
 
 // API to Generate and Download PDF Report
-app.get("/api/generate-pdf", async (req, res) => {
+app.post("/api/generate-pdf", async (req, res) => {
   try {
-    // Create a new PDF document with table support
+    const { items } = req.body; // Receive items with QR codes
     const doc = new PDFDocumentWithTables({ margin: 30 });
 
     // Set headers for PDF download
-    res.setHeader(
-      "Content-Disposition",
-      'attachment; filename="LostAndFound_Report.pdf"'
-    );
+    res.setHeader("Content-Disposition", 'attachment; filename="LostAndFound_Report.pdf"');
     res.setHeader("Content-Type", "application/pdf");
 
-    // Stream the PDF directly to the response
     doc.pipe(res);
 
     // 🏫 Report Header
-    doc.fontSize(18).text("UST-SHS Lost and Found Report", {
-      align: "center",
-      underline: true,
-    });
+    doc.fontSize(18).text("UST-SHS Lost and Found Report", { align: "center", underline: true });
     doc.moveDown(1.5);
 
-    // 📝 Fetch and Format Lost Items (Only SHS)
-    const lostItemsSnapshot = await getDocs(
-      query(lostItemsCollectionRef, where("department", "==", "SHS"))
-    );
-
-    if (!lostItemsSnapshot.empty) {
+    // 📝 Add Lost Items Table with QR Codes
+    if (items.length > 0) {
       doc.fontSize(14).text("LOST ITEMS", { underline: true });
       doc.moveDown(0.5);
 
-      const lostItems = lostItemsSnapshot.docs.map((docData) => {
-        const data = docData.data();
-        return [
-          data.lostID,
-          data.lost_item_name,
-          data.lost_item_desc,
-          data.dateLost,
-          data.locationLost,
-          data.notifEmail || "N/A",
-          data.status,
-        ];
-      });
+      for (const item of items) {
+        doc.fontSize(12).text(`Item ID: ${item.id}`);
+        doc.moveDown(0.2);
 
-      // ✅ Use `table` method correctly
-      await doc.table(
-        {
-          title: "Lost Items",
-          headers: [
-            "Lost ID",
-            "Item",
-            "Description",
-            "Date",
-            "Location",
-            "Lost By",
-            "Status",
-          ],
-          rows: lostItems,
-        },
-        {
-          width: 500,
+        if (item.qrCode) {
+          const qrImage = Buffer.from(item.qrCode.split(",")[1], "base64"); // Convert QR to Buffer
+          doc.image(qrImage, { fit: [100, 100], align: "center" });
         }
-      );
 
-      doc.moveDown(1);
+        doc.moveDown(1);
+      }
+    } else {
+      doc.fontSize(12).text("No lost items found.");
     }
+
+    doc.end();
+  } catch (error) {
+    console.error("❌ Error generating PDF:", error);
+    res.status(500).send("Failed to generate PDF.");
+  }
+});
 
     // 📝 Fetch and Format Found Items (Only SHS)
     const foundItemsSnapshot = await getDocs(
