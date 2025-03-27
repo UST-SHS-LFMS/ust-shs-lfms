@@ -3,6 +3,11 @@ import StudentSidebar from "../../components/student/StudentSidebar";
 
 const faqs = [
   {
+    question: "Who can I contact for support?",
+    answer:
+      "Please send an email to office.shs@ust.edu.ph.",
+  },
+  {
     question: "How do I report a lost item?",
     answer:
       "You can report a lost item by filling out the form in the 'Report Item' section.",
