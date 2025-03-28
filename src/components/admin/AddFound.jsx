@@ -220,7 +220,7 @@ function AddFound() {
   }, [lostItems, foundItems]) // Ensures matches only update when lists change
 
   // Create a match entry in the database
-  const createMatch = async (lostItem, foundItem, matchId) => {
+  const createMatch = async (lostItem, foundItem, newMatchID) => {
     try {
       const response = await fetch(`${API_URL}/api/matches`, {
         method: "POST",
@@ -248,7 +248,7 @@ function AddFound() {
           Please visit the UST SHS 8th Floor Office to verify at your earliest convenience. </p>
           <p>Location: ${lostItem.locationLost} and ${foundItem.locationFound}</p>
           <p>Date Matched: ${new Date().toISOString().split("T")[0]}</p>
-          <p>Kindly prepare to show your Match ID: <strong>${matchId}</strong> during verification.</p>
+          <p>Kindly prepare to show your Match ID: <strong>${newMatchID}</strong> during verification.</p>
         `;
 
         // Send email by making a request to the backend's /send-email endpoint
