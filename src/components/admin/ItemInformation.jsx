@@ -1,95 +1,97 @@
-import { QrCodeIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { QrCodeIcon } from "@heroicons/react/24/outline"
+import { useState } from "react"
+import { Html5QrcodeScanner } from "html5-qrcode"
+import { useEffect } from "react"
 
 const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
-  const [isClaimFormOpen, setClaimFormOpen] = useState(false);
-  const [isMatchClaimFormOpen, setMatchClaimFormOpen] = useState(false);
-  const [claimedByID, setClaimedByID] = useState("");
-  const [claimedByName, setClaimedByName] = useState("");
-  const [showScanner, setShowScanner] = useState("");
-  const [scanner, setScanner] = useState(null);
-  const [isIDLocked, setIsIDLocked] = useState(false);
+  const [isClaimFormOpen, setClaimFormOpen] = useState(false)
+  const [isMatchClaimFormOpen, setMatchClaimFormOpen] = useState(false)
+  const [claimedByID, setClaimedByID] = useState("")
+  const [claimedByName, setClaimedByName] = useState("")
+  const [showScanner, setShowScanner] = useState("")
+  const [scanner, setScanner] = useState(null)
+  const [isIDLocked, setIsIDLocked] = useState(false)
 
-  const API_URL =
-    "https://ust-shs-lost-and-found-management-system.onrender.com";
+  const API_URL = "https://ust-shs-lost-and-found-management-system.onrender.com"
 
   useEffect(() => {
     // Cleanup function for the scanner
     return () => {
       if (scanner) {
-        scanner.clear();
+        scanner.clear()
       }
-    };
-  }, [scanner]); // Runs only when scanner changes
+    }
+  }, [scanner]) // Runs only when scanner changes
 
-  if (!isOpen || !item) return null;
+  if (!isOpen || !item) return null
 
   const fetchUserDataByName = async () => {
-    if (!claimedByName.trim()) return;
+    if (!claimedByName.trim()) return
 
     try {
-      const response = await fetch(
-        `${API_URL}/api/users/name/${claimedByName}`
-      );
+      const response = await fetch(`${API_URL}/api/users/name/${claimedByName}`)
 
       if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+        throw new Error(`Server responded with status: ${response.status}`)
       }
 
-      const responseData = await response.json();
-      console.log("Fetched user data:", responseData);
+      const responseData = await response.json()
+      console.log("Fetched user data:", responseData)
 
       if (responseData.exists && responseData.data) {
-        setClaimedByID(responseData.data.employeeNumber || responseData.data.studentNum);
-      } else {}
+        setClaimedByID(responseData.data.employeeNumber || responseData.data.studentNum || "")
+        setIsIDLocked(true)
+      } else {
+        setClaimedByID("")
+        setIsIDLocked(false)
+        alert("No matching ID found for this name.")
+      }
     } catch (error) {
-      setClaimedByID("");
+      setClaimedByID("")
     }
-  };
+  }
 
   const fetchUserDataByID = async (idNumber) => {
-    if (!idNumber) return;
+    if (!idNumber) return
 
     try {
-      const response = await fetch(`${API_URL}/api/users/id/${idNumber}`);
+      const response = await fetch(`${API_URL}/api/users/id/${idNumber}`)
 
       if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+        throw new Error(`Server responded with status: ${response.status}`)
       }
 
-      const responseData = await response.json();
-      console.log("Fetched user data:", responseData);
+      const responseData = await response.json()
+      console.log("Fetched user data:", responseData)
 
       if (responseData.exists && responseData.data) {
-        setClaimedByName(responseData.data.fullName);
-      } else {}
+        setClaimedByName(responseData.data.fullName || "")
+      } else {
+      }
     } catch (error) {
-      setClaimedByName("");
+      setClaimedByName("")
     }
-  };
+  }
 
   const handleClaimSubmit = async (e) => {
-    e.preventDefault();
-    await moveItem(); // Trigger the moveItem function
-    setClaimFormOpen(false); // Close the claim form
-  };
+    e.preventDefault()
+    await moveItem() // Trigger the moveItem function
+    setClaimFormOpen(false) // Close the claim form
+  }
 
   const handleMatchClaimSubmit = async (e) => {
-    e.preventDefault();
-    await moveMatchItem(item.matchID); // Pass match ID
-    setMatchClaimFormOpen(false);
-  };
+    e.preventDefault()
+    await moveMatchItem(item.matchID) // Pass match ID
+    setMatchClaimFormOpen(false)
+  }
 
   const moveItem = async () => {
     try {
-      const docId = item.id;
+      const docId = item.id
 
       if (!docId) {
-        alert("No item ID found!");
-        return;
+        alert("No item ID found!")
+        return
       }
 
       const response = await fetch(`${API_URL}/api/moveItem/${docId}`, {
@@ -98,29 +100,29 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ claimedByID, claimedByName }), // Include form data in the request
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.success) {
-        alert("Item claimed successfully");
-        onClose(); // Close the modal after the move
+        alert("Item claimed successfully")
+        onClose() // Close the modal after the move
       } else {
-        alert("Failed to claim item");
+        alert("Failed to claim item")
       }
     } catch (error) {
-      console.error("Error claiming item:", error);
-      alert("An error occurred while claiming the item");
+      console.error("Error claiming item:", error)
+      alert("An error occurred while claiming the item")
     }
-  };
+  }
 
   const moveMatchItem = async () => {
     try {
-      const docId = item.id; // Ensure we're using item.id like moveItem
+      const docId = item.id // Ensure we're using item.id like moveItem
 
       if (!docId) {
-        alert("No item ID found!");
-        return;
+        alert("No item ID found!")
+        return
       }
 
       const response = await fetch(`${API_URL}/api/moveMatchItem/${docId}`, {
@@ -129,56 +131,53 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ claimedByID, claimedByName }), // Include form data
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.success) {
-        alert("Matched item moved successfully!");
-        onClose(); // Close modal after success
+        alert("Matched item moved successfully!")
+        onClose() // Close modal after success
       } else {
-        alert("Failed to move item: " + data.error);
+        alert("Failed to move item: " + data.error)
       }
     } catch (error) {
-      console.error("Error moving item:", error);
-      alert("An error occurred while moving the item.");
+      console.error("Error moving item:", error)
+      alert("An error occurred while moving the item.")
     }
-  };
+  }
 
   const cancelMatch = async () => {
     try {
-      const docId = item.id;
-      console.log("Match ID:", docId);
+      const docId = item.id
+      console.log("Match ID:", docId)
 
       if (!docId) {
-        alert("No item ID found!");
-        return;
+        alert("No item ID found!")
+        return
       }
 
-      const cancelResponse = await fetch(
-        `${API_URL}/api/cancelMatch/${docId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const cancelResponse = await fetch(`${API_URL}/api/cancelMatch/${docId}`, {
+        method: "DELETE",
+      })
 
       if (!cancelResponse.ok) {
-        throw new Error("Failed to cancel match");
+        throw new Error("Failed to cancel match")
       }
 
-      const cancelData = await cancelResponse.json();
+      const cancelData = await cancelResponse.json()
 
       if (!cancelData.success) {
-        throw new Error("Failed to cancel match");
+        throw new Error("Failed to cancel match")
       }
 
-      alert("Match cancelled successfully");
-      onClose(); // Close the modal
+      alert("Match cancelled successfully")
+      onClose() // Close the modal
     } catch (error) {
-      console.error("Error cancelling match:", error);
-      alert(`An error occurred: ${error.message}`);
+      console.error("Error cancelling match:", error)
+      alert(`An error occurred: ${error.message}`)
     }
-  };
+  }
 
   const renderFoundContent = () => (
     <>
@@ -204,7 +203,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         <strong>Status:</strong> {item.status}
       </p>
     </>
-  );
+  )
 
   const renderCICSContent = () => (
     <>
@@ -218,22 +217,19 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         <strong>Found ID:</strong> {item.foundID || item.lostID || "N/A"}
       </p>
       <p>
-        <strong>Description:</strong>{" "}
-        {item.found_item_desc || item.lost_item_desc || "N/A"}
+        <strong>Description:</strong> {item.found_item_desc || item.lost_item_desc || "N/A"}
       </p>
       <p>
-        <strong>Item Name:</strong>{" "}
-        {item.found_item_name || item.lost_item_name || "N/A"}
+        <strong>Item Name:</strong> {item.found_item_name || item.lost_item_name || "N/A"}
       </p>
       <p>
-        <strong>Location Found:</strong>{" "}
-        {item.locationFound || item.locationLost || "N/A"}
+        <strong>Location Found:</strong> {item.locationFound || item.locationLost || "N/A"}
       </p>
       <p>
         <strong>Status:</strong> {item.status}
       </p>
     </>
-  );
+  )
 
   const renderLostContent = () => (
     <>
@@ -259,10 +255,10 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         <strong>Status:</strong> {item.status}
       </p>
     </>
-  );
+  )
 
   const renderMatchContent = () => {
-    const { foundItem = {}, lostItem = {} } = item;
+    const { foundItem = {}, lostItem = {} } = item
 
     return (
       <div className="grid grid-cols-2 gap-4">
@@ -317,25 +313,25 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           </p>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const renderContent = () => {
     switch (activeTab) {
       case "FOUND ITEMS":
-        return renderFoundContent();
+        return renderFoundContent()
       case "LOST ITEMS":
-        return renderLostContent();
+        return renderLostContent()
       case "POTENTIAL MATCHES":
-        return renderMatchContent();
+        return renderMatchContent()
       case "ARCHIVE":
-        return renderFoundContent(); // Assuming archive displays found content
+        return renderFoundContent() // Assuming archive displays found content
       case "VIEW CICS":
-        return renderCICSContent();
+        return renderCICSContent()
       default:
-        return <p>No information available.</p>;
+        return <p>No information available.</p>
     }
-  };
+  }
 
   const renderButton = () => {
     if (activeTab === "FOUND ITEMS" && item.status === "Matched") {
@@ -343,7 +339,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
         <p className="text-black-600 font-medium">
           Cancel match in the <strong>Matches</strong> tab to claim.
         </p>
-      );
+      )
     }
 
     switch (activeTab) {
@@ -355,134 +351,127 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
           >
             Claim
           </button>
-        );
+        )
       case "POTENTIAL MATCHES":
         return (
-          <div className="flex justify-between">
-            {/* Cancel Match Button (Left) */}
-            <button
-              onClick={cancelMatch}
-              className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600"
-            >
-              Cancel Match
-            </button>
-
-            {/* Mark as Claimed Button (Right) */}
-            <button
-              onClick={() => setMatchClaimFormOpen(true)}
-              className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
-            >
-              Claim
-            </button>
-          </div>
-        );
+          <div className="flex flex-wrap justify-between gap-2">
+          {/* Cancel Match Button */}
+          <button
+            onClick={cancelMatch}
+            className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600"
+          >
+            Cancel Match
+          </button>
+        
+          {/* Mark as Claimed Button */}
+          <button
+            onClick={() => setMatchClaimFormOpen(true)}
+            className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600"
+          >
+            Claim
+          </button>
+        </div>
+        )
 
       case "LOST ITEMS":
       case "ARCHIVE":
-        return null; // No button for these cases
+        return null // No button for these cases
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   const startScanner = () => {
-    setShowScanner(true);
+    setShowScanner(true)
     requestAnimationFrame(() => {
       if (scanner) {
-        scanner.clear();
+        scanner.clear()
       }
 
       const newScanner = new Html5QrcodeScanner("qr-reader", {
         fps: 10,
         qrbox: { width: 300, height: 300 },
-      });
+      })
 
-      setScanner(newScanner);
+      setScanner(newScanner)
 
       newScanner.render(
         async (decodedText) => {
-          const idNumber = decodedText.replace(/\D/g, "").substring(0, 10);
-          console.log("Original decoded text:", decodedText);
-          console.log("Extracted ID (first 10 digits):", idNumber);
+          const idNumber = decodedText.replace(/\D/g, "").substring(0, 10)
+          console.log("Original decoded text:", decodedText)
+          console.log("Extracted ID (first 10 digits):", idNumber)
 
-          setClaimedByID(idNumber); // Auto-fill ID field
-          setShowScanner(false);
+          setClaimedByID(idNumber) // Auto-fill ID field
+          setShowScanner(false)
 
           try {
-            const response = await fetch(`${API_URL}/api/users/id/${idNumber}`);
+            const response = await fetch(`${API_URL}/api/users/id/${idNumber}`)
 
             if (!response.ok) {
-              throw new Error(
-                `Server responded with status: ${response.status}`
-              );
+              throw new Error(`Server responded with status: ${response.status}`)
             }
 
-            const responseData = await response.json();
-            console.log("User data:", responseData);
+            const responseData = await response.json()
+            console.log("User data:", responseData)
 
             // Check if the response has the 'exists' property (indicating it's using the format {exists, data})
             if (responseData.hasOwnProperty("exists")) {
               if (responseData.exists && responseData.data) {
-                setClaimedByName(responseData.data.fullName || "");
+                setClaimedByName(responseData.data.fullName || "")
 
                 if (!responseData.data.fullName) {
-                  console.warn("User found but no name detected");
-                  alert("User found, but please enter the name manually.");
+                  console.warn("User found but no name detected")
+                  alert("User found, but please enter the name manually.")
                 }
               } else {
-                alert("User not found!");
+                alert("User not found!")
               }
             } else {
               // Direct data format (no exists/data wrapper)
               if (responseData && responseData.fullName) {
-                setClaimedByName(responseData.fullName);
+                setClaimedByName(responseData.fullName)
               } else {
-                console.warn("User found but no name detected");
-                alert("User found, but please enter the name manually.");
+                console.warn("User found but no name detected")
+                alert("User found, but please enter the name manually.")
               }
             }
           } catch (error) {
-            console.error("Error fetching user data:", error);
-            alert(`Failed to fetch user information: ${error.message}`);
+            console.error("Error fetching user data:", error)
+            alert(`Failed to fetch user information: ${error.message}`)
           }
-          newScanner.clear();
-          setScanner(null);
+          newScanner.clear()
+          setScanner(null)
         },
         (errorMessage) => {
-          console.log("QR Scan error:", errorMessage);
-        }
-      );
-    });
-  };
+          console.log("QR Scan error:", errorMessage)
+        },
+      )
+    })
+  }
 
   return (
     <>
       {/* Main Modal */}
       <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-        <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
+        <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md md:max-w-lg lg:w-1/3 relative">
           {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-          >
+          <button onClick={onClose} className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700">
             ✕
           </button>
 
           {/* Container for Left and Right Sections */}
-          <div className="flex space-x-0">
+          <div className="flex flex-col md:flex-row md:space-x-4">
             {/* Left Section: Item Details */}
-            <div className="w-1/2">
-              <div className="text-sm text-gray-700 space-y-2">
-                {renderContent()}
-              </div>
+            <div className="w-full md:w-1/2">
+              <div className="text-sm text-gray-700 space-y-2">{renderContent()}</div>
             </div>
 
             {/* Right Section: Item Image */}
-            <div className="w-1/2 flex justify-center items-center">
+            <div className="w-full md:w-1/2 flex justify-center items-center mt-4 md:mt-0">
               <img
                 src={item.photoURL || "https://i.imgur.com/R6u77UJ.png"}
                 alt="Item"
-                className="w-38 h-38 object-cover rounded-lg shadow-md"
+                className="w-32 h-32 md:w-38 md:h-38 object-cover rounded-lg shadow-md"
               />
             </div>
           </div>
@@ -494,7 +483,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
 
       {isMatchClaimFormOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md md:max-w-lg lg:w-1/3 relative">
             <button
               onClick={() => setMatchClaimFormOpen(false)}
               className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -520,10 +509,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   value={claimedByID}
                   onChange={(e) => {
                     if (!isIDLocked) {
-                      const value = e.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 10);
-                      setClaimedByID(value);
+                      const value = e.target.value.replace(/\D/g, "").slice(0, 10)
+                      setClaimedByID(value)
                     }
                   }}
                   onBlur={() => fetchUserDataByID(claimedByID)} // Fetch the full name when ID is entered first
@@ -531,7 +518,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   required
                   readOnly={isIDLocked}
                 />
-                <div className="flex justify-end items-center gap-2">
+                <div className="flex flex-wrap justify-end items-center gap-2">
                   <button
                     onClick={startScanner}
                     type="button"
@@ -539,8 +526,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   >
                     <QrCodeIcon className="cursor-pointer w-7 h-7" />
                   </button>
-              
-                    <button
+
+                  <button
                     type="button"
                     onClick={() => {
                       setClaimedByName("")
@@ -551,6 +538,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   >
                     Clear
                   </button>
+
                   <button
                     type="submit"
                     className="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-3xl hover:bg-green-600 flex items-center gap-2"
@@ -566,7 +554,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
 
       {isClaimFormOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg w-1/3 relative min-h-[310px] h-auto">
+          <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md md:max-w-lg lg:w-1/3 relative min-h-[310px] h-auto">
             <button
               onClick={() => setClaimFormOpen(false)}
               className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -587,9 +575,7 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   maxLength="100"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  {claimedByName.length}/100 characters
-                </p>
+                <p className="text-sm text-gray-500 mt-1">{claimedByName.length}/100 characters</p>
 
                 {/* Student Number Input */}
                 <input
@@ -598,10 +584,8 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   value={claimedByID}
                   onChange={(e) => {
                     if (!isIDLocked) {
-                      const value = e.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 10);
-                      setClaimedByID(value);
+                      const value = e.target.value.replace(/\D/g, "").slice(0, 10)
+                      setClaimedByID(value)
                     }
                   }}
                   onBlur={(e) => fetchUserDataByID(e.target.value)} // Fetch name when user finishes typing ID
@@ -610,13 +594,11 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   readOnly={isIDLocked}
                 />
                 {claimedByID.length > 0 && claimedByID.length !== 10 && (
-                  <p className="text-sm text-red-600">
-                    Student number must be exactly 10 digits.
-                  </p>
+                  <p className="text-sm text-red-600">Student number must be exactly 10 digits.</p>
                 )}
 
                 {/* Flex Container for Claim, Clear, and QR Code */}
-                <div className="flex justify-end items-center gap-2">
+                <div className="flex flex-wrap justify-end items-center gap-2">
                   {/* Clickable QR Code Icon */}
                   <button
                     onClick={startScanner}
@@ -630,9 +612,9 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      setClaimedByName("");
-                      setClaimedByID("");
-                      setIsIDLocked(false);
+                      setClaimedByName("")
+                      setClaimedByID("")
+                      setIsIDLocked(false)
                     }}
                     className="cursor-pointer px-4 py-2 bg-gray-400 text-white rounded-3xl hover:bg-gray-500"
                   >
@@ -654,15 +636,15 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
       )}
       {showScanner && (
         <div className="fixed inset-0 flex justify-center items-center bg-black/75 z-[60]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-lg w-[95%] max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold">Scan QR Code</h3>
               <button
                 onClick={() => {
-                  setShowScanner(false);
+                  setShowScanner(false)
                   if (scanner) {
-                    scanner.clear();
-                    setScanner(null);
+                    scanner.clear()
+                    setScanner(null)
                   }
                 }}
                 className="cursor-pointer text-gray-500 hover:text-gray-700"
@@ -670,12 +652,12 @@ const ItemInformation = ({ isOpen, onClose, item, activeTab }) => {
                 ✕
               </button>
             </div>
-            <div id="qr-reader" className="w-[350px] mx-auto"></div>
+            <div id="qr-reader" className="w-full max-w-[350px] mx-auto"></div>
           </div>
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default ItemInformation;
+export default ItemInformation
