@@ -249,6 +249,7 @@ function AddFound() {
           <p>Location: ${lostItem.locationLost} and ${foundItem.locationFound}</p>
           <p>Date Matched: ${new Date().toISOString().split("T")[0]}</p>
           <p>Kindly prepare to show your Match ID: <strong>${matchId}</strong> during verification.</p>
+        `;
 
         // Send email by making a request to the backend's /send-email endpoint
         const emailResponse = await fetch(`${API_URL}/api/send-email`, {
