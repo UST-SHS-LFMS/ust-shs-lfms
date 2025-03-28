@@ -997,19 +997,13 @@ app.post("/api/generate-pdf", async (req, res) => {
     const doc = new PDFDocumentWithTables({ margin: 30 });
 
     // Set headers for PDF download
-    res.setHeader(
-      "Content-Disposition",
-      'attachment; filename="LostAndFound_Report.pdf"'
-    );
+    res.setHeader("Content-Disposition", 'attachment; filename="LostAndFound_Report.pdf"');
     res.setHeader("Content-Type", "application/pdf");
 
     doc.pipe(res);
 
     // 🏫 Report Header
-    doc.fontSize(18).text("UST-SHS Lost and Found Report", {
-      align: "center",
-      underline: true,
-    });
+    doc.fontSize(18).text("UST-SHS Lost and Found Report", { align: "center", underline: true });
     doc.moveDown(1.5);
 
     // 📝 Add Lost Items Table with QR Codes
@@ -1018,12 +1012,17 @@ app.post("/api/generate-pdf", async (req, res) => {
       doc.moveDown(0.5);
 
       for (const item of items) {
-        doc.fontSize(12).text(`Item ID: ${item.id}`);
+        const startX = 50; // Left padding for text
+        const qrX = 400; // Position QR on the right
+        const qrSize = 80; // QR code size
+
+        // Item details
+        doc.fontSize(12).text(`Item ID: ${item.id}`, startX);
         doc.moveDown(0.2);
 
         if (item.qrCode) {
           const qrImage = Buffer.from(item.qrCode.split(",")[1], "base64"); // Convert QR to Buffer
-          doc.image(qrImage, { fit: [100, 100], align: "center" });
+          doc.image(qrImage, qrX, doc.y, { width: qrSize, height: qrSize });
         }
 
         doc.moveDown(1);
@@ -1031,6 +1030,14 @@ app.post("/api/generate-pdf", async (req, res) => {
     } else {
       doc.fontSize(12).text("No lost items found.");
     }
+
+    doc.end();
+  } catch (error) {
+    console.error("❌ Error generating PDF:", error);
+    res.status(500).send("Failed to generate PDF.");
+  }
+});
+
 
     // 📝 Fetch and Format Found Items (Only SHS)
     const foundItemsSnapshot = await getDocs(
