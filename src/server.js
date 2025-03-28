@@ -992,9 +992,10 @@ app.delete("/api/items/:lostID", async (req, res) => {
 
 // API to Generate and Download PDF Report
 app.post("/api/generate-pdf", async (req, res) => {
+  const doc = new PDFDocumentWithTables({ margin: 30 });
+
   try {
     const { items } = req.body; // Receive items with QR codes
-    const doc = new PDFDocumentWithTables({ margin: 30 });
 
     // Set headers for PDF download
     res.setHeader("Content-Disposition", 'attachment; filename="LostAndFound_Report.pdf"');
@@ -1030,11 +1031,11 @@ app.post("/api/generate-pdf", async (req, res) => {
     } else {
       doc.fontSize(12).text("No lost items found.");
     }
-
-    doc.end();
   } catch (error) {
     console.error("❌ Error generating PDF:", error);
     res.status(500).send("Failed to generate PDF.");
+  } finally {
+    doc.end(); // Always close the document
   }
 });
 
