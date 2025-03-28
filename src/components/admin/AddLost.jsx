@@ -151,7 +151,7 @@ function AddLost() {
   }, [lostItems, foundItems]); // Ensures matches only update when lists change
 
   // Create a match entry in the database
-  const createMatch = async (lostItem, foundItem) => {
+  const createMatch = async (lostItem, foundItem, matchId) => {
     try {
       const response = await fetch(`${API_URL}/api/matches`, {
         method: "POST",
