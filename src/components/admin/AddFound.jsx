@@ -243,12 +243,12 @@ function AddFound() {
         // Prepare the email content
         const subject = "Match Found for Your Lost Item"
         const message = `
-          <h1>Match Found!</h1>
-          <p>Your lost item ("${lostItem.lost_item_name}") has been matched with a found item.</p>
+          <h2>UST SHS Lost and Found Management System</h2>
+          <p>We have found a potential match for your lost item ("${lostItem.lost_item_name}"). 
+          Please visit the UST SHS 8th Floor Office to verify at your earliest convenience. </p>
           <p>Location: ${lostItem.locationLost} and ${foundItem.locationFound}</p>
-          <p>Date Matched: ${new Date().toISOString()}</p>
-          <p>Thank you for using our service!</p>
-        `
+          <p>Date Matched: ${new Date().toISOString().split("T")[0]}</p>
+          <p>Kindly prepare to show your Match ID: <strong>${matchId}</strong> during verification.</p>
 
         // Send email by making a request to the backend's /send-email endpoint
         const emailResponse = await fetch(`${API_URL}/api/send-email`, {
