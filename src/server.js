@@ -1017,25 +1017,36 @@ app.post("/api/generate-pdf", async (req, res) => {
         doc.moveDown(0.5);
       });
 
-      doc.moveDown(3); // Space before QR codes
+      doc.moveDown(3); // Add space before QR codes
 
-      // 📌 Add QR Codes Below the Table
-      items.forEach((item) => {
+      // 📌 Add QR Codes Below the Table, properly spaced
+      let startX = 50; // Left margin for QR codes
+      let startY = doc.y; // Start from the current Y position
+
+      items.forEach((item, index) => {
         if (item.qrCode) {
           const qrImage = Buffer.from(item.qrCode.split(",")[1], "base64"); // Convert QR to Buffer
-          doc.image(qrImage, { width: 100, height: 100, align: "center" });
-          doc.moveDown(3); // Enough space to prevent overlap
+          
+          // Define fixed spacing (e.g., every 120 points) to prevent overlap
+          if (index % 3 === 0 && index !== 0) {  
+            startX = 50;  
+            startY += 120; // Move down for new row of QR codes
+          }
+
+          doc.image(qrImage, startX, startY, { width: 100, height: 100 });
+          startX += 150; // Move right for the next QR code
         }
       });
 
     } else {
       doc.fontSize(12).text("No lost items found.");
     }
+
   } catch (error) {
     console.error("❌ Error generating PDF:", error);
     res.status(500).send("Failed to generate PDF.");
   } finally {
-    doc.end(); // Always close the document
+    doc.end(); // ✅ Always ends the document, ensuring no hanging streams
   }
 });
 
