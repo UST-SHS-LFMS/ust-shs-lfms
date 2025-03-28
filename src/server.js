@@ -995,9 +995,8 @@ app.post("/api/generate-pdf", async (req, res) => {
   const doc = new PDFDocumentWithTables({ margin: 30 });
 
   try {
-    const { items } = req.body; // Receive items with QR codes
+    const { items } = req.body;
 
-    // Set headers for PDF download
     res.setHeader("Content-Disposition", 'attachment; filename="LostAndFound_Report.pdf"');
     res.setHeader("Content-Type", "application/pdf");
 
@@ -1006,49 +1005,6 @@ app.post("/api/generate-pdf", async (req, res) => {
     // 🏫 Report Header
     doc.fontSize(18).text("UST-SHS Lost and Found Report", { align: "center", underline: true });
     doc.moveDown(1.5);
-
-    // 📝 Add Lost Items Table
-    if (items.length > 0) {
-      doc.fontSize(14).text("LOST ITEMS", { underline: true });
-      doc.moveDown(0.5);
-
-      items.forEach((item) => {
-        doc.fontSize(12).text(`Item ID: ${item.id}`);
-        doc.moveDown(0.5);
-      });
-
-      doc.moveDown(3); // Add space before QR codes
-
-      // 📌 Add QR Codes Below the Table, properly spaced
-      let startX = 50; // Left margin for QR codes
-      let startY = doc.y; // Start from the current Y position
-
-      items.forEach((item, index) => {
-        if (item.qrCode) {
-          const qrImage = Buffer.from(item.qrCode.split(",")[1], "base64"); // Convert QR to Buffer
-          
-          // Define fixed spacing (e.g., every 120 points) to prevent overlap
-          if (index % 3 === 0 && index !== 0) {  
-            startX = 50;  
-            startY += 120; // Move down for new row of QR codes
-          }
-
-          doc.image(qrImage, startX, startY, { width: 100, height: 100 });
-          startX += 150; // Move right for the next QR code
-        }
-      });
-
-    } else {
-      doc.fontSize(12).text("No lost items found.");
-    }
-
-  } catch (error) {
-    console.error("❌ Error generating PDF:", error);
-    res.status(500).send("Failed to generate PDF.");
-  } finally {
-    doc.end(); // ✅ Always ends the document, ensuring no hanging streams
-  }
-});
 
     // 📝 Fetch and Format Found Items (Only SHS)
     const foundItemsSnapshot = await getDocs(
@@ -1072,7 +1028,7 @@ app.post("/api/generate-pdf", async (req, res) => {
         ];
       });
 
-      // ✅ Use `table` method correctly
+      // ✅ Add table
       await doc.table(
         {
           title: "Found Items",
@@ -1087,23 +1043,52 @@ app.post("/api/generate-pdf", async (req, res) => {
           ],
           rows: foundItems,
         },
-        {
-          width: 500,
-        }
+        { width: 500 }
       );
-
       doc.moveDown(1);
     }
 
-    // Finalize the PDF
-    doc.end();
+    // 📝 Add Lost Items Table
+    if (items.length > 0) {
+      doc.fontSize(14).text("LOST ITEMS", { underline: true });
+      doc.moveDown(0.5);
+
+      items.forEach((item) => {
+        doc.fontSize(12).text(`Item ID: ${item.id}`);
+        doc.moveDown(0.5);
+      });
+
+      doc.moveDown(3); // Space before QR codes
+
+      // 📌 Display QR Codes Below the Table in a Grid (3 per row)
+      let startX = 50;
+      let startY = doc.y;
+      const qrSize = 100;
+
+      items.forEach((item, index) => {
+        if (item.qrCode) {
+          const qrImage = Buffer.from(item.qrCode.split(",")[1], "base64");
+          doc.image(qrImage, startX, startY, { width: qrSize, height: qrSize });
+          
+          startX += 150; // Move right for next QR
+          
+          // If third QR, reset X and move down for new row
+          if ((index + 1) % 3 === 0) {
+            startX = 50;
+            startY += qrSize + 20; // Adjust spacing
+          }
+        }
+      });
+    } else {
+      doc.fontSize(12).text("No lost items found.");
+    }
   } catch (error) {
     console.error("❌ Error generating PDF:", error);
-
-    // Send an error response only if headers haven't been sent yet
     if (!res.headersSent) {
       res.status(500).json({ error: "Internal Server Error" });
     }
+  } finally {
+    doc.end(); // ✅ Ensures PDF stream is finalized
   }
 });
 
