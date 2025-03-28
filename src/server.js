@@ -1006,27 +1006,27 @@ app.post("/api/generate-pdf", async (req, res) => {
     doc.fontSize(18).text("UST-SHS Lost and Found Report", { align: "center", underline: true });
     doc.moveDown(1.5);
 
-    // 📝 Add Lost Items Table with QR Codes
+    // 📝 Add Lost Items Table
     if (items.length > 0) {
       doc.fontSize(14).text("LOST ITEMS", { underline: true });
       doc.moveDown(0.5);
 
-      for (const item of items) {
-        const startX = 50; // Left padding for text
-        const qrX = 400; // Position QR on the right
-        const qrSize = 80; // QR code size
+      items.forEach((item) => {
+        doc.fontSize(12).text(`Item ID: ${item.id}`);
+        doc.moveDown(0.5);
+      });
 
-        // Item details
-        doc.fontSize(12).text(`Item ID: ${item.id}`, startX);
-        doc.moveDown(0.2);
+      doc.moveDown(3); // Space before QR codes
 
+      // 📌 Add QR Codes Below the Table
+      items.forEach((item) => {
         if (item.qrCode) {
           const qrImage = Buffer.from(item.qrCode.split(",")[1], "base64"); // Convert QR to Buffer
-          doc.image(qrImage, qrX, doc.y, { width: qrSize, height: qrSize });
+          doc.image(qrImage, { width: 100, height: 100, align: "center" });
+          doc.moveDown(3); // Enough space to prevent overlap
         }
+      });
 
-        doc.moveDown(1);
-      }
     } else {
       doc.fontSize(12).text("No lost items found.");
     }
@@ -1037,7 +1037,6 @@ app.post("/api/generate-pdf", async (req, res) => {
     res.status(500).send("Failed to generate PDF.");
   }
 });
-
 
     // 📝 Fetch and Format Found Items (Only SHS)
     const foundItemsSnapshot = await getDocs(
